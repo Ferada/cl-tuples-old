@@ -47,10 +47,10 @@
 
 (defmacro def-with-tuple* (type-name)
   "Create a macro that can be used to bind members of the tuples array to symbols to symbols e-g (with-vector* thing-vec (x y z w)  &body forms)"
-  `(defmacro ,(make-adorned-symbol type-name :prefix "WITH" :asterisk)  (tuple-array element-syms &body forms)
+  `(defmacro ,(make-adorned-symbol type-name :prefix "WITH" :asterisk t)  (tuple-array element-syms &body forms)
      `(multiple-value-bind
             ,element-syms
-          (,type-name ,tuple)
+          (,',type-name ,tuple-array)
         (progn ,@forms))))
 
 (defmacro def-with-tuple-array (type-name)

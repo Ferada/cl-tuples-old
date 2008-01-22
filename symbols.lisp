@@ -2,14 +2,13 @@
 
 (in-package :cl-tuples)
 
-
 ;; package used to hold tuple type info
 (defpackage :tuple-types)
 
 ;; make #{ .. } notation become a short hand for (values ...)
 (defun |#{-reader| (stream char arg)
   (declare (ignore char arg))
-  `(values ,@(read-delimited-list \}|# stream t)))
+  `(values ,@(read-delimited-list #\} stream t)))
 
 (set-dispatch-macro-character #\# #\{ #'|#{-reader|)
 (set-macro-character #\} (get-macro-character #\) nil))

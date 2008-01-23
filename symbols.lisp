@@ -13,6 +13,19 @@
 (set-dispatch-macro-character #\# #\{ #'|#{-reader|)
 (set-macro-character #\} (get-macro-character #\) nil))
 
+(defmacro with-gensyms ((&rest names) &body body)
+  "Classic macro for creating named unique symbols."
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+
+(defmacro once-only ((&rest names) &body body)
+  "Evaluate arguments once only in macro form body"
+  (let ((gensyms (loop for n in names collect (gensym))))
+    `(let (,@(loop for g in gensyms collect `(,g (gensym))))
+       `(let (,,@(loop for g in gensyms for n in names collect ``(,,g ,,n)))
+          ,(let (,@(loop for n in names for g in gensyms collect `(,n ,g)))
+             ,@body)))))
+
 ;; define helper functions we will use
 
 (defun gensym-list (n)

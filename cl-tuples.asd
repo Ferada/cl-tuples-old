@@ -17,8 +17,4 @@
                (:file "matrix")
                (:file "colour")))
 
-(defun vaporise-wip ()
-          (let ((package-to-vaporise *package*))
-            (in-package :cl-user)
-            (delete-package package-to-vaporise)))
                   

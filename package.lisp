@@ -4,6 +4,7 @@
 (defpackage :cl-tuples
   (:use :cl)
   (:export def-tuple-type
+           def-tuple-op
 
            vector2d
            new-vector2d
@@ -59,6 +60,8 @@
            map-vertex3d-tuples
            reduce-vertex3d-tuple
            vertex3d->vector3d
+           vertex3d-distance
+           delta-vector3d 
 
            matrix33
            new-matrix33

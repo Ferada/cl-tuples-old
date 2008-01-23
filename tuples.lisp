@@ -45,6 +45,7 @@
           ,tuple
         (progn ,@forms))))
 
+
 (defmacro def-with-tuple* (type-name)
   "Create a macro that can be used to bind members of the tuples array to symbols to symbols e-g (with-vector* thing-vec (x y z w)  &body forms)"
   `(defmacro ,(make-adorned-symbol type-name :prefix "WITH" :asterisk t)  (tuple-array element-syms &body forms)
@@ -123,6 +124,7 @@
   "Create a function that will return the size of the given tuple array (in tuples rather than tuple elements)"
   `(defun ,(make-adorned-symbol type-name :suffix "ARRAY-DIMENSIONS") (tuple-array)
      (/ (car  (array-dimensions tuple-array)) ,(tuple-size type-name))))
+
 
 (defmacro def-tuple-setf (type-name)
   "Create generalised variable macros for tuple of type-name with the given elements"

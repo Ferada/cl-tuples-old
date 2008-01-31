@@ -11,49 +11,50 @@
 
 ;; need conjugate, angle-axis conversion, slerp
 
-(defmacro quaterion-conjugate (q)
-  `(with-quaternion ,q
-       (x y z a)
-     (values (-x ) (- y) (- z) a)))
+(def-tuple-op quaternion-conjugate 
+  ((q quaternion (x y z w)))
+  (quaternion-tuple (- x) (- y) (- z) w))
 
-(defmacro quaternion-dot (q0 q1)
-  `(with-quaternion ,q0
-       (x0 y0 z0 a0)
-     (with-quaternion ,q1
-         (x1 y1 z1 a1)
-       (+
-        (- (* a0 a1) (* x0 x1) (* y0 y1) (* z0 z1))
-        (+ (* a0 x1) (* x0 a1) (* y0 z1) (- (* z0 y1)))
-        (+ (* a0 y1) (- (* x0 z1)) (* y0 a1) (* z0 x1))
-        (+ (* a0 z1) (* x0 y1) (- (* y0 x1)) (* z0 a1))))))
 
-(defmacro quaternion-mag-square (q)
-  `(reduce-quaternion-values 
-    #'+
-    (map-quaternion-values #'* ,q ,q)))
+(def-tuple-op quaternion-dot 
+    ((quaternion-lhs quaternion (x0 y0 z0 w0)) 
+     (quaternion-rhs quaternion (x1 y1 z1 w1)))
+    "Dot product of two quaternions."
+     (reduce-quaternion-tuple 
+       #'+ (map-quaternion-tuples #'* 
+                                 (quaternion-tuple x0 y0 z0 w0) 
+                                 (quaternion-tuple x1 y1 z1 w1))))
 
-(defmacro quaternion-mag (q)
-  `(sqrt (quaternion-mag-square ,q)))
+(def-tuple-op quaternion-inverse 
+  ((q quarternion (x y z w)))
+    "Inverse of quaternion"
+   (let ((dot-recip 
+          (/ 1.0 (quaternion-dot 
+                  (quaternion-tuple x y z w) 
+                  (quaternion-tuple)))))    
+     (map-quaternion-tuples
+         #'(lambda (t) (* t dot-recip))
+         (quaternion-conjugate (quaternion-tuple x y z w)))))
 
-(defmacro quaternion-normal (q)
-  (let ((mag-square (gensym)))
-    `(with-quaternion ,q
-         (x y z w) 
-       (let ((,mag-square (quaternion-mag-sqare (values x y z w))))
-         (map-quaternion-values #'(lambda (x)
-                                    (/ x ,mag-square)) / (values x y z w))))))
+(def-tuple-op quaternion-product
+    ((q-lhs quaternion (x y z w))
+     (q-rhs quaternion (x1 y1 z1 w1)))
+  "Multiple of two quaternions"
+  (quaternion-tuple (- (* w w1) (* x x1) (* y y1) (* z z1))
+                    (+ (* x w1) (* w x1) (- (* z y1)) (* y z1))
+                    (+ (* y w1) (* z x1) (* w y1) (- (* x z1)))
+                    (+ (* z w1) (- (* y x1)) (* x y1) (* w z1))))
 
-(defmacro quaternion-matrix33 (q)
-  "Convert a quaternion to a 3x3 rotation matrix."
-  `(with-quaterion ,q
-     (x y z w)
+(def-tuple-op quaterntion-maxtrix33 
+  ((q quaternion (x y z w)))
+   "Convert a quaternion to a 3x3 rotation matrix."
      (matrix33-tuple
       (- 1 (* 2 y y) (* 2 z z))   (- (* 2 x y) (* 2 w z))   (+ (* 2 x z) (* 2 w y))
       (+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w x))
-      (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y)))))
+      (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y))))
      
 
-(defmacro angle-axis->quaternion (aa)
+(defmacro angle-axis-quaternion (aa)
   "Convert an angle-axis tuple to a quaternion"
   (with-gensyms (cosa sina)
   `(with-angle-axis ,aa
@@ -63,3 +64,15 @@
        (quaternion-tuple (* x ,sina) (* y ,sina) (* z ,sina) (* w, cosa))))))
                 
     
+(def-tuple-op quaternion-transform-vector3d
+    ((vector vector3d (vx vy vz vw))
+     (quat quaterinon (qx qy qx qw)))
+  "Transform a 3d vector with a quaternion"
+  (with-quaternion 
+      (quaternion-product
+       (quaternion-product
+        (quaternion-tuple qx qy qz qw)
+        (quaternion-tuple vx vy vz 0.0))
+       (quaternion-conjugate (quaternion-tuple qx qy qz qw)))
+      (rx ry rz rw)
+    (vector3d-tuples rx ry rz)))

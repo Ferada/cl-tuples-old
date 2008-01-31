@@ -36,12 +36,12 @@
        (x y)
        (values (/ x length) (/ y length)))))
 
-(defmacro vector2d->vertex2d (vector2d)
+(defmacro vector2d-vertex2d (vector2d)
   `(with-vector2d ,vector2d
      (x y)
      (values x y 1)))
 
-(defmacro vertex2d->vector2d (vertex2d)
+(defmacro vertex2d-vector2d (vertex2d)
   `(with-vertex2d ,vertex2d
      (x y w)
      (values x y)))
@@ -80,12 +80,12 @@
        (x y z)
        (values (/ x length) (/ y length) (/ z length)))))
 
-(defmacro vector3d->vertex3d (vector3d)
+(defmacro vector3d-vertex3d (vector3d)
   `(with-vector3d ,vector3d 
      (x y z)
     (values x y w 1)))
 
-(defmacro vertex3d->vector3d (vertex3d)
+(defmacro vertex3d-vector3d (vertex3d)
   `(with-vertex3d ,vertex3d
      (x y z w)
      (values x y z)))

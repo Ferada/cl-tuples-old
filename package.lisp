@@ -9,6 +9,7 @@
            vector2d
            new-vector2d
            make-vector2d
+           make-vector2d*
            make-vector2d-array
            vector2d-aref
            with-vector2d
@@ -20,7 +21,7 @@
            vector2d-mag-square
            vector2d-length
            vector2d-normal
-           vector2d->vertex2d
+           vector2d-vertex2d
 
            vertex2d
            new-vertex2d
@@ -31,11 +32,12 @@
            with-vertex2d-array
            map-vertex2d-tuples
            reduce-vertex2d-tuple
-           vertex2d->vector2d
+           vertex2d-vector2d
 
            vector3d
            new-vector3d
            make-vector3d
+           make-vector3d*
            make-vector3d-array
            vector3d-aref
            with-vector3d
@@ -48,24 +50,26 @@
            vector3d-length
            vector3d-normal
            vector3d-cross
-           vector3d->vertex3d
+           vector3d-vertex3d
 
            vertex3d
            new-vertex3d
            make-vertex3d
+           make-vertex3d*
            make-vertex3d-array
            vertex3d-aref
            with-vertex3d
            with-vertex3d-array
            map-vertex3d-tuples
            reduce-vertex3d-tuple
-           vertex3d->vector3d
+           vertex3d-vector3d
            vertex3d-distance
            delta-vector3d 
 
            matrix33
            new-matrix33
            make-matrix33
+           make-matrix33*
            make-matrix33-array
            matrix33-aref
            with-matrix33
@@ -76,6 +80,7 @@
            matrix44
            new-matrix44
            make-matrix44
+           make-matrix44*
            make-matrix44-array
            matrix44-aref
            with-matrix44
@@ -93,6 +98,7 @@
            quaternion
            new-quaternion
            make-quaternion
+           make-quaternion*
            make-quaternion-array
            quaternion-aref
            with-quaternion
@@ -103,6 +109,7 @@
            angle-axis
            new-angle-axis
            make-angle-axis
+           make-angle-axis*
            make-angle-axis-array
            angle-axis-aref
            with-angle-axis
@@ -114,10 +121,16 @@
            quaternion-dot
            quaternion-mag-square
            quaternion-mag
+           quaternion-inverse
+           qauternion-product
+           quaternion-matrix33
+           angle-axis-quaternion
+           quaternion-transform-vector3d
 
            colour
            new-colour
            make-colour
+           make-colour*
            make-colour-array
            make-colour-aref
            with-colour

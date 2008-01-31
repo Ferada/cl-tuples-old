@@ -103,10 +103,27 @@
   "Create a function to create an array suitable for holding an individual tuple."
     `(defmacro ,(make-prefixed-symbol type-name "NEW") ()
        `(make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
-  
+
 (defmacro def-tuple-maker (type-name)
+    `(defmacro ,(make-adorned-symbol type-name :prefix "MAKE") (tuple)
+       (let ((varlist (gensym-list ,(tuple-size type-name)))
+             (tuple-sym (gensym))
+             (counter-sym 0))
+             `(let  ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
+                (multiple-value-bind 
+                      ,varlist
+                    ,tuple
+                  (progn ,@(mapcar #'(lambda (x)
+                                       (prog1
+                                            `(setf (aref ,tuple-sym ,counter-sym) ,x)
+                                          (incf counter-sym)))
+                                    varlist)
+                         ,tuple-sym))))))
+
+
+(defmacro def-tuple-maker* (type-name)
   "Create a function to create an array suitable for holding an individual tuple, and set its initial values"
-    `(defmacro ,(make-prefixed-symbol type-name "MAKE") (&rest elements)
+    `(defmacro ,(make-adorned-symbol type-name :prefix "MAKE" :asterisk t) (&rest elements)
        (let ((tuple-sym (gensym)))
          `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
             (,',(make-suffixed-symbol type-name "SETTER") ,tuple-sym ,@elements)
@@ -221,12 +238,14 @@ of fn"
      (def-tuple-array-setter  ,type-name)
      (def-tuple-creator ,type-name)
      (def-tuple-maker ,type-name)
+     (def-tuple-maker* ,type-name)
      (def-tuple-array-maker ,type-name)
      (def-tuple-setf  ,type-name)
      (def-tuple-array-setf  ,type-name)
      (def-tuple-map ,type-name)
      (def-tuple-reduce ,type-name)))
 
+;; possibly we also need a deftype form to describe a tuple array?
 
 (defmacro def-tuple-type (tuple-type-name &key tuple-element-type elements)
   "Create a tuple type. To be used from the top level. 
@@ -237,15 +256,19 @@ of fn"
      (export-tuple ,tuple-type-name)))
 
 
-
-(defmacro def-tuple-op (name  args &body forms)
+;; this needs some way of having the names as meaningful symbols
+;; also a way of specifying type of return value and non-tuple parameters
+(defmacro def-tuple-op (name args &body forms)
   "Macro to define a tuple operator. The name of the operator is name. The operator arguments are determined by args, 
    which is a list of the form ((argument-name argument-type (elements) ..)). Within the forms 
    the tuple value form is bound to the argument-name and the tuple elements are bound to the symbols in the element list"
   (let ((arg-names (mapcar #'car args))
         (arg-typenames (mapcar #'cadr  args))
         (arg-elements (mapcar #'caddr args)))             
-    `(defmacro ,name ,arg-names 
-         ,(arg-expander-fn arg-names arg-typenames arg-elements forms))))
+    `(progn
+       (defmacro ,name ,arg-names 
+         ,(arg-expander-fn arg-names arg-typenames arg-elements forms))
+       ,(when (stringp (first forms))
+         `(setf (documentation ',name 'function) ,(first forms))))))
 
 

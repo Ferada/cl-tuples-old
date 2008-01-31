@@ -45,7 +45,7 @@
                     (+ (* y w1) (* z x1) (* w y1) (- (* x z1)))
                     (+ (* z w1) (- (* y x1)) (* x y1) (* w z1))))
 
-(def-tuple-op quaterntion-maxtrix33 
+(def-tuple-op quaternion-maxtrix33 
   ((q quaternion (x y z w)))
    "Convert a quaternion to a 3x3 rotation matrix."
      (matrix33-tuple
@@ -61,12 +61,12 @@
        (x y z a)
      (let ((,cosa (cos (/ a 2)))
            (,sina (sin (/ a 2))))
-       (quaternion-tuple (* x ,sina) (* y ,sina) (* z ,sina) (* w, cosa))))))
+       (quaternion-tuple (* x ,sina) (* y ,sina) (* z ,sina) (* a ,cosa))))))
                 
     
 (def-tuple-op quaternion-transform-vector3d
     ((vector vector3d (vx vy vz vw))
-     (quat quaterinon (qx qy qx qw)))
+     (quat quaternion (qx qy qz qw)))
   "Transform a 3d vector with a quaternion"
   (with-quaternion 
       (quaternion-product

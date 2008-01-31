@@ -7,6 +7,7 @@
            def-tuple-op
 
            vector2d
+           vector2d-tuple
            new-vector2d
            make-vector2d
            make-vector2d*
@@ -24,6 +25,7 @@
            vector2d-vertex2d
 
            vertex2d
+           vertex2d-tuple
            new-vertex2d
            make-vertex2d
            make-vertex2d-array
@@ -35,6 +37,7 @@
            vertex2d-vector2d
 
            vector3d
+           vector3d-tuple
            new-vector3d
            make-vector3d
            make-vector3d*
@@ -53,6 +56,7 @@
            vector3d-vertex3d
 
            vertex3d
+           vertex3d-tuple
            new-vertex3d
            make-vertex3d
            make-vertex3d*
@@ -67,6 +71,7 @@
            delta-vector3d 
 
            matrix33
+           matrix33-tuple
            new-matrix33
            make-matrix33
            make-matrix33*
@@ -78,6 +83,7 @@
            reduce-matrix33-tuple
 
            matrix44
+           matrix44-tuple
            new-matrix44
            make-matrix44
            make-matrix44*
@@ -96,6 +102,7 @@
            matrix44-product
 
            quaternion
+           quaternion-tuple
            new-quaternion
            make-quaternion
            make-quaternion*
@@ -107,6 +114,7 @@
            reduce-quaternion-tuple
 
            angle-axis
+           angle-axis-tuple
            new-angle-axis
            make-angle-axis
            make-angle-axis*
@@ -122,12 +130,13 @@
            quaternion-mag-square
            quaternion-mag
            quaternion-inverse
-           qauternion-product
+           quaternion-product
            quaternion-matrix33
            angle-axis-quaternion
            quaternion-transform-vector3d
 
            colour
+           colour-tuple
            new-colour
            make-colour
            make-colour*

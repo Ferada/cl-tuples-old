@@ -115,17 +115,49 @@ is stored in the property list of the symbol."
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
 
+(defun symbol-macro-expander-fn (n names elements gensyms body)
+  "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent
+   name capture."
+  (if (nth n elements)
+    ``(symbol-macrolet 
+          ,',(loop 
+                for gensym in (nth n gensyms) 
+                for element in (nth n elements) collect `(,element ,gensym))
+          (declare (ignorable ,@',(nth n gensyms)))
+        ,,(if (< (1+ n) (length names))
+              (symbol-macro-expander-fn (1+ n) names elements gensyms body)
+              ``(progn ,@',body)))
+    (if (< (1+ n) (length names))
+        (symbol-macro-expander-fn (1+ n) names elements gensyms body)
+        ``(progn ,@',body))))
+                                      
+
+(defun arg-expander-fn-aux (n names types elements gensyms body)
+  (if (nth n types)
+      ``(,',(make-adorned-symbol (nth n types) :prefix "WITH")
+          ,,(nth n  names) ,',(nth n  gensyms)
+          ,,(if (< (1+ n) (length names))
+                (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+                (symbol-macro-expander-fn 0 names elements gensyms body)))
+      ``(symbol-macrolet ((,',(nth n names) ,,(nth n names)))
+          ,,(if (< (1+ n) (length names))
+                (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+                (symbol-macro-expander-fn 0 names elements gensyms body)))))
+
+
 (defun arg-expander-fn (names types elements forms)
   "Helper function for def-tuple-op. Expands the arguments into a series of WITH-* forms so that
    symbols are bound to tuple elements in the body of the operator."
+  (assert (= (length names) (length types) (length elements)) ()
+          "Malformed def-tuple-op argument list.")
   (let ((body (if (stringp (first forms)) (rest forms) forms)))
     (if (car types)
-        ``(,',(make-adorned-symbol (car types) :prefix "WITH")
-              ,,(car  names) ,',(car elements) 
-              ,,(if (cdr names)
-                    (arg-expander-fn (cdr names) (cdr types) (cdr elements) body)
-                    ``(progn ,@',body)))
-          ``(symbol-macrolet ((,',(car names) ,,(car names)))
-              ,,(if (cdr names)
-                    (arg-expander-fn (cdr names) (cdr types) (cdr elements) body)
-                    ``(progn ,@',@body))))))
+        (let ((gensyms 
+               (mapcar #'(lambda (element-list) 
+                           (gensym-list (length element-list))) elements)))
+          (arg-expander-fn-aux 0 names types elements gensyms body)))))
+
+; tester
+;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
+
+

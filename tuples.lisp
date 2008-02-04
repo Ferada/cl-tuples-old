@@ -5,9 +5,8 @@
 (defmacro def-tuple (type-name)
   "Create an macro such as (vector3d-tuple x y z) that takes element forms  and them into multiple values."
   `(defmacro ,(make-suffixed-symbol type-name "TUPLE") (&rest values-form)
-     `(values
-       ,@values-form)))
-
+     `(the (values ,@',(loop for i from 0 below (tuple-size type-name) collect (tuple-element-type type-name))) 
+        (values  ,@values-form))))
 
 (defmacro def-tuple-getter (type-name)
   "Create an access macro such as (vector3d vec) that takes an instance of an array and unpacks it to tuples (aka multiple values)"
@@ -20,7 +19,7 @@
 
 
 (defmacro def-tuple-array-getter (type-name)
-  "Create a tuple aref macro for packing multiple values into  a tuple struct. eg (vector! up #{ 0.0 1.0 0.0 })"
+  "Create a tuple aref macro for unpacking individual tuple from an array of tuples. eg (vector3d-aref up 5) => (values 0.0 1.0 0.0)"
   `(defmacro ,(make-suffixed-symbol type-name "AREF") (target-sym array-index)
      (let* ((varlist (gensym-list ,(tuple-size type-name)))
             (array-index-sym (gensym))
@@ -36,6 +35,14 @@
                                  `(incf ,counter-sym)))
                             varlist))))))
 
+(defmacro document-tuple-type (type-name)  
+  `(progn
+     (setf (documentation ',(make-suffixed-symbol type-name "TUPLE") 'function) "Convert forms to tuple values.")
+     (setf (documentation ',type-name 'function) "Unpack array  and convert to tuple values.")
+     (setf (documentation ','(make-suffixed-symbol type-name "AREF") 'function) "Unpack individual tuple from an array of tuples.")           
+     (setf (documentation ','(make-adorned-symbol type-name :prefix "WITH") 'function) "Bind members of the tuple values to symbols.")))
+
+(document-tuple-type vertex3d)
 
 (defmacro def-with-tuple (type-name)
   "Create a macro that can be used to bind members of the tuples  values to symbols to symbols e-g (with-vector thing-vec (x y z w)  &body forms)"
@@ -43,6 +50,7 @@
      `(multiple-value-bind
             ,element-syms
           ,tuple
+        (declare (ignorable ,@element-syms))
         (progn ,@forms))))
 
 
@@ -52,12 +60,12 @@
      `(multiple-value-bind
             ,element-syms
           (,',type-name ,tuple-array)
+        (declare (ignorable ,@element-syms))
         (progn ,@forms))))
 
+;; to do -- not sure we need this one -- possibly for mapping over arrays?
 (defmacro def-with-tuple-array (type-name)
-  "Create a macro that can be used to bind members of the tuples
-   array to symbols to symbols e-g (with-vector thing-vec (x y z w)
-   &body forms)"
+  "Create a macro that can be used to bind elements of an array of tuples to symbols to symbols e-g (with-vector3d-array thing-vec (x y z w) 5 (+ x y z w))"
   `(defmacro ,(make-adorned-symbol type-name :prefix "WITH" :suffix "ARRAY")  (tuple element-syms &optional index &body forms)
      `(symbol-macrolet
           ,(loop
@@ -68,7 +76,7 @@
           ,@forms))))
 
 (defmacro def-tuple-setter (type-name)
-  "Creates a tuple-setter for setting values in a struct  a tuple struct. eg (vector3d-setter up #{ 0.0 1.0 0.0 })"
+  "Creates a tuple-setter for setting a tuple array from a mutiple-value tuple. eg (vector3d-setter up #{ 0.0 1.0 0.0 })"
   `(defmacro ,(make-suffixed-symbol type-name "SETTER") (target-sym tuple-values)
      (let* ((varlist (gensym-list ,(tuple-size type-name))))
        `(multiple-value-bind
@@ -81,7 +89,7 @@
                 `(setf (aref ,target-sym ,index) ,(nth index varlist))))))))
 
 (defmacro def-tuple-array-setter (type-name)
-  "Create an aref-setter macro for packing multiple values into  a tuple struct. eg (vector3d-aref-setter up 2 #{ 0.0 1.0 0.0 })"
+  "Create an aref-setter macro for setting an element in an array of tuples  from a multiple-value tuple. eg (vector3d-aref-setter up 2 #{ 0.0 1.0 0.0 })"
   `(defmacro ,(make-suffixed-symbol type-name "AREF-SETTER") (target-sym array-index tuple)
      (let* ((varlist (gensym-list ,(tuple-size type-name)))
             (array-index-sym (gensym))
@@ -100,11 +108,12 @@
                               varlist)))))))
 
 (defmacro def-tuple-creator (type-name)
-  "Create a function to create an array suitable for holding an individual tuple."
+  "Create a function to create an array suitable for holding an individual tuple. eg (new-vector3d)"
     `(defmacro ,(make-prefixed-symbol type-name "NEW") ()
        `(make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
 
 (defmacro def-tuple-maker (type-name)
+  "Create a function to create an array suitable for holding an individual tuple, and initialise elements from multiple-value tuple. eg (make-vector3d #{ 1.0 2.0 2.0 })"
     `(defmacro ,(make-adorned-symbol type-name :prefix "MAKE") (tuple)
        (let ((varlist (gensym-list ,(tuple-size type-name)))
              (tuple-sym (gensym))
@@ -122,7 +131,7 @@
 
 
 (defmacro def-tuple-maker* (type-name)
-  "Create a function to create an array suitable for holding an individual tuple, and set its initial values"
+  "Create a function to create an array suitable for holding an individual tuple, and initialise elements from array tuple. eg (make-vector3d* #( 1.0 2.0 2.0 ))"
     `(defmacro ,(make-adorned-symbol type-name :prefix "MAKE" :asterisk t) (&rest elements)
        (let ((tuple-sym (gensym)))
          `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
@@ -130,7 +139,7 @@
             ,tuple-sym))))
 
 (defmacro def-tuple-array-maker (type-name)
-  "Create a function to create an array suitable for holding an number of individual tuples."
+  "Create a function to create an array suitable for holding an number of individual tuples. ie an array of array tuples. eg (make-vector3d-array 5 :adjustable t)"
   `(defun ,(make-adorned-symbol  type-name :prefix "MAKE" :suffix "ARRAY") (dimensions &key adjustable fill-pointer)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
@@ -138,13 +147,13 @@
                  :element-type ',(tuple-element-type type-name))))
 
 (defmacro def-tuple-array-dimensions (type-name)
-  "Create a function that will return the size of the given tuple array (in tuples rather than tuple elements)"
+  "Create a function that will return the number of tuples in the array of array tuples."
   `(defun ,(make-adorned-symbol type-name :suffix "ARRAY-DIMENSIONS") (tuple-array)
      (/ (car  (array-dimensions tuple-array)) ,(tuple-size type-name))))
 
 
 (defmacro def-tuple-setf (type-name)
-  "Create generalised variable macros for tuple of type-name with the given elements"
+  "Create generalised variable macros for tuple of type-name with the given elements."
   `(defsetf ,type-name ,(make-suffixed-symbol type-name "SETTER")))
 
 (defmacro def-tuple-array-setf (type-name)
@@ -253,15 +262,17 @@ of fn"
   `(eval-when (:compile-toplevel :execute :load-toplevel)
      (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',elements)
      (make-tuple-operations ,tuple-type-name)
-     (export-tuple ,tuple-type-name)))
+     (document-tuple-type ,tuple-type-name)))
 
 
 ;; this needs some way of having the names as meaningful symbols
 ;; also a way of specifying type of return value and non-tuple parameters
 (defmacro def-tuple-op (name args &body forms)
-  "Macro to define a tuple operator. The name of the operator is name. The operator arguments are determined by args, 
-   which is a list of the form ((argument-name argument-type (elements) ..)). Within the forms 
-   the tuple value form is bound to the argument-name and the tuple elements are bound to the symbols in the element list"
+  "Macro to define a tuple operator. The name of the operator is
+   name. The operator arguments are determined by args, which is a
+   list of the form ((argument-name argument-type (elements)   ..)). 
+   Within the forms the tuple value form is bound to the argument-name 
+   and the tuple elements are bound to the symbols in the element list"
   (let ((arg-names (mapcar #'car args))
         (arg-typenames (mapcar #'cadr  args))
         (arg-elements (mapcar #'caddr args)))             

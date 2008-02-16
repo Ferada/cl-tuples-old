@@ -99,7 +99,7 @@
         (w (gensym)))  
     `(with-vertex3d ,vertex3d
          (,x ,y ,z ,w)
-       (values x y z))))
+       (values ,x ,y ,z))))
   
 
 (defmacro vector3d-cross (vector3d-lhs vector3d-rhs)

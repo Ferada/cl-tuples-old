@@ -1,0 +1,25 @@
+* cl-tuples
+** TODO Array reference should maybe be via (tuple-aref type index) => (values elements...), rather than baking types into names?
+** TODO def-tuple-op needs to specify non tuple argument types and return types
+** TODO many of the exisiting macros could be rewritten in terms of def-tuple-op
+** TODO unit tests
+** TODO maybe refactor into *-tuple-place an *-tuple fns
+** TODO with-tuple-* to (with-tuple (vector3d thing (elements))) ?
+
+* blockworld
+** TODO platonic solids
+** TODO cursor 3d
+** TODO shader compiler
+** DONE normal calculations
+** TODO strip index arrays ogl can't handle
+** TODO draw mesh
+** TODO load images
+** TODO wrap libnoise
+** TODO bounding boxes
+** TODO loose octreees
+** TODO simple modelling
+** TODO interactive model loading and placement
+
+* thesis
+** TODO Discuss optimisation of lisp code
+** TODO Discuss rationale of mesh compiler

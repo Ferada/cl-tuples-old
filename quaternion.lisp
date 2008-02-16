@@ -59,8 +59,8 @@
   (with-gensyms (cosa sina)
   `(with-angle-axis ,aa
        (x y z a)
-     (let ((,cosa (cos (/ a 2)))
-           (,sina (sin (/ a 2))))
+     (let ((,cosa (cos (/ a 2.0)))
+           (,sina (sin (/ a 2.0))))
        (quaternion-tuple (* x ,sina) (* y ,sina) (* z ,sina) (* a ,cosa))))))
                 
     
@@ -75,4 +75,4 @@
         (quaternion-tuple vx vy vz 0.0))
        (quaternion-conjugate (quaternion-tuple qx qy qz qw)))
       (rx ry rz rw)
-    (vector3d-tuples rx ry rz)))
+    (vector3d-tuple rx ry rz)))

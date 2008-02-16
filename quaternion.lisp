@@ -37,15 +37,15 @@
          (quaternion-conjugate (quaternion-tuple x y z w)))))
 
 (def-tuple-op quaternion-product
-    ((q-lhs quaternion (x y z w))
-     (q-rhs quaternion (x1 y1 z1 w1)))
+    ((q-lhs quaternion (x1 y1 z1 w1))
+     (q-rhs quaternion (x2 y2 z2 w2)))
   "Multiple of two quaternions"
-  (quaternion-tuple (- (* w w1) (* x x1) (* y y1) (* z z1))
-                    (+ (* x w1) (* w x1) (- (* z y1)) (* y z1))
-                    (+ (* y w1) (* z x1) (* w y1) (- (* x z1)))
-                    (+ (* z w1) (- (* y x1)) (* x y1) (* w z1))))
+  (quaternion-tuple (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
+                    (- (+ (* w1 y2) (* y1 w2) (* z1 x2)) (* x1 z2))
+                    (- (+ (* w1 z2) (* x1 y2) (* z1 w2)) (* y1 x2))
+                    (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2))))
 
-(def-tuple-op quaternion-maxtrix33 
+(def-tuple-op quaternion-matrix33 
   ((q quaternion (x y z w)))
    "Convert a quaternion to a 3x3 rotation matrix."
      (matrix33-tuple

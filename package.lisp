@@ -8,6 +8,7 @@
 
            vector2d
            vector2d-tuple
+           vector2d-array-dimensions
            new-vector2d
            make-vector2d
            make-vector2d*
@@ -26,6 +27,7 @@
 
            vertex2d
            vertex2d-tuple
+           vertex2d-array-dimensions
            new-vertex2d
            make-vertex2d
            make-vertex2d-array
@@ -38,6 +40,7 @@
 
            vector3d
            vector3d-tuple
+           vector3d-array-dimensions
            new-vector3d
            make-vector3d
            make-vector3d*
@@ -57,6 +60,7 @@
 
            vertex3d
            vertex3d-tuple
+           vertex3d-array-dimensions
            new-vertex3d
            make-vertex3d
            make-vertex3d*
@@ -72,6 +76,7 @@
 
            matrix33
            matrix33-tuple
+           matrix33-array-dimensions
            new-matrix33
            make-matrix33
            make-matrix33*
@@ -84,6 +89,7 @@
 
            matrix44
            matrix44-tuple
+           matrix44-array-dimensions
            new-matrix44
            make-matrix44
            make-matrix44*
@@ -103,6 +109,7 @@
 
            quaternion
            quaternion-tuple
+           quarternion-array-dimensions
            new-quaternion
            make-quaternion
            make-quaternion*
@@ -115,6 +122,7 @@
 
            angle-axis
            angle-axis-tuple
+           angle-axis-array-dimensions
            new-angle-axis
            make-angle-axis
            make-angle-axis*
@@ -137,6 +145,7 @@
 
            colour
            colour-tuple
+           colour-array-dimensions
            new-colour
            make-colour
            make-colour*

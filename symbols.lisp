@@ -115,20 +115,24 @@ is stored in the property list of the symbol."
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
 
-(defun symbol-macro-expander-fn (n names elements gensyms body)
+(defun symbol-macro-expander-fn (n names types elements gensyms body)
   "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent
    name capture."
   (if (nth n elements)
     ``(symbol-macrolet 
           ,',(loop 
                 for gensym in (nth n gensyms) 
-                for element in (nth n elements) collect `(,element ,gensym))
-          (declare (ignorable ,@',(nth n gensyms)))
-        ,,(if (< (1+ n) (length names))
-              (symbol-macro-expander-fn (1+ n) names elements gensyms body)
-              ``(progn ,@',body)))
+                for element in (nth n elements) collect `(,element  ,gensym))
+        (declare (ignorable ,@',(nth n gensyms)))
+        (symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "TUPLE")
+                                                ,@',(loop
+                                                       for gensym in (nth n gensyms)
+                                                       collect gensym))))                         
+                         ,,(if (< (1+ n) (length names))
+                               (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
+                               ``(progn ,@',body))))
     (if (< (1+ n) (length names))
-        (symbol-macro-expander-fn (1+ n) names elements gensyms body)
+        (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
         ``(progn ,@',body))))
                                       
 
@@ -138,11 +142,11 @@ is stored in the property list of the symbol."
           ,,(nth n  names) ,',(nth n  gensyms)
           ,,(if (< (1+ n) (length names))
                 (arg-expander-fn-aux (1+ n) names types elements gensyms body)
-                (symbol-macro-expander-fn 0 names elements gensyms body)))
+                (symbol-macro-expander-fn 0 names types elements gensyms body)))
       ``(symbol-macrolet ((,',(nth n names) ,,(nth n names)))
           ,,(if (< (1+ n) (length names))
                 (arg-expander-fn-aux (1+ n) names types elements gensyms body)
-                (symbol-macro-expander-fn 0 names elements gensyms body)))))
+                (symbol-macro-expander-fn 0 names types elements gensyms body)))))
 
 
 (defun arg-expander-fn (names types elements forms)
@@ -158,6 +162,6 @@ is stored in the property list of the symbol."
           (arg-expander-fn-aux 0 names types elements gensyms body)))))
 
 ; tester
-;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
+(arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
 
 

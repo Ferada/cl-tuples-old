@@ -282,4 +282,8 @@ of fn"
        ,(when (stringp (first forms))
          `(setf (documentation ',name 'function) ,(first forms))))))
 
+(def-tuple-op vertex3d-distance
+    ((start vertex3d (ox oy oz ow))
+     (end vertex3d (ex ey ez ew)))
+  (vector3d-length (values (- ex ox) (- ey oy) (- ez oz))))
 

@@ -39,10 +39,8 @@
   `(progn
      (setf (documentation ',(make-suffixed-symbol type-name "TUPLE") 'function) "Convert forms to tuple values.")
      (setf (documentation ',type-name 'function) "Unpack array  and convert to tuple values.")
-     (setf (documentation ','(make-suffixed-symbol type-name "AREF") 'function) "Unpack individual tuple from an array of tuples.")           
-     (setf (documentation ','(make-adorned-symbol type-name :prefix "WITH") 'function) "Bind members of the tuple values to symbols.")))
-
-(document-tuple-type vertex3d)
+     (setf (documentation ',(make-suffixed-symbol type-name "AREF") 'function) "Unpack individual tuple from an array of tuples.")           
+     (setf (documentation ',(make-adorned-symbol type-name :prefix "WITH") 'function) "Bind members of the tuple values to symbols.")))
 
 (defmacro def-with-tuple (type-name)
   "Create a macro that can be used to bind members of the tuples  values to symbols to symbols e-g (with-vector thing-vec (x y z w)  &body forms)"
@@ -282,8 +280,4 @@ of fn"
        ,(when (stringp (first forms))
          `(setf (documentation ',name 'function) ,(first forms))))))
 
-(def-tuple-op vertex3d-distance
-    ((start vertex3d (ox oy oz ow))
-     (end vertex3d (ex ey ez ew)))
-  (vector3d-length (values (- ex ox) (- ey oy) (- ez oz))))
 

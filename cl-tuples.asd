@@ -11,6 +11,7 @@
   :serial t
   :components ((:file "package")
                (:file "symbols")
+               (:file "tuple-expander")
                (:file "tuples") 
                (:file "vector")
                (:file "quaternion")

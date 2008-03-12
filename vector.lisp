@@ -57,10 +57,6 @@
 (defmacro vector3d-length (vector3d)
   `(sqrt (vector3d-mag-square ,vector3d)))
 
-;; (def-tuple-op vector3d-dot
-;;   ((vector3d-lhs vector3d (x y z))
-;;    (vector3d-rhs vector3d (n o p)))
-;;   (format t "Hello"))
 
 (defmacro vector3d-dot (vector3d-lhs vector3d-rhs)
   `(reduce-vector3d-tuple 

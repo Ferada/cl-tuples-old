@@ -19,7 +19,7 @@
    product between the row and column of a matrix"
   (labels 
       ((make-matrix-element-symbol (mat row col)
-         (intern (string-upcase (format nil "e~A~A~A" mat row col)))))
+         (intern (string-upcase (format nil "e~A~A~A" mat row col)) :cl-tuples)))
   (let 
       ((col-sym-names 
          (loop for row from 0 below dimension
@@ -41,7 +41,7 @@
            ,matrix33 (e00 e01 e02
                       e10 e11 e12
                       e20 e21 e22)
-           (values
+           (vertex2d-tuple
             (+ (* x e00) (* y e01) (* w e02))
             (+ (* x e10) (* y e11) (* w e12))
             (+ (* x e20) (* y e21) (* w e22))))))
@@ -53,7 +53,7 @@
            ,matrix33 (e00 e01 e02 
                       e10 e11 e12
                       e20 e21 e22)
-           (values
+           (vector2d-tuple
             (+ (* x e00) (* y e01))
             (+ (* x e10) (* y e11))
             (+ (* x e20) (* y e21))))))
@@ -67,7 +67,7 @@
          (e100 e101 e102
           e110 e111 e112
           e120 e121 e122)
-       (values
+       (matrix33-tuple
         (matrix-dot 3 0 0)
         (matrix-dot 3 0 1)
         (matrix-dot 3 0 2)
@@ -89,7 +89,7 @@
                       e10 e11 e12 e13
                       e20 e21 e22 e23
                       e30 e31 e32 e33)
-           (values
+           (vertex3d-tuple
             (+ (* x e00) (* y e01) (* z e02) (* w e03))
             (+ (* x e10) (* y e11) (* z e02) (* w e13))
             (+ (* x e20) (* y e21) (* z e02) (* w e23))
@@ -103,7 +103,7 @@
                       e10 e11 e12 e13
                       e20 e21 e22 e23
                       e30 e31 e32 e33)
-           (values
+           (vector3d-tuple
             (+ (* x e00) (* y e01) (* z e02))
             (+ (* x e10) (* y e11) (* z e02))
             (+ (* x e20) (* y e21) (* z e02))
@@ -121,7 +121,7 @@
           e110 e111 e112 e113
           e120 e121 e122 e123
           e130 e131 e132 e133)
-       (values
+       (matrix44-tuple
         (matrix-dot 4 0 0)
         (matrix-dot 4 0 1)
         (matrix-dot 4 0 2)
@@ -143,4 +143,61 @@
         (matrix-dot 4 3 3)))))
      
 
-                
+(defun identity-matrix44 ()  
+  (matrix44-tuple
+   1.0 0.0 0.0 0.0
+   0.0 1.0 0.0 0.0
+   0.0 0.0 1.0 0.0
+   0.0 0.0 0.0 1.0))
+
+(defmacro translation-matrix44 (tx ty tz)
+    `(matrix44-tuple
+      0.0 0.0 0.0 ,tx
+      0.0 0.0 0.0 ,ty
+      0.0 0.0 0.0 ,tz
+      0.0 0.0 0.0 1.0))                
+
+(defmacro rotatex-matrix44 (a)
+  (let 
+      ((sina (gensym))
+       (nsina (gensym))
+       (cosa (gensym)))    
+    `(let 
+         ((,sina ,(sin a))
+          (,nsina ,(- (sin a)))
+          (,cosa ,(cos a)))       
+       (matrix44-tuple
+        1.0  0.0   0.0    0.0
+        0.0 ,cosa ,nsina  0.0
+        0.0 ,sina ,cosa   0.0
+        0.0  0.0  0.0     1.0))))
+
+(defmacro rotatey-matrix44 (a)
+  (let 
+      ((sina (gensym))
+       (nsina (gensym))
+       (cosa (gensym)))    
+    `(let 
+         ((,sina ,(sin a))
+          (,nsina ,(- (sin a)))
+          (,cosa ,(cos a)))       
+       (matrix44-tuple
+        ,cosa   0.0     ,sina   0.0
+        0.0     1.0     0.0     0.0
+        ,nsina  0.0    ,cosa    0.0
+        0.0     0.0     0.0     1.0))))
+
+(defmacro rotatez-matrix44 (a)
+  (let 
+      ((sina (gensym))
+       (nsina (gensym))
+       (cosa (gensym)))    
+    `(let 
+         ((,sina ,(sin a))
+          (,nsina ,(- (sin a)))
+          (,cosa ,(cos a)))       
+       (matrix44-tuple
+        ,cosa   0.0   ,nsina  0.0
+        ,sina   0.0   ,cosa   0.0
+        0.0     0.0   1.0     0.0
+        0.0     0.0   0.0     1.0))))

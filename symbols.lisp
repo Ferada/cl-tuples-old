@@ -58,7 +58,7 @@
                        (when suffix
                          (string suffix))
                        (when asterisk
-                         (string "*")))))
+                         (string "*"))) :cl-tuples))
 
 (defun make-suffixed-symbol (name suffix)
   (make-adorned-symbol name :suffix suffix))
@@ -162,6 +162,6 @@ is stored in the property list of the symbol."
           (arg-expander-fn-aux 0 names types elements gensyms body)))))
 
 ; tester
-(arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
+;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
 
 

@@ -86,7 +86,7 @@
         (z (gensym)))
     `(with-vector3d ,vector3d 
          (,x ,y ,z)
-       (values ,x ,y ,z 1))))
+       (values ,x ,y ,z 1.0))))
 
 (defmacro vertex3d-vector3d (vertex3d)
   (let ((x (gensym))

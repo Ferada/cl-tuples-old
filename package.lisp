@@ -99,6 +99,11 @@
            with-matrix44-array
            map-matrix44-tuples
            reduce-matrix44-tuple
+           identity-matrix44
+           translation-matrix44
+           rotatex-matrix44
+           rotatey-matrix44
+           rotatez-matrix44
 
            transform-vertex2d
            transform-vertex3d

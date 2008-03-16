@@ -3,6 +3,27 @@
 
 ;; to do - for each expansion, we want (make-expansion-name type-name expansion)
 
+(defmethod tuple-symbol (type-name expansion)
+  "Given the expansion, return the name of the macro/function associated with it."
+  (ccase expansion
+    (:def-tuple `(make-suffixed-symbol ,type-name "TUPLE"))
+    (:def-tuple-getter `(make-adorned-symbol  ,type-name))    
+    (:def-tuple-array-getter `(make-suffixed-symbol ,type-name "AREF"))
+    (:def-with-tuple `(make-adorned-symbol ,type-name :prefix "WITH"))
+    (:def-with-tuple* `(make-adorned-symbol ,type-name :prefix "WITH" :asterisk t))
+    (:def-with-tuple-aref `(make-adorned-symbol ,type-name :prefix "WITH" :suffix "AREF"))
+    (:def-tuple-setter `(make-suffixed-symbol ,type-name "SETTER"))
+    (:def-tuple-aref-setter `(make-suffixed-symbol ,type-name "AREF-SETTER") )
+    (:def-new-tuple `(make-prefixed-symbol ,type-name "NEW"))
+    (:def-tuple-maker `(make-adorned-symbol ,type-name :prefix "MAKE"))
+    (:def-tuple-maker* `(make-adorned-symbol ,type-name :prefix "MAKE" :asterisk t))
+    (:def-tuple-array-maker `(make-adorned-symbol  ,type-name :prefix "MAKE" :suffix "ARRAY"))
+    (:def-tuple-array-dimensions `(make-adorned-symbol ,type-name :suffix "ARRAY-DIMENSIONS"))
+    (:def-tuple-setf `(make-suffixed-symbol ,type-name "SETTER"))
+    (:def-tuple-array-setf `(make-suffixed-symbol ,type-name "AREF"))
+    (:def-tuple-map `(make-adorned-symbol ,type-name :prefix "MAP" :suffix "TUPLES"))
+    (:def-tuple-reduce `(make-adorned-symbol ,type-name :prefix "REDUCE" :suffix "TUPLE"))))
+
 (defmethod tuple-expansion-fn (type-name expansion)
   (ccase expansion
     (:def-tuple
@@ -11,11 +32,12 @@
            (values  ,@values-form))))
     (:def-tuple-getter
      `(defmacro ,type-name (tuple-array-name)
-        `(values
-          ,@(loop
-               for index from 0 below (tuple-size ',type-name)
-               collect
-               `(aref ,tuple-array-name ,index)))))
+        `(the (values ,@',(loop for i from 0 below (tuple-size type-name) collect (tuple-element-type type-name)))
+           (values
+            ,@(loop
+                 for index from 0 below (tuple-size ',type-name)
+                 collect
+                   `(aref ,tuple-array-name ,index))))))
     (:def-tuple-array-getter
      `(defmacro ,(make-suffixed-symbol type-name "AREF") (target-sym array-index)
         (let* ((varlist (gensym-list ,(tuple-size type-name)))
@@ -124,21 +146,20 @@
      `(defmacro ,(make-adorned-symbol type-name :prefix "MAP" :suffix "TUPLES")  (fn &body tuples)
         `(macrolet
              ((map-values-aux (fn n gensym-lists &body v)
-                  (if v
-                      (let* ((gensym-list-sym (gensym-list n)))
-                        `(multiple-value-bind
-                               ,gensym-list-sym
-                             ,(car v)
-                           (declare (type ,(tuple-element-type ',type-name) ,gensym-list-sym))
-                           (map-values-aux ,fn ,n (,@gensym-lists ,gensym-list-sym) ,@(cdr v))))
-                      `(values
-                        ,@(loop
-                             for index from 0 below (length (car gensym-lists))
-                             collect
-                             `(funcall ,fn
-                                       ,@(loop
-                                            for gensym-list in gensym-lists
-                                            collect (nth index gensym-list))))))))
+                (if v
+                    (let* ((gensym-list-sym (gensym-list n)))
+                      `(multiple-value-bind
+                             ,gensym-list-sym
+                           ,(car v)
+                         (map-values-aux ,fn ,n (,@gensym-lists ,gensym-list-sym) ,@(cdr v))))
+                    `(values
+                      ,@(loop
+                           for index from 0 below (length (car gensym-lists))
+                           collect
+                           `(funcall ,fn
+                                     ,@(loop
+                                          for gensym-list in gensym-lists
+                                          collect (nth index gensym-list))))))))
            (map-values-aux ,fn ,(tuple-size ',type-name)  NIL ,@tuples))))
     (:def-tuple-reduce
      `(defmacro ,(make-adorned-symbol type-name :prefix "REDUCE" :suffix "TUPLE") (fn  tuples)
@@ -159,3 +180,26 @@
                        ,v
                      (reduce-values-body ,fn ,n ,gensym-list-sym ,v)))))
            (reduce-values ,fn  ,(tuple-size ',type-name)  ,tuples))))))
+
+
+
+;; (defun map-binding-expansion-fn (type-name)
+;;   `(defmacro ,(make-adorned-symbol type-name :prefix "MAP" :suffix "TUPLES") (fn-sym &body value-lists)
+;;      (let* ((n ,(tuple-size type-name))
+;;             (gensym-lists (loop for i from 0 below (length value-lists)
+;;                              collect
+;;                              (gensym-list n))))
+;;        (labels ((map-value-expansion-fn (symbol-lists)
+;;                   `(values
+;;                     ,@(loop for i from 0 below n
+;;                          collect `(funcall ,fn-sym
+;;                                            ,@(loop 
+;;                                                 for lst in symbol-lists
+;;                                                 collect (nth i lst))))))
+;;                 (expand-car (value-lists sym-lists)
+;;                   `(multiple-value-bind  ,(car sym-lists) ,(car value-lists)
+;;                      ,(if (cdr value-lists)
+;;                           (expand-car (cdr value-lists) (cdr sym-lists))
+;;                           (map-value-expansion-fn gensym-lists)))))
+;;          (expand-car value-lists gensym-lists)))))
+

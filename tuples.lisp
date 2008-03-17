@@ -11,9 +11,9 @@
   "Create an access macro such as (vector3d vec) that takes an instance of an array and unpacks it to tuples (aka multiple values)"
   (tuple-expansion-fn type-name :def-tuple-getter))
 
-(defmacro def-tuple-array-getter (type-name)
+(defmacro def-tuple-aref (type-name)
   "Create a tuple aref macro for unpacking individual tuple from an array of tuples. eg (vector3d-aref up 5) => (values 0.0 1.0 0.0)"
-  (tuple-expansion-fn type-name :def-tuple-array-getter))
+  (tuple-expansion-fn type-name :def-tuple-aref))
 
 (defmacro def-with-tuple (type-name)
   "Create a macro that can be used to bind members of a value tuple to symbols to symbols e-g (with-vector thing-vec (x y z w)  &body forms)"
@@ -87,7 +87,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-tuple ,type-name)
      (def-tuple-array-dimensions ,type-name)
      (def-tuple-getter ,type-name)
-     (def-tuple-array-getter ,type-name)
+     (def-tuple-aref ,type-name)
      (def-with-tuple ,type-name)
      (def-with-tuple* ,type-name)
      (def-with-tuple-aref ,type-name)

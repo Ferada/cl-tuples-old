@@ -61,6 +61,6 @@
                   (matrix44-product (matrix44  *rotatey*) (matrix44 *rotatez*)))))
 
 (defparameter *vertexx3* (make-vertex3d
-                          (transform-vertex3d                           
-                           (matrix44 *concat-transform*)
-                           (vertex3d *vertexx0*))))
+                          (transform-vertex3d 
+                           (vertex3d *vertexx0*)
+                           (matrix44 *concat-transform*))))

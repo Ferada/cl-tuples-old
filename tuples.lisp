@@ -35,6 +35,12 @@
   "Create an aref-setter macro for setting an element in an array of tuples  from a multiple-value tuple. eg (vector3d-aref-setter up 2 #{ 0.0 1.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple-aref-setter))
 
+(defmacro def-tuple-vector-push (type-name)
+    (tuple-expansion-fn type-name :def-tuple-vector-push))
+
+(defmacro def-tuple-vector-push-extend (type-name)
+    (tuple-expansion-fn type-name :def-tuple-vector-push-extend))
+
 (defmacro def-new-tuple (type-name)
   "Create a function to create an array suitable for holding an individual tuple. eg (new-vector3d)"
   (tuple-expansion-fn type-name :def-new-tuple))
@@ -93,6 +99,8 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-with-tuple-aref ,type-name)
      (def-tuple-setter  ,type-name)
      (def-tuple-aref-setter  ,type-name)
+     (def-tuple-vector-push ,type-name)
+     (def-tuple-vector-push-extend ,type-name)
      (def-new-tuple ,type-name)
      (def-tuple-maker ,type-name)
      (def-tuple-maker* ,type-name)

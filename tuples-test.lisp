@@ -4,6 +4,40 @@
 
 (in-package :cl-tuples-test)
 
+(make-tuple-symbol 'pair '(unsigned-byte 8) '(x y))
+(def-tuple pair)
+(def-tuple-getter pair)
+(def-tuple-aref pair)
+(def-with-tuple pair)
+(def-with-tuple* pair)
+(def-with-tuple-aref pair)
+(def-tuple-setter pair)
+(def-tuple-aref-setter pair)
+(def-new-tuple pair)
+(def-tuple-maker pair)
+(def-tuple-maker* pair)
+(def-tuple-array-maker pair)
+(def-tuple-array-dimensions pair)
+(def-tuple-vector-push   pair)
+(def-tuple-vector-push-extend pair)
+(def-tuple-setf pair)
+(def-tuple-array-setf pair)
+(def-tuple-map pair)
+(def-tuple-reduce pair)
+
+(defparameter *test-pair* (make-pair (pair-tuple 1 2)))
+(defparameter *pair-array* (make-pair-array 2 :adjustable t :fill-pointer 1))
+(setf *test-pair* (make-pair #{ 3 4 }))
+
+(pair-aref *pair-array* 0)
+(setf (aref *pair-array* 0) (pair  *test-pair*))
+(pair-vector-push (pair *test-pair*) *pair-array*)
+(pair-vector-push-extend (pair-tuple 6 7) *pair-array*)
+(aref *pair-array* 2)
+
+(map-pair-tuples #'+ #{ 1 2 } #{ 2 3 } #{ 4 5 })
+(reduce-pair-tuple #'* #{ 2 2 })
+
 (defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } )) 
 (defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
 (defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
@@ -62,5 +96,18 @@
 
 (defparameter *vertexx3* (make-vertex3d
                           (transform-vertex3d 
-                           (vertex3d *vertexx0*)
-                           (matrix44 *concat-transform*))))
+                           (matrix44 *concat-transform*)
+                           (vertex3d *vertexx0*))))
+
+
+(defparameter *vector-array* (make-vector3d-array '(2) :adjustable t :fill-pointer 1))
+
+(setf (vector3d-aref *vector-array* 0) (vector3d *vectorx*))
+(vector-push *vector-array* (vector3d  *vectory*))
+(vector-push-extend *vector-array* (vector3d *vectorz*))
+
+;; iterate across array, apply transforms
+(loop
+   for i from 0 below (vector3d-array-dimensions *vector-array*)
+   do (transform-vertex3d (vector3d-aref *vector-array* i)
+                          (matrix44 *concat-transform*)))

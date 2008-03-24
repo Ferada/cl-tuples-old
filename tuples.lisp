@@ -108,7 +108,9 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-tuple-setf  ,type-name)
      (def-tuple-array-setf  ,type-name)
      (def-tuple-map ,type-name)
-     (def-tuple-reduce ,type-name)))
+     (def-tuple-reduce ,type-name)
+     ,@(loop for kw in *tuple-expander-keywords* collect `(export (tuple-symbol (quote ,type-name) ,kw)))))
+
 
 ;; possibly we also need a deftype form to describe a tuple array?
 
@@ -117,7 +119,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
  For example (def-tuple-type vector3d single-float (x y z)) will create several macros and functions. Firstly, the accessor functions (vector3d array) (vector3d-aref array index). Secondly,  the context macros (with-vector3d tuple (element-symbols) forms..) and  (with-vector3d-array tuple (element-symbols) index forms..),  thirdly the constructors (new-vector3d) and (make-vector3d tuple),  (make-vector3d-array dimensions &key adjustable fill-pointer), forthly generalised access as in  (setf (vector3d array) tuple) and (setf (vector3d-aref array) index tuple), fiftly and finally, the  funcional macros (map-vector3d fn tuples..) (reduce-vector3d fn tuple)."
   `(eval-when (:compile-toplevel :execute :load-toplevel)
      (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',elements)
-     (make-tuple-operations ,tuple-type-name)
+     (make-tuple-operations ,tuple-type-name)     
      (document-tuple-type ',tuple-type-name)))
 
 

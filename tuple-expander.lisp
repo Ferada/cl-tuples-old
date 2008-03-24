@@ -1,10 +1,13 @@
 
 (in-package :cl-tuples)
 
-;; to do - for each expansion, we want (make-expansion-name type-name expansion)
+(defparameter *tuple-expander-keywords* '(:def-tuple :def-tuple-getter :def-tuple-aref :def-with-tuple :def-with-tuple* :def-with-tuple-aref :def-tuple-setter :def-tuple-aref-setter :def-tuple-vector-push :def-tuple-vector-push-extend :def-new-tuple :def-tuple-maker :def-tuple-maker* :def-tuple-array-maker :def-tuple-array-dimensions :def-tuple-setf :def-tuple-array-setf :def-tuple-map :def-tuple-reduce))
 
 (defgeneric tuple-symbol (type-name expansion))
 ;;  "Given the expansion, return the name of the macro/function associated with it."
+
+(defmethod tuple-symbol ((type-name string) expansion)
+  (tuple-symbol (find-symbol type-name) expansion))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple)))
   (make-suffixed-symbol type-name "TUPLE"))
@@ -266,31 +269,3 @@
 
 
 
-(make-tuple-symbol 'pair '(unsigned-byte 8) '(x y))
-(def-tuple pair)
-(def-tuple-getter pair)
-(def-tuple-aref pair)
-(def-with-tuple pair)
-(def-with-tuple* pair)
-(def-with-tuple-aref pair)
-(def-tuple-setter pair)
-(def-tuple-aref-setter pair)
-(def-new-tuple pair)
-(def-tuple-maker pair)
-(def-tuple-maker* pair)
-(def-tuple-array-maker pair)
-(def-tuple-array-dimensions pair)
-(def-tuple-vector-push   pair)
-(def-tuple-vector-push-extend pair)
-(def-tuple-setf pair)
-(def-tuple-array-setf pair)
-(def-tuple-map pair)
-(def-tuple-reduce pair)
-
-(defparameter *test-pair* (make-pair (pair-tuple 1 2)))
-(defparameter *pair-array* (make-pair-array 2 :adjustable t :fill-pointer 1))
-(setf *test-pair* (make-pair #{ 3 4 }))
-
-(pair-aref *pair-array* 0)
-(setf (aref *pair-array* 0) (pair  *test-pair*))
-(pair-vector-push (pair *test-pair*) *pair-array*)

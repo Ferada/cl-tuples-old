@@ -5,9 +5,13 @@
     :tuple-element-type single-float
     :elements (x y z w))
 
+(export-tuple-operations quaternion)
+
 (def-tuple-type angle-axis
     :tuple-element-type single-float
     :elements (x y z a))
+
+(export-tuple-operations angle-axis)
 
 ;; need conjugate, angle-axis conversion, slerp
 

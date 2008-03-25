@@ -6,17 +6,26 @@
     :tuple-element-type single-float 
     :elements (x y))
 
+(export-tuple-operations vector2d)
+
 (def-tuple-type vertex2d 
     :tuple-element-type single-float 
     :elements (x y w))
+
+(export-tuple-operations vertex3d)
 
 (def-tuple-type vector3d 
     :tuple-element-type single-float 
     :elements (x y z))
 
+(export-tuple-operations vector3d)
+
 (def-tuple-type vertex3d 
     :tuple-element-type single-float
     :elements (x y z w))
+
+(export-tuple-operations vertex3d)
+
 
 (defmacro vector2d-mag-square (vector2d)
   `(reduce-vector2d-tuple #'+ (map-vector2d-values #'* ,vector2d ,vector2d)))

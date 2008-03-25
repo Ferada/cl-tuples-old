@@ -7,12 +7,16 @@
                e10 e11 e12
                e20 e21 e22))
 
+(export-tuple-operations matrix33)
+
 (def-tuple-type matrix44 
     :tuple-element-type single-float
     :elements (e00 e01 e02 e03
                e10 e11 e12 e13
                e20 e21 e22 e23
                e30 e31 e32 e33))
+
+(export-tuple-operations matrix44)
 
 (defmacro matrix-dot (dimension row col)
   "Generate the symbols required for a dot

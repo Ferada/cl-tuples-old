@@ -108,7 +108,10 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-tuple-setf  ,type-name)
      (def-tuple-array-setf  ,type-name)
      (def-tuple-map ,type-name)
-     (def-tuple-reduce ,type-name)
+     (def-tuple-reduce ,type-name)))
+
+(defmacro export-tuple-operations (type-name)
+  `(progn 
      ,@(loop for kw in *tuple-expander-keywords* collect `(export (tuple-symbol (quote ,type-name) ,kw)))))
 
 

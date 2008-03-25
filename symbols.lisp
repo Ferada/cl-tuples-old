@@ -44,6 +44,7 @@
     ((stringp x)
      x)))
 
+
 (defun make-adorned-symbol (name &key prefix suffix asterisk)
   (check-type name symbol)
   (check-type prefix (or symbol string null))
@@ -58,7 +59,7 @@
                        (when suffix
                          (string suffix))
                        (when asterisk
-                         (string "*"))) :cl-tuples))
+                         (string "*")))))
 
 (defun make-suffixed-symbol (name suffix)
   (make-adorned-symbol name :suffix suffix))

@@ -205,7 +205,7 @@
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker*) (&rest elements)
      (let ((tuple-sym (gensym)))
        `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
-          (,',(tuple-symbol type-name :def-tuple-setter) ,tuple-sym ,@elements)
+          (,',(tuple-symbol type-name :def-tuple-setter) ,tuple-sym (values  ,@elements))
           ,tuple-sym))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))

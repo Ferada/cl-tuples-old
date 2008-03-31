@@ -45,7 +45,7 @@
      x)))
 
 
-(defun make-adorned-symbol (name &key prefix suffix asterisk)
+(defun make-adorned-symbol (name &key prefix suffix asterisk package)
   (check-type name symbol)
   (check-type prefix (or symbol string null))
   (check-type suffix (or symbol string null))
@@ -59,7 +59,8 @@
                        (when suffix
                          (string suffix))
                        (when asterisk
-                         (string "*")))))
+                         (string "*")))
+          (if package package *package*)))
 
 (defun make-suffixed-symbol (name suffix)
   (make-adorned-symbol name :suffix suffix))

@@ -116,6 +116,11 @@ is stored in the property list of the symbol."
   "Return the size of the type"
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
+(defun tuple-typespec (type-name)
+  "Return typespec of tuple."
+  `(values ,@(loop 
+               for i from 0 to (tuple-size type-name) 
+                collect (tuple-element-type type-name))))
 
 (defun symbol-macro-expander-fn (n names types elements gensyms body)
   "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent
@@ -153,7 +158,9 @@ is stored in the property list of the symbol."
 
 (defun body-expander-fn (names types elements gensyms body)
   (if (eq (caar body) :return)
-    (let ((ret-type (cadar body))
+      (let ((ret-type (if (tuple-typep (cadar body))
+                          
+                          (cadar body)))
           (real-body (cddar body)))
       `(the ,ret-type
          ,(arg-expander-fn-aux 0 names types elements gensyms real-body)))

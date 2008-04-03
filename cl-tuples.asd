@@ -18,4 +18,7 @@
                (:file "matrix")
                (:file "colour")))
 
+(defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
+  (operate 'asdf:load-op :cl-tuples-tests)
+  (operate 'asdf:test-op :cl-tuples-tests))
                   

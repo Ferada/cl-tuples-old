@@ -151,6 +151,14 @@ is stored in the property list of the symbol."
                 (symbol-macro-expander-fn 0 names types elements gensyms body)))))
 
 
+(defun body-expander-fn (names types elements gensyms body)
+  (if (eq (caar body) :return)
+    (let ((ret-type (cadar body))
+          (real-body (cddar body)))
+      `(the ,ret-type
+         ,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
+    (arg-expander-fn-aux 0 names types elements gensyms body)))
+
 (defun arg-expander-fn (names types elements forms)
   "Helper function for def-tuple-op. Expands the arguments into a series of WITH-* forms so that
    symbols are bound to tuple elements in the body of the operator."
@@ -161,9 +169,8 @@ is stored in the property list of the symbol."
         (let ((gensyms 
                (mapcar #'(lambda (element-list) 
                            (gensym-list (length element-list))) elements)))
-          (arg-expander-fn-aux 0 names types elements gensyms body)))))
+          (body-expander-fn names types elements gensyms body)))))
 
 ; tester
-;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '(format t "~A" (x qw)))
-
-
+;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
+;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" ((:return (values single-float single-float single-float single-float)) (vertex3d-tuple x y z qw))))

@@ -131,9 +131,10 @@
 
 (def-tuple-op delta-vector3d
     ((start vertex3d (ox oy oz ow))
-     (end vertex3d (ex ey ez ew)))
+     (end vertex3d (ex ey ez ew)))  
   (vector3d-tuple  (- ex ox) (- ey oy) (- ez oz)))
 
+(the (unsigned-int) )
 ;; TO DO 
 
 ;; convert 2 3d vectors to angle axis

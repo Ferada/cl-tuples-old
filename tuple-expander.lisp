@@ -86,7 +86,7 @@
          `(aref ,tuple-array-name ,index))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref)))
-  `(defmacro ,(tuple-symbol type-name :def-tuple-aref) (target-sym array-index)
+  `(defmacro ,(tuple-symbol type-name :def-tuple-aref) (tuple-array array-index)
      (let* ((varlist (gensym-list ,(tuple-size type-name)))
             (array-index-sym (gensym))
             (counter-sym (gensym)))
@@ -96,7 +96,7 @@
                   (declare ( ignore x))
                   (list
                    'prog1
-                   `(aref ,target-sym
+                   `(aref ,tuple-array
                           (+ ,counter-sym ,array-index-sym))
                    `(incf ,counter-sym)))
                             varlist))))))

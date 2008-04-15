@@ -10,6 +10,7 @@
   :description "Experimental Tuple Types"
   :serial t
   :components ((:file "package")
+               (:file "utils")
                (:file "symbols")
                (:file "tuple-expander")
                (:file "tuples") 

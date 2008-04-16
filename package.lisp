@@ -3,7 +3,9 @@
 
 (defpackage :cl-tuples
   (:use :cl)
-  (:export def-tuple-type
+  (:export make-tuple-symbol
+
+           def-tuple-type
            def-tuple-op
 
            vector2d-dot

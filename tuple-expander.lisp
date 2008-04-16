@@ -212,7 +212,7 @@
   `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
-                 :fill-pointer fill-pointer
+                 :fill-pointer (* ,(tuple-size type-name) fill-pointer)
                  :element-type ',(tuple-element-type type-name))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))

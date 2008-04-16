@@ -5,30 +5,13 @@
 
 (in-package :cl-tuples-test)
 
-(defun run-cl-tuples-tests ()
-  (make-tuple-symbol 'pair '(unsigned-byte 8) '(x y))
-  (def-tuple pair)
-  (def-tuple-getter pair)
-  (def-tuple-aref pair)
-  (def-with-tuple pair)
-  (def-with-tuple* pair)
-  (def-with-tuple-aref pair)
-  (def-tuple-setter pair)
-  (def-tuple-aref-setter pair)
-  (def-new-tuple pairlisr)
-  (def-tuple-maker pair)
-  (def-tuple-maker* pair)
-  (def-tuple-array-maker pair)
-  (def-tuple-array-dimensions pair)
-  (def-tuple-vector-push   pair)
-  (def-tuple-vector-push-extend pair)
-  (def-tuple-setf pair)
-  (def-tuple-array-setf pair)
-  (def-tuple-map pair)
-  (def-tuple-reduce pair)
 
-  (defparameter *test-pair* (make-pair (pair-tuple 1 2)))
-  (defparameter *pair-array* (make-pair-array 2 :adjustable t :fill-pointer 1))
+(def-tuple-type pair
+    :tuple-element-type (unsigned-byte 8)
+    :elements (x y))
+
+(defparameter *test-pair* (make-pair (pair-tuple 1 2)))
+(defparameter *pair-array* (make-pair-array 2 :adjustable t :fill-pointer 1))
 
   (setf *test-pair* (make-pair #{ 3 4 }))
   (pair-aref *pair-array* 0)
@@ -103,6 +86,6 @@
      for i from 0 below (vector3d-array-dimensions *vector-array*)
      do (transform-vertex3d (vector3d-aref *vector-array* i)
                             (matrix44 *concat-transform*)))
-  t)
+  
 
 

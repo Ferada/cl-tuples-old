@@ -179,7 +179,7 @@
           ,@(loop
              for index from 0 below ,(tuple-size type-name)
              collect
-               `(vector-push-extend ,(nth index varlist) ,array-name))))))
+               `(vector-push-extend ,(nth index varlist) ,array-name ,(tuple-size type-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-new-tuple)))
   `(defmacro ,(tuple-symbol type-name :def-new-tuple) ()
@@ -217,7 +217,7 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))
 `(defun ,(tuple-symbol  type-name :def-tuple-array-dimensions) (tuple-array)
-   (/ (car  (array-dimensions tuple-array)) ,(tuple-size type-name))))
+   (/ (length tuple-array) ,(tuple-size type-name))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf)))
   `(defsetf ,type-name ,(tuple-symbol type-name :def-tuple-setter)))

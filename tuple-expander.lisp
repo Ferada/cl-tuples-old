@@ -1,7 +1,15 @@
 
 (in-package :cl-tuples)
 
-(defparameter *tuple-expander-keywords* '(:def-tuple :def-tuple-getter :def-tuple-aref :def-with-tuple :def-with-tuple* :def-with-tuple-aref :def-tuple-setter :def-tuple-aref-setter :def-tuple-vector-push :def-tuple-vector-push-extend :def-new-tuple :def-tuple-maker :def-tuple-maker* :def-tuple-array-maker :def-tuple-array-dimensions :def-tuple-setf :def-tuple-array-setf :def-tuple-map :def-tuple-reduce))
+(defparameter *tuple-expander-keywords* 
+  '(:def-tuple :def-tuple-getter :def-tuple-aref 
+    :def-with-tuple :def-with-tuple* :def-with-tuple-aref 
+    :def-tuple-setter :def-tuple-aref-setter 
+    :def-tuple-vector-push :def-tuple-vector-push-extend 
+    :def-new-tuple :def-tuple-maker :def-tuple-maker* 
+    :def-tuple-array-maker :def-tuple-array-dimensions 
+    :def-tuple-setf :def-tuple-array-setf 
+    :def-tuple-map :def-tuple-reduce))
 
 (defgeneric tuple-symbol (type-name expansion))
 ;;  "Given the expansion, return the name of the macro/function associated with it."
@@ -179,7 +187,7 @@
           ,@(loop
              for index from 0 below ,(tuple-size type-name)
              collect
-               `(vector-push-extend ,(nth index varlist) ,array-name ,(tuple-size type-name)))))))
+               `(vector-push-extend ,(nth index varlist) ,array-name ,',(tuple-size type-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-new-tuple)))
   `(defmacro ,(tuple-symbol type-name :def-new-tuple) ()

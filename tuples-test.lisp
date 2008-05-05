@@ -36,8 +36,7 @@
        (let 
            ((,result ,test))
          (assert ,result)
-         (setf ,test-sym (and ,test-sym ,result)))))
-
+         (setf ,test-sym (and ,test-sym ,result))))))
 
 (defparameter *result* t)
 
@@ -89,16 +88,18 @@
   (setf *result* (vector3d-length (vector3d *vector1*))))
 
 (with-test *result*
- (equalp *test-vector* #( 0.57735026 0.57735026 0.57735026))
- (setf *test-vector* (make-vector3d (vector3d-normal (vector3d *vector1*)))))
+ (equalp *test-vector* #(0.57735026 0.57735026 0.57735026))
+ (setf  *test-vector*
+       (make-vector3d (vector3d-normal (vector3d *vector1*)))))
 
 (with-test *result*
   (equalp *test-vector* #(0.0 0.0 1.0))
-  (setf *text-vector* (vector3d-cross (vector3d *vectorx*) (vector3d *vectory*))))
+  (setf (vector3d *test-vector*)
+        (vector3d-cross (vector3d *vectorx*) (vector3d *vectory*))))
 
 (with-test *result*
   (= *result* 0.57735026)
-  (setf *result* (vector3d-dot 
+  (setf  *result* (vector3d-dot 
                   (vector3d *vectorx*) (vector3d-normal  (vector3d *vector1*)))))
 
 (defparameter *vertex0* (make-vertex3d (vector3d-vertex3d (vector3d  *vector0*))))
@@ -113,7 +114,8 @@
 
 (with-test *result*
   (= *result* 1.7320508)
-  (vertex3d-distance (vector3d  *vertex0*) (vector3d  *vertex1*)))
+  (setf *result*
+        (vertex3d-distance (vector3d  *vertex0*) (vector3d  *vertex1*))))
 
 ;; basic matrix math
 (defparameter *rotatex* (make-matrix44 (rotatex-matrix44 45)))

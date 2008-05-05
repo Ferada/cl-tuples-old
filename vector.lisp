@@ -122,7 +122,7 @@
        (,rhs-x ,rhs-y ,rhs-z)
        (values (- (* ,lhs-y ,rhs-z) (* ,lhs-z ,rhs-y))
                (- (* ,lhs-z ,rhs-x) (* ,lhs-x ,rhs-z))
-               (- (* ,lhs-z ,rhs-y) (* ,lhs-y ,rhs-x)))))))
+               (- (* ,lhs-x ,rhs-y) (* ,lhs-y ,rhs-x)))))))
 
 (def-tuple-op vertex3d-distance
     ((start vertex3d (ox oy oz ow))

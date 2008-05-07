@@ -107,27 +107,21 @@
        (values ,x ,y ,z))))
   
 
-(defmacro vector3d-cross (vector3d-lhs vector3d-rhs)
-  (let ((lhs-x (gensym))
-        (lhs-y (gensym))
-        (lhs-z (gensym))
-        (rhs-x (gensym))
-        (rhs-y (gensym))
-        (rhs-z (gensym)))
-  `(with-vector3d 
-      ,vector3d-lhs
-     (,lhs-x ,lhs-y ,lhs-z)
-     (with-vector3d 
-         ,vector3d-rhs
-       (,rhs-x ,rhs-y ,rhs-z)
-       (values (- (* ,lhs-y ,rhs-z) (* ,lhs-z ,rhs-y))
-               (- (* ,lhs-z ,rhs-x) (* ,lhs-x ,rhs-z))
-               (- (* ,lhs-x ,rhs-y) (* ,lhs-y ,rhs-x)))))))
+(def-tuple-op vector3d-cross
+    ((lhs vector3d (lhs-x lhs-y lhs-z))
+     (rhs vector3d (rhs-x rhs-y rhs-z)))
+  (:return vector3d
+           (vector3d-tuple
+            (- (* lhs-y rhs-z) (* lhs-z rhs-y))
+            (- (* lhs-z rhs-x (* lhs-x rhs-z)))
+            (- (* lhs-x rhs-y (* lhs-y rhs-x))))))
+
 
 (def-tuple-op vertex3d-distance
     ((start vertex3d (ox oy oz ow))
      (end vertex3d (ex ey ez ew)))
-  (vector3d-length (values (- ex ox) (- ey oy) (- ez oz))))
+  (:return vector3d
+           (vector3d-length (values (- ex ox) (- ey oy) (- ez oz)))))
 
 (def-tuple-op delta-vector3d
     ((start vertex3d (ox oy oz ow))

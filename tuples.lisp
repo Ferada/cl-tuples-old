@@ -155,6 +155,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (document-tuple-type ',tuple-type-name)))
 
 
+;; full syntax (def-tuple-op name ((name type (elements)) ..) (
 ;; this needs some way of having the names as meaningful symbols
 ;; also a way of specifying type of return value and non-tuple parameters
 (defmacro def-tuple-op (name args &body forms)

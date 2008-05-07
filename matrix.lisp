@@ -161,47 +161,30 @@
       0.0 0.0 0.0 ,tz
       0.0 0.0 0.0 1.0))                
 
-(defmacro rotatex-matrix44 (a)
-  (let 
-      ((sina (gensym))
-       (nsina (gensym))
-       (cosa (gensym)))    
-    `(let 
-         ((,sina ,(sin a))
-          (,nsina ,(- (sin a)))
-          (,cosa ,(cos a)))       
-       (matrix44-tuple
-        1.0  0.0   0.0    0.0
-        0.0 ,cosa ,nsina  0.0
-        0.0 ,sina ,cosa   0.0
-        0.0  0.0  0.0     1.0))))
+(def-tuple-op rotatex-matrix44 
+    ((rotation single-float))
+  "Return a matrix for rotating around the x axis."
+  (matrix44-tuple
+   1.0  0.0   0.0    0.0
+   0.0 (cos rotation) (sin rotation)  0.0
+   0.0 (sin rotation) (cos rotation)   0.0
+   0.0  0.0  0.0     1.0)))
 
-(defmacro rotatey-matrix44 (a)
-  (let 
-      ((sina (gensym))
-       (nsina (gensym))
-       (cosa (gensym)))    
-    `(let 
-         ((,sina ,(sin a))
-          (,nsina ,(- (sin a)))
-          (,cosa ,(cos a)))       
-       (matrix44-tuple
-        ,cosa   0.0     ,sina   0.0
-        0.0     1.0     0.0     0.0
-        ,nsina  0.0    ,cosa    0.0
-        0.0     0.0     0.0     1.0))))
 
-(defmacro rotatez-matrix44 (a)
-  (let 
-      ((sina (gensym))
-       (nsina (gensym))
-       (cosa (gensym)))    
-    `(let 
-         ((,sina ,(sin a))
-          (,nsina ,(- (sin a)))
-          (,cosa ,(cos a)))       
-       (matrix44-tuple
-        ,cosa   0.0   ,nsina  0.0
-        ,sina   0.0   ,cosa   0.0
-        0.0     0.0   1.0     0.0
-        0.0     0.0   0.0     1.0))))
+(def-tuple-op rotatey-matrix44
+    ((rotation single-float))
+  "Return a matrix for rotating around the y axis."
+  (matrix44-tuple
+   (cos rotation)   0.0     (sin rotation)   0.0
+   0.0     1.0     0.0     0.0
+   (sin rotation)  0.0    (cos rotation)   0.0
+   0.0     0.0     0.0     1.0))
+
+(def-tuple-op rotatez-matrix44
+    ((rotation single-float))
+  "Return a matrix for rotating around the z axis."
+  (matrix44-tuple
+   (cos rotation)   0.0   (sin rotation)  0.0
+   (sin rotation)   0.0   (cos rotation)   0.0
+   0.0     0.0   1.0     0.0
+   0.0     0.0   0.0     1.0))

@@ -127,7 +127,7 @@
                                             (vertex3d  *vertexx*))))
 
 (defparameter *vertexx1* (make-vertex3d  
-                            (transform-vertex3d 
+                            (transform-vertex3d  
                              (matrix44  *rotatey*) 
                              (vertex3d  *vertexx0*))))
 

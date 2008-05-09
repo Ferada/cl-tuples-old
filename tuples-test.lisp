@@ -102,11 +102,16 @@
   (setf  *result* (vector3d-dot 
                   (vector3d *vectorx*) (vector3d-normal  (vector3d *vector1*)))))
 
+;; test identity mult
+
+(defparameter *test-matrix* (make-matrix44 (cl-tuples::make-test-matrix44)))
+(defparameter *identity-matrix* (make-matrix44 (identity-matrix44)))
+
 (defparameter *vertex0* (make-vertex3d (vector3d-vertex3d (vector3d  *vector0*))))
 (defparameter *vertex1* (make-vertex3d (vector3d-vertex3d (vector3d  *vector1*))))
-(defparameter *vertexx* (make-vertex3d (vector3d-vertex3d (vector3d  *vectorx*))))
-(defparameter *vertexy* (make-vertex3d (vector3d-vertex3d (vector3d  *vectory*))))
-(defparameter *vertexz* (make-vertex3d (vector3d-vertex3d (vector3d  *vectorz*))))
+(defparameter *vertexx* (make-vertex3d #{1.0 0.0 0.0 1.0}))
+(defparameter *vertexy* (make-vertex3d #{0.0 1.0 0.0 1.0}))
+(defparameter *vertexz* (make-vertex3d #{0.0 0.0 1.0 0.0}))
 
 (with-test *result*
   (equalp *test-vector* #(1.0 1.0 1.0))
@@ -117,10 +122,13 @@
   (setf *result*
         (vertex3d-distance (vector3d  *vertex0*) (vector3d  *vertex1*))))
 
+
+(defun torad (x) (coerce  (* x (/ PI 180.0)) 'single-float))
+
 ;; basic matrix math
-(defparameter *rotatex* (make-matrix44 (rotatex-matrix44 45)))
-(defparameter *rotatey* (make-matrix44 (rotatey-matrix44 45)))
-(defparameter *rotatez* (make-matrix44 (rotatez-matrix44 45)))
+(defparameter *rotatex* (make-matrix44 (rotatex-matrix44 (torad 90))))
+(defparameter *rotatey* (make-matrix44 (rotatey-matrix44 (torad 90))))
+(defparameter *rotatez* (make-matrix44 (rotatez-matrix44 (torad 90))))
 
 (defparameter *vertexx0* (make-vertex3d  (transform-vertex3d 
                                             (matrix44  *rotatex*) 

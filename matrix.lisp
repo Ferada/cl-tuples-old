@@ -146,7 +146,7 @@
         (matrix-dot 4 3 2)
         (matrix-dot 4 3 3)))))
 
-(defun identity-matrix44 
+(def-tuple-op identity-matrix44 
     ()  
   (:return matrix44
          (matrix44-tuple
@@ -204,7 +204,7 @@
 (def-tuple-op make-test-matrix44
   ()
   "Return a matrix for testing purposes"
-  (return :matrix44
+  (:return matrix44
           (matrix44-tuple
            1.0  2.0  3.0  4.0
            5.0  6.0  7.0  8.0

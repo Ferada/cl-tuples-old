@@ -57,6 +57,6 @@ is stored in the property list of the symbol."
 (defun tuple-typespec (type-name)
   "Return typespec of tuple."
   `(values ,@(loop 
-               for i from 0 to (tuple-size type-name) 
+               for i from 0 below (tuple-size type-name) 
                 collect (tuple-element-type type-name))))
 

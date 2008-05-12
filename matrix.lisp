@@ -168,7 +168,7 @@
    1.0  0.0   0.0    0.0
    0.0 (cos rotation) (sin rotation)  0.0
    0.0 (sin rotation) (cos rotation)   0.0
-   0.0  0.0  0.0     1.0)))
+   0.0  0.0  0.0     1.0))
 
 
 (def-tuple-op rotatey-matrix44

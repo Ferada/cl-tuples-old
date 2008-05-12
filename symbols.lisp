@@ -79,16 +79,22 @@ is stored in the property list of the symbol."
                                       
 
 (defun arg-expander-fn-aux (n names types elements gensyms body)
-  (if (tuple-typep (nth n types))
-      ``(,',(make-adorned-symbol (nth n types) :prefix "WITH")
-          ,,(nth n  names) ,',(nth n  gensyms)
-          ,,(if (< (1+ n) (length names))
-                (arg-expander-fn-aux (1+ n) names types elements gensyms body)
-                (symbol-macro-expander-fn 0 names types elements gensyms body)))
-      ``(symbol-macrolet ((,',(nth n names) (the ,',(nth n types)  ,,(nth n names))))
-          ,,(if (< (1+ n) (length names))
-                (arg-expander-fn-aux (1+ n) names types elements gensyms body)
-                (symbol-macro-expander-fn 0 names types elements gensyms body)))))
+  "Handle the expansion of the n-th parameter in a def-tuple-op call list"
+  (if (nth n types)
+      (if (tuple-typep (nth n types))
+          ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
+          ``(,',(make-adorned-symbol (nth n types) :prefix "WITH")
+                ,,(nth n  names) ,',(nth n  gensyms)
+                ,,(if (< (1+ n) (length names))
+                      (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+                      (symbol-macro-expander-fn 0 names types elements gensyms body)))
+          ;; otherwise just use a straight symbol
+          ``(symbol-macrolet ((,',(nth n names) (the ,',(nth n types)  ,,(nth n names))))
+              ,,(if (< (1+ n) (length names))
+                    (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+                    (symbol-macro-expander-fn 0 names types eleminents gensyms body))))
+    ;; if there are no associated parameters with this call, just expand body
+    `(progn ,@body)))
 
 
 (defun body-expander-fn (names types elements gensyms body)
@@ -115,13 +121,16 @@ is stored in the property list of the symbol."
   ;; if the first of the forms is a string then it's a docstring
   (let ((body (if (stringp (first forms)) (rest forms) forms)))
     ;; create a gensym for every tuple element - they are going to be symbol macros
-    (if (car types)
-        (let ((gensyms 
-               (mapcar #'(lambda (element-list) 
-                           (gensym-list (length element-list))) elements)))
-          ;; epand the body
-          (body-expander-fn names types elements gensyms body)))))
+    (let ((gensyms 
+           (mapcar #'(lambda (element-list) 
+                       (gensym-list (length element-list))) elements)))
+      ;; epand the body
+      (body-expander-fn names types elements gensyms body))))
 
 ; tester
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
+
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
+
+;; 
+

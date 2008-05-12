@@ -79,7 +79,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
   "Creates a macro called reduce-{tuple-type}-values. Which applies the reduction function to each value in it's second parameter, where it expects to recieve the same number of values as the named type. e.g (def-tuple-reduce vector2d) produces (reduce-vector2d-values fn tuples)"
   (tuple-expansion-fn type-name :def-tuple-reduce))
 
-(defun document-tuple-type (type-name)  
+(defun document-tuple-type (type-name)
   `(progn
      ;; instead of setf, need some form that can use the symbol in the format
      (setf (documentation ',(tuple-symbol type-name :def-tuple) 'function)
@@ -87,11 +87,11 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (setf (documentation ',(tuple-symbol type-name :def-tuple-getter) 'function)
            (format nil "Unpack array representation of an ~A and convert to multiple values." ,type-name))
      (setf (documentation ,'(tuple-symbol type-name :def-tuple-aref) 'function)
-           (format nil "Unpack individual ~A to multiple values from an array of ~As." ,type-name ,type-name))                
+           (format nil "Unpack individual ~A to multiple values from an array of ~As." ,type-name ,type-name))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple) 'function)
            (format nil "Bind elements of a ~A multiple value to symbols."  ,type-name))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple*) 'function)
-           (format nil "Bind elements of a ~A vector to symbols."  ',type-name))     
+           (format nil "Bind elements of a ~A vector to symbols."  ',type-name))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple-aref) 'function)
            (format nil  "Bind the elements of a ~A from vector of ~A's to symbols"))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-setter) 'function)
@@ -113,7 +113,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (setf (documentation ,'(tuple-symbol type-name :def-tuple-array-dimensions) 'function)
            (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,type-name ,type-name))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-map) 'function)
-           (format nil  "Map a function over an arbitrary number of ~A's expressed as multiple values and return a ~A mutiple value" ,type-name ,type-name ,type-name))     
+           (format nil  "Map a function over an arbitrary number of ~A's expressed as multiple values and return a ~A mutiple value" ,type-name ,type-name ,type-name))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-reduce) 'function)
            (format nil "Reduce a ~A to a single value (the same type as it's element) by repated application of the function" ,type-name))))
 
@@ -140,18 +140,18 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-tuple-reduce ,type-name)))
 
 (defmacro export-tuple-operations (type-name)
-  `(progn 
+  `(progn
      ,@(loop for kw in *tuple-expander-keywords* collect `(export (tuple-symbol (quote ,type-name) ,kw)))))
 
 
 ;; possibly we also need a deftype form to describe a tuple array?
 
 (defmacro def-tuple-type (tuple-type-name &key tuple-element-type elements)
-  "Create a tuple type. To be used from the top level. 
+  "Create a tuple type. To be used from the top level.
  For example (def-tuple-type vector3d single-float (x y z)) will create several macros and functions. Firstly, the accessor functions (vector3d array) (vector3d-aref array index). Secondly,  the context macros (with-vector3d tuple (element-symbols) forms..) and  (with-vector3d-array tuple (element-symbols) index forms..),  thirdly the constructors (new-vector3d) and (make-vector3d tuple),  (make-vector3d-array dimensions &key adjustable fill-pointer), forthly generalised access as in  (setf (vector3d array) tuple) and (setf (vector3d-aref array) index tuple), fiftly and finally, the  funcional macros (map-vector3d fn tuples..) (reduce-vector3d fn tuple)."
   `(eval-when (:compile-toplevel :execute :load-toplevel)
      (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',elements)
-     (make-tuple-operations ,tuple-type-name)     
+     (make-tuple-operations ,tuple-type-name)
      (document-tuple-type ',tuple-type-name)))
 
 
@@ -161,15 +161,15 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
 (defmacro def-tuple-op (name args &body forms)
   "Macro to define a tuple operator. The name of the operator is
    name. The operator arguments are determined by args, which is a
-   list of the form ((argument-name argument-type (elements)   ..)). 
-   Within the forms the tuple value form is bound to the argument-name 
+   list of the form ((argument-name argument-type (elements)   ..)).
+   Within the forms the tuple value form is bound to the argument-name
    and the tuple elements are bound to the symbols in the element list"
-  (let ((arg-names (mapcar #'car args))
+  (let* ((arg-names (mapcar #'car args))
         (arg-typenames (mapcar #'cadr  args))
-        (arg-elements (mapcar #'caddr args)))             
-    `(defmacro ,name ,arg-names 
-      ,(arg-expander-fn arg-names arg-typenames arg-elements forms))
-    (when (stringp (first forms))
-      `(setf (documentation ',name 'function) ,(first forms)))))
-
-
+        (arg-elements (mapcar #'caddr args))
+        (doc (if (stringp (first forms))
+                 (first forms)
+                 (format nil "DEF-TUPLE-OP ~A ~A" name arg-typenames))))
+    `(defmacro ,name ,arg-names
+       ,doc
+       ,(arg-expander-fn arg-names arg-typenames arg-elements forms))))

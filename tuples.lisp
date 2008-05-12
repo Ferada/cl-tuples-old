@@ -167,10 +167,9 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
   (let ((arg-names (mapcar #'car args))
         (arg-typenames (mapcar #'cadr  args))
         (arg-elements (mapcar #'caddr args)))             
-    `(progn
-       (defmacro ,name ,arg-names 
-         ,(arg-expander-fn arg-names arg-typenames arg-elements forms))
-       ,(when (stringp (first forms))
-         `(setf (documentation ',name 'function) ,(first forms))))))
+    `(defmacro ,name ,arg-names 
+      ,(arg-expander-fn arg-names arg-typenames arg-elements forms))
+    (when (stringp (first forms))
+      `(setf (documentation ',name 'function) ,(first forms)))))
 
 

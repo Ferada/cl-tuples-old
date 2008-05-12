@@ -284,6 +284,7 @@
 (defun symbol-macro-expander-fn (n names types elements gensyms body)
   "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent
    name capture."
+  ;; if this is a tuple type with elements, we expand using with-tuple
   (if (nth n elements)
     ``(symbol-macrolet 
           ,',(loop 
@@ -296,10 +297,10 @@
                                                        collect gensym))))                         
                          ,,(if (< (1+ n) (length names))
                                (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
-                               ``(progn ,@',body))))
+                               ``(progn ,@',body)))) )
     (if (< (1+ n) (length names))
         (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
-        ``(progn ,@',body))))
+        ``(progn ,@',body)))
                                       
 
 (defun arg-expander-fn-aux (n names types elements gensyms body)
@@ -355,3 +356,14 @@
 ; tester
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
+;; 
+;;
+;; (arg-expander-fn '(tx ty tz) 
+;;                  '(single-float single-float single-float)
+;;                  '(nil nil nil)
+;;                  '("Return a matrix that represents a translation transformation"
+;;                    (:return matrix44  (matrix44-tuple
+;;                                        0.0 0.0 0.0 tx
+;;                                        0.0 0.0 0.0 ty
+;;                                        0.0 0.0 0.0 tz
+;;                                        0.0 0.0 0.0 1.0))))

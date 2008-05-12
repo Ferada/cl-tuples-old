@@ -156,9 +156,9 @@
           0.0 0.0 0.0 1.0)))
 
 (def-tuple-op translation-matrix 
-  ((tx single-float)
-   (ty single-float)
-   (tz single-float))
+    ((tx single-float)
+     (ty single-float)
+     (tz single-float))
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44-tuple
@@ -166,7 +166,6 @@
             0.0 0.0 0.0 ty
             0.0 0.0 0.0 tz
             0.0 0.0 0.0 1.0)))
-
 
 
 (def-tuple-op rotatex-matrix44 

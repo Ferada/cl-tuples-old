@@ -146,21 +146,20 @@
         (matrix-dot 4 3 2)
         (matrix-dot 4 3 3)))))
 
-;: TO DO-------     
-;; needs to be rewritten as tuple-op but tuple-op
-;; does't support zero args!?
-(defun identity-matrix44 ()  
-  (matrix44-tuple
-   1.0 0.0 0.0 0.0
-   0.0 1.0 0.0 0.0
-   0.0 0.0 1.0 0.0
-   0.0 0.0 0.0 1.0))
+(defun identity-matrix44 
+    ()  
+  (:return matrix44
+         (matrix44-tuple
+          1.0 0.0 0.0 0.0
+          0.0 1.0 0.0 0.0
+          0.0 0.0 1.0 0.0
+          0.0 0.0 0.0 1.0)))
 
 (def-tuple-op translation-matrix 
-  "Return a matrix that represents a translation transformation"
   ((tx single-float)
    (ty single-float)
    (tz single-float))
+  "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44-tuple
             0.0 0.0 0.0 tx
@@ -173,46 +172,50 @@
 (def-tuple-op rotatex-matrix44 
     ((rotation single-float))
   "Return a matrix for rotating around the x axis."
-  (matrix44-tuple
-   1.0  0.0   0.0   0.0
-   0.0 (cos rotation) (sin rotation)  0.0
-   0.0 (sin rotation) (cos rotation)   0.0
-   0.0  0.0  0.0     1.0))
+  (:return matrix44
+           (matrix44-tuple
+            1.0  0.0   0.0   0.0
+            0.0 (cos rotation) (sin rotation)  0.0
+            0.0 (sin rotation) (cos rotation)   0.0
+            0.0  0.0  0.0     1.0)))
 
 
-(def-tuple-op rotatey-matrix44
+(def-tuple-op rotatey-matrix44    
     ((rotation single-float))
   "Return a matrix for rotating around the y axis."
-  (matrix44-tuple
-   (cos rotation)   0.0     (sin rotation)   0.0
-   0.0     1.0     0.0     0.0
-   (sin rotation)  0.0    (cos rotation)   0.0
-   0.0     0.0     0.0     1.0))
+  (:return matrix44
+           (matrix44-tuple
+            (cos rotation)   0.0     (sin rotation)   0.0
+            0.0     1.0     0.0     0.0
+            (sin rotation)  0.0    (cos rotation)   0.0
+            0.0     0.0     0.0     1.0)))
 
 (def-tuple-op rotatez-matrix44
     ((rotation single-float))
   "Return a matrix for rotating around the z axis."
-  (matrix44-tuple
-   (cos rotation)   0.0   (sin rotation)  0.0
-   (sin rotation)   0.0   (cos rotation)   0.0
-   0.0     0.0   1.0     0.0
-   0.0     0.0   0.0     1.0))
+  (:return matrix44
+           (matrix44-tuple
+            (cos rotation)   0.0   (sin rotation)  0.0
+            (sin rotation)   0.0   (cos rotation)   0.0
+            0.0     0.0   1.0     0.0
+            0.0     0.0   0.0     1.0)))
 
 (def-tuple-op make-test-matrix44
   ()
   "Return a matrix for testing purposes"
-  (matrix44-tuple
-   1.0  2.0  3.0  4.0
-   5.0  6.0  7.0  8.0
-   9.0  10.0 11.0 12.0
-   13.0 14.0 15.0 16.0))
+  (return :matrix44
+          (matrix44-tuple
+           1.0  2.0  3.0  4.0
+           5.0  6.0  7.0  8.0
+           9.0  10.0 11.0 12.0
+           13.0 14.0 15.0 16.0)))
 
 (def-tuple-op print-matrix44
   ((mat matrix44 (e00 e01 e02 e03
                   e10 e11 e12 e13
                   e20 e21 e22 e23
                   e30 e31 e32 e33)))
-  "Actually print the matrix values"
+  "Print a matrix in a useful format."
   (:return (values)
            (format t "~A ~A ~A ~A ~%" e00 e01 e02 e03)
            (format t "~A ~A ~A ~A ~%" e10 e11 e12 e13)

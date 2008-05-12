@@ -36,19 +36,22 @@ is stored in the property list of the symbol."
 
 (defun tuple-typep (type-name)
   "Test to see if this symbol represents a tuple type"
-  (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'is-tuple))
+  (when (or (symbolp type-name) (stringp type-name))
+    (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'is-tuple)))
 
 (defun tuple-size (type-name)
   "Return the size of the type"
+  (assert (or (symbolp type-name) (stringp type-name)))
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'tuple-length))
-
 
 (defun tuple-element-type (type-name)
   "Return the size of the type"
+  (assert (or (symbolp type-name) (stringp type-name)))
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'element-type))
 
 (defun tuple-elements (type-name)
   "Return the size of the type"
+  (assert (or (symbolp type-name) (stringp type-name)))
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
 (defun tuple-typespec (type-name)

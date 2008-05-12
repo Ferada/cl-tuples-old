@@ -285,22 +285,31 @@
   "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent
    name capture."
   ;; if this is a tuple type with elements, we expand using with-tuple
-  (if (nth n elements)
-    ``(symbol-macrolet 
-          ,',(loop 
-                for gensym in (nth n gensyms) 
-                for element in (nth n elements) collect `(,element  ,gensym))
-        (declare (ignorable ,@',(nth n gensyms)))
-        (symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "TUPLE")
-                                                ,@',(loop
-                                                       for gensym in (nth n gensyms)
-                                                       collect gensym))))                         
-                         ,,(if (< (1+ n) (length names))
-                               (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
-                               ``(progn ,@',body)))) )
-    (if (< (1+ n) (length names))
-        (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
-        ``(progn ,@',body)))
+  (if (tuple-typep (nth n types))
+      (progn 
+        (assert (= (length (nth n gensyms)) 
+                   (length (nth n elements))) 
+                nil "~A contains too few elements for a ~A" (nth n elements) (nth n types))
+      ``(symbol-macrolet 
+            ,',(loop 
+                  for gensym in (nth n gensyms) 
+                  for element in (nth n elements) collect `(,element  ,gensym))
+          (declare (ignorable ,@',(nth n gensyms)))
+          (symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "TUPLE")
+                                                  ,@',(loop
+                                                         for gensym in (nth n gensyms)
+                                                         collect gensym))))                         
+            ;; recurs down to the next parameter
+            ,,(if (< (1+ n) (length names))
+                  (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
+                  ;; or bottom out
+                  ``(progn ,@',body)))))
+      ;; if this is not a tuple type, and theres more to come, recurse down
+      (if (< (1+ n) (length names))
+          (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
+          ;; otherwise, bottom out
+          ``(progn ,@',body))))
+
                                       
 
 (defun arg-expander-fn-aux (n names types elements gensyms body)
@@ -335,8 +344,8 @@
                  (cadar body)))
             ;; the rest of the body is the actual body
             (real-body (cddar body)))
-        `(the ,ret-type
-           ,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
+        ``(the ,',ret-type
+           ,,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
       (arg-expander-fn-aux 0 names types elements gensyms body)))
 
 (defun arg-expander-fn (names types elements forms)
@@ -358,12 +367,3 @@
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
 ;; 
 ;;
-;; (arg-expander-fn '(tx ty tz) 
-;;                  '(single-float single-float single-float)
-;;                  '(nil nil nil)
-;;                  '("Return a matrix that represents a translation transformation"
-;;                    (:return matrix44  (matrix44-tuple
-;;                                        0.0 0.0 0.0 tx
-;;                                        0.0 0.0 0.0 ty
-;;                                        0.0 0.0 0.0 tz
-;;                                        0.0 0.0 0.0 1.0))))

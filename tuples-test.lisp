@@ -104,7 +104,7 @@
 
 ;; test identity mult
 
-(defparameter *test-matrix* (make-matrix44 (cl-tuples::make-test-matrix44)))
+(defparameter *test-matrix* (make-test-matrix44 (cl-tuples::make-test-matrix44)))
 (defparameter *identity-matrix* (make-matrix44 (identity-matrix44)))
 
 (defparameter *vertex0* (make-vertex3d (vector3d-vertex3d (vector3d  *vector0*))))

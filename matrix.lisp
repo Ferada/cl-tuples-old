@@ -210,6 +210,7 @@
            9.0  10.0 11.0 12.0
            13.0 14.0 15.0 16.0)))
 
+
 (def-tuple-op print-matrix44
   ((mat matrix44 (e00 e01 e02 e03
                   e10 e11 e12 e13

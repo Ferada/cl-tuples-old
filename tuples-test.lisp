@@ -104,7 +104,7 @@
 
 ;; test identity mult
 
-(defparameter *test-matrix* (make-test-matrix44 (cl-tuples::make-test-matrix44)))
+(defparameter *test-matrix* (make-matrix44 (cl-tuples::make-test-matrix44)))
 (defparameter *identity-matrix* (make-matrix44 (identity-matrix44)))
 
 (defparameter *vertex0* (make-vertex3d (vector3d-vertex3d (vector3d  *vector0*))))
@@ -120,7 +120,7 @@
 (with-test *result*
   (= *result* 1.7320508)
   (setf *result*
-        (vertex3d-distance (vector3d  *vertex0*) (vector3d  *vertex1*))))
+        (vertex3d-distance (vertex3d  *vertex0*) (vertex3d  *vertex1*))))
 
 
 (defun torad (x) (coerce  (* x (/ PI 180.0)) 'single-float))

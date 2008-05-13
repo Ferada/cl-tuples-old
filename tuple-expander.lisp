@@ -328,7 +328,7 @@
                     (arg-expander-fn-aux (1+ n) names types elements gensyms body)
                     (symbol-macro-expander-fn 0 names types elements gensyms body))))
       ;; if there are no associated parameters with this op, just expand the body    
-      `(progn ,@body)))
+      (symbol-macro-expander-fn 0 nil nil nil nil body)))
 
 
 (defun body-expander-fn (names types elements gensyms body)
@@ -344,8 +344,13 @@
                  (cadar body)))
             ;; the rest of the body is the actual body
             (real-body (cddar body)))
+        ;; when we have a parameter list, expand it
         ``(the ,',ret-type
-           ,,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
+            ,,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
+;;         ;; otherwise splice in the quoted body
+;;         ``(the ,',ret-type
+;;             (progn ,@',real-body)))
+      ;; no we havent specified a return type, just fall in
       (arg-expander-fn-aux 0 names types elements gensyms body)))
 
 (defun arg-expander-fn (names types elements forms)
@@ -366,4 +371,3 @@
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
 ;; 
-;;

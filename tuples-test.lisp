@@ -146,8 +146,11 @@
 ;; iterate across array, apply transforms
 (loop
    for i from 0 below (vector3d-array-dimensions *vector-array*)
-   do (transform-vertex3d (vector3d-aref *vector-array* i)
-                          (matrix44 *concat-transform*)))
+   do
+     (setf (vector3d-aref *vector-array* i)
+           (cl-tuples::transform-vector3d 
+            (matrix44 *concat-transform*)
+            (vector3d-aref *vector-array* i))))
   
 
 

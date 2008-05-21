@@ -62,89 +62,77 @@
             (+ (* x e10) (* y e11))
             (+ (* x e20) (* y e21))))))
 
-(defmacro matrix33-product (m0 m1)
-  `(with-matrix33 ,m0
-       (e000 e001 e002 
-        e010 e011 e012 
-        e020 e021 e022) 
-     (with-matrix33 ,m1
-         (e100 e101 e102
-          e110 e111 e112
-          e120 e121 e122)
-       (matrix33-tuple
-        (matrix-dot 3 0 0)
-        (matrix-dot 3 0 1)
-        (matrix-dot 3 0 2)
-
-        (matrix-dot 3 1 0)
-        (matrix-dot 3 1 1)
-        (matrix-dot 3 1 2)
-
-        (matrix-dot 3 2 0)
-        (matrix-dot 3 2 1)
-        (matrix-dot 3 2 2)))))
+(def-tuple-op matrix33-product 
+    ((m0 matrix33 (e000 e001 e002 e010 e011 e012 e020 e021 e022))
+     (m1 matrix33 (e100 e101 e102 e110 e111 e112 e120 e121 e122)))
+    (:return matrix33-tuple
+             (matrix33-tuple
+              (matrix-dot 3 0 0)
+              (matrix-dot 3 0 1)
+              (matrix-dot 3 0 2)
+              
+              (matrix-dot 3 1 0)
+              (matrix-dot 3 1 1)
+              (matrix-dot 3 1 2)
+              
+              (matrix-dot 3 2 0)
+              (matrix-dot 3 2 1)
+              (matrix-dot 3 2 2))))
 
 
-(defmacro transform-vertex3d (matrix44 vertex3d)
-  `(with-vertex3d 
-       ,vertex3d (x y z w)
-       (with-matrix44 
-           ,matrix44 (e00 e01 e02 e03
-                      e10 e11 e12 e13
-                      e20 e21 e22 e23
-                      e30 e31 e32 e33)
+(def-tuple-op transform-vertex3d 
+    ((mat matrix44 
+          (e00 e01 e02 e03
+           e10 e11 e12 e13
+           e20 e21 e22 e23
+           e30 e31 e32 e33))
+     (vert vertex3d (x y z w)))
+  (:return vertex3d
            (vertex3d-tuple
             (+ (* x e00) (* y e01) (* z e02) (* w e03))
             (+ (* x e10) (* y e11) (* z e02) (* w e13))
             (+ (* x e20) (* y e21) (* z e02) (* w e23))
-            (+ (* x e30) (* y e31) (* z e32) (* w e33))))))
+            (+ (* x e30) (* y e31) (* z e32) (* w e33)))))
 
-(defmacro transform-vector3d (matrix44 vector3d)
-  `(with-vector3d 
-       ,vector3d (x y z)
-       (with-matrix44 
-           ,matrix44 (e00 e01 e02 e03
-                      e10 e11 e12 e13
-                      e20 e21 e22 e23
-                      e30 e31 e32 e33)
-           (vector3d-tuple
-            (+ (* x e00) (* y e01) (* z e02))
-            (+ (* x e10) (* y e11) (* z e02))
-            (+ (* x e20) (* y e21) (* z e02))
-            (+ (* x e30) (* y e31) (* z e32))))))
+(def-tuple-op transform-vector3d 
+    ((mat matrix44 
+          (e00 e01 e02 e03
+           e10 e11 e12 e13
+           e20 e21 e22 e23
+           e30 e31 e32 e33))
+     (vect vector3d (x y z)))
+  (:return vertex3d
+           (vertex3d-tuple
+            (+ (* x e00) (* y e01) (* z e02) )
+            (+ (* x e10) (* y e11) (* z e02) )
+            (+ (* x e20) (* y e21) (* z e02) )
+            (+ (* x e30) (* y e31) (* z e32) ))))
 
 
-(defmacro matrix44-product (m0 m1)
-  `(with-matrix44 ,m0
-       (e000 e001 e002 e003
-        e010 e011 e012 e013
-        e020 e021 e022 e023
-        e030 e031 e032 e033)
-     (with-matrix44 ,m1
-         (e100 e101 e102 e103
-          e110 e111 e112 e113
-          e120 e121 e122 e123
-          e130 e131 e132 e133)
-       (matrix44-tuple
-        (matrix-dot 4 0 0)
-        (matrix-dot 4 0 1)
-        (matrix-dot 4 0 2)
-        (matrix-dot 4 0 3)
-
-        (matrix-dot 4 1 0)
-        (matrix-dot 4 1 1)
-        (matrix-dot 4 1 2)
-        (matrix-dot 4 1 3)
-
-        (matrix-dot 4 2 0)
-        (matrix-dot 4 2 1)
-        (matrix-dot 4 2 2)
-        (matrix-dot 4 2 3)
-
-        (matrix-dot 4 3 0)
-        (matrix-dot 4 3 1)
-        (matrix-dot 4 3 2)
-        (matrix-dot 4 3 3)))))
+(def-tuple-op matrix44-product
+    ((m0 matrix44 (e000 e001 e002 e003 e010 e011 e012 e013  e020 e021 e022 e023  e030 e031 e032 e033))
+     (m1 matrix44 (e100 e101 e102 e103 e110 e111 e112 e113  e120 e121 e122 e123  e130 e131 e132 e133)))
+  (:return matrix44
+           (matrix44-tuple
+            (matrix-dot 4 0 0)
+            (matrix-dot 4 0 1)
+            (matrix-dot 4 0 2)
+            (matrix-dot 4 0 3)
+   
+            (matrix-dot 4 1 0)
+            (matrix-dot 4 1 1)
+            (matrix-dot 4 1 2)
+            (matrix-dot 4 1 3)
+   
+            (matrix-dot 4 2 0)
+            (matrix-dot 4 2 1)
+            (matrix-dot 4 2 2)
+            (matrix-dot 4 2 3)
+   
+            (matrix-dot 4 3 0)
+            (matrix-dot 4 3 1)
+            (matrix-dot 4 3 2)
+            (matrix-dot 4 3 3))))
 
 (def-tuple-op identity-matrix44 
     ()  

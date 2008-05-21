@@ -35,8 +35,8 @@
 
            transform-vertex2d
            transform-vertex3d
-           transform-vertex2d
-           transform-vertex3d
+           transform-vector2d
+           transform-vector3d
            matrix33-product
            matrix44-product
 

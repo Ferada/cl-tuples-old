@@ -7,28 +7,6 @@
 
 
 
-;; (cl-tuples::def-tuple pair)
-;; (cl-tuples::def-tuple-array-dimensions pair)
-;; (cl-tuples::def-tuple-getter pair)
-;; (cl-tuples::def-tuple-aref pair)
-;; (cl-tuples::def-with-tuple pair)
-;; (cl-tuples::def-with-tuple* pair)
-;; (cl-tuples::def-with-tuple-aref pair)
-;; (cl-tuples::def-tuple-setter  pair)
-;; (cl-tuples::def-tuple-aref-setter  pair)
-;; (cl-tuples::def-tuple-vector-push pair)
-;; (cl-tuples::def-tuple-vector-push-extend pair)
-;; (cl-tuples::def-new-tuple pair)
-;; (cl-tuples::def-tuple-maker pair)
-;; (cl-tuples::def-tuple-maker* pair)
-;; (cl-tuples::def-tuple-array-maker pair)
-;; (cl-tuples::def-tuple-setf  pair)
-;; (cl-tuples::def-tuple-array-setf  pair)
-;; (cl-tuples::def-tuple-map pair)
-;; (cl-tuples::def-tuple-reduce pair)
-
-
-
 (defmacro with-test (test-sym test &rest forms)
   (cl-tuples::with-gensyms (result)
     `(progn

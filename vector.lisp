@@ -89,22 +89,15 @@
            (,x ,y ,z)
          (values (/ ,x ,mag) (/ ,y ,mag) (/ ,z ,mag))))))
 
-(defmacro vector3d-vertex3d (vector3d)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(with-vector3d ,vector3d 
-         (,x ,y ,z)
-       (values ,x ,y ,z 1.0))))
+(def-tuple-op vector3d-vertex3d 
+    ((vector3d vec (x y z)))
+  (:return vertex3d
+           (vertex3d-tuple x y z 1.0)))
 
-(defmacro vertex3d-vector3d (vertex3d)
-  (let ((x (gensym))
-        (y (gensym))
-        (z (gensym))
-        (w (gensym)))  
-    `(with-vertex3d ,vertex3d
-         (,x ,y ,z ,w)
-       (values ,x ,y ,z))))
+(def-tuple-op vertex3d-vector3d 
+    ((vert  vertex3d (x y z w)))
+  (:return vector3d 
+           (vector3d-tuple x y z)))
   
 
 (def-tuple-op vector3d-cross

@@ -58,36 +58,45 @@
 ;; make 33 matrix from 2 2d vectors
 
 
-(defmacro vector3d-mag-square (vector3d)
-  `(reduce-vector3d-tuple 
-    #'+
-    (map-vector3d-tuples #'* ,vector3d ,vector3d)))
+(def-tuple-op vector3d-length
+    ((vec vector3d (x y z)))
+  (:return single-float
+           (sqrt (+ (* x x) (* y y) (* z z)))))
 
-(defmacro vector3d-length (vector3d)
-  `(sqrt (vector3d-mag-square ,vector3d)))
+(def-tuple-op vector3d-dot
+    ((veca vector3d (xa ya za))
+     (vecb vector3d (xb yb zb)))
+  (:return single-float
+           (+ (* xa xb) (* ya yb) (* za zb))))
 
+(def-tuple-op vector3d-difference
+    ((veca vector3d (xa ya za))
+     (vecb vector3d (xb yb zb)))
+     (:return vector3d
+              (vector3d-tuple
+               (- xa xb)
+               (- ya yb)
+               (- za zb))))
 
-(defmacro vector3d-dot (vector3d-lhs vector3d-rhs)
-  `(reduce-vector3d-tuple 
-    #'+ (map-vector3d-tuples #'* ,vector3d-lhs ,vector3d-rhs)))
+(def-tuple-op vector3d-sum
+    ((veca vector3d (xa ya za))
+     (vecb vector3d (xb yb zb)))
+     (:return vector3d
+              (vector3d-tuple
+               (+ xa xb)
+               (+ ya yb)
+               (+ za zb))))
 
-(defmacro vector3d-difference (vector3d-lhs vector3d-rhs)
-  `(map-vector3d-tuples  #'- ,vector3d-lhs ,vector3d-rhs))
+(def-tuple-op vector3d-normal 
+    ((vec vector3d (x y z)))
+  (:return vector3d
+           (let 
+               ((mag (sqrt (+ (* x x) (* y y) (* z z)))))
+             (vector3d-tuple
+              (/ x mag)
+              (/ y mag)
+              (/ z mag)))))
 
-(defmacro vector3d-sum (vector3d-lhs vector3d-rhs)
-  `(map-vector3d-tuples  #'+ ,vector3d-lhs ,vector3d-rhs))
-
-(defmacro vector3d-normal (vector3d)
-  (let ((mag (gensym))
-        (x (gensym))
-        (y (gensym))
-        (z (gensym)))
-    `(let 
-         ((,mag (vector3d-length ,vector3d)))
-       (with-vector3d
-           ,vector3d
-           (,x ,y ,z)
-         (values (/ ,x ,mag) (/ ,y ,mag) (/ ,z ,mag))))))
 
 (def-tuple-op vector3d-vertex3d 
     ((vector3d vec (x y z)))

@@ -17,6 +17,8 @@
            vertex2d-vector2d
 
            vector3d-dot
+           vector3d-sum
+           vector3d-difference
            vector3d-mag-square
            vector3d-length
            vector3d-normal
@@ -48,8 +50,12 @@
            quaternion-product
            quaternion-matrix33
            angle-axis-quaternion
-           quaternion-transform-vector3d)
+           quaternion-transform-vector3d
 
+           width
+           height)
+
+  
            (:nicknames :tuples))
 
 (in-package :cl-tuples)

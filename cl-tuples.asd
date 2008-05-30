@@ -17,7 +17,8 @@
                (:file "vector")
                (:file "quaternion")
                (:file "matrix")
-               (:file "colour")))
+               (:file "colour")
+               (:file "rect")))
 
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
   (operate 'asdf:load-op :cl-tuples-tests)

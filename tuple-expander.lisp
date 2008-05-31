@@ -80,7 +80,7 @@
 
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple)))
-  `(defmacro ,(tuple-symbol type-name expansion) (&rest values-form)
+  `(defmacro ,(tuple-symbol type-name expansion) (&rest elements)
      `(the (values ,@',(loop for i from 0 below (tuple-size type-name) collect (tuple-element-type type-name)))
         (values  ,@values-form))))
 

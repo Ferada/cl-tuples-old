@@ -82,7 +82,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple)))
   `(defmacro ,(tuple-symbol type-name expansion) (&rest elements)
      `(the (values ,@',(loop for i from 0 below (tuple-size type-name) collect (tuple-element-type type-name)))
-        (values  ,@values-form))))
+        (values  ,@elements))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-getter)))
   `(defmacro ,type-name (tuple-array-name)
@@ -95,22 +95,23 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref)))
   `(defmacro ,(tuple-symbol type-name :def-tuple-aref) (tuple-array array-index)
-     (let* ((varlist (gensym-list ,(tuple-size type-name)))
-            (array-index-sym (gensym))
-            (counter-sym (gensym)))
-       `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index))
-              (,counter-sym 0))
-          (values ,@(mapcar #'(lambda (x)
-                  (declare ( ignore x))
-                  (list
-                   'prog1
-                   `(aref ,tuple-array
-                          (+ ,counter-sym ,array-index-sym))
-                   `(incf ,counter-sym)))
-                            varlist))))))
+    (let* ((varlist (gensym-list ,(tuple-size type-name)))
+           (array-index-sym (gensym))
+           (counter-sym (gensym)))
+      `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index))
+             (,counter-sym 0))
+         (values ,@(mapcar #'(lambda (x)
+                               (declare (ignore x))
+                               (list
+                                'prog1
+                                `(aref ,tuple-array
+                                       (+ ,counter-sym ,array-index-sym))
+                                `(incf ,counter-sym)))
+                          varlist))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-with-tuple)))
   `(defmacro ,(tuple-symbol type-name :def-with-tuple)  (tuple element-syms &body forms)
+     (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple")
      `(multiple-value-bind
           ,element-syms
           ,tuple
@@ -120,6 +121,7 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql  :def-with-tuple*)))
   `(defmacro ,(tuple-symbol type-name :def-with-tuple*) (tuple-array element-syms &body forms)
+     (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple*")
      `(multiple-value-bind
           ,element-syms
           (,',type-name ,tuple-array)
@@ -143,7 +145,7 @@
                                      `(aref ,array-name (+,counter-sym ,array-index-sym))
                                      `(incf ,counter-sym)))
                                 element-syms))
-              (declare (ignorable ,@element-syms))
+            (declare (ignorable ,@element-syms) (type ','(tuple-element-type type-name)))
             (progn ,@forms))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setter)))

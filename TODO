@@ -1,10 +1,6 @@
 * cl-tuples
-** TODO Array reference should maybe be via (tuple-aref type index) => (values elements...), rather than baking types into names?
-** TODO def-tuple-op needs to specify non tuple argument types and return types
-** TODO many of the exisiting macros could be rewritten in terms of def-tuple-op
-** TODO unit tests
-** TODO maybe refactor into *-tuple-place an *-tuple fns
 ** TODO with-tuple-* to (with-tuple (vector3d thing (elements))) ?
+** TODO documentation doesn't work!
 
 * blockworld
 ** TODO platonic solids

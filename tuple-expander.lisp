@@ -128,13 +128,23 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-with-tuple-aref)))
   `(defmacro ,(tuple-symbol type-name :def-with-tuple-aref)  ((array-name index element-syms) &body forms)
-     `(symbol-macrolet
-          ,(loop
-            for element-sym in element-syms
-            for array-index = (* index (tuple-size ',type-name))  then (1+ array-index)
-            collect `(,element-sym (aref ,array-name ,index)))
-        (progn
-          ,@forms))))
+     (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple-aref")
+     (let* ((array-index-sym (gensym))
+            (counter-sym (gensym)))
+       `(let ((,array-index-sym (* ,',(tuple-size type-name) ,index))
+              (,counter-sym 0))
+          (multiple-value-bind
+                ,element-syms
+              ;; this is the bit we need to generate
+              (values ,@(mapcar #'(lambda (x)
+                                    (declare (ignore x))
+                                    (list
+                                     'prog1
+                                     `(aref ,array-name (+,counter-sym ,array-index-sym))
+                                     `(incf ,counter-sym)))
+                                element-syms))
+              (declare (ignorable ,@element-syms))
+            (progn ,@forms))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setter)))
   `(defmacro ,(tuple-symbol type-name :def-tuple-setter) (tuple-place tuple-values)

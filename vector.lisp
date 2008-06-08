@@ -99,7 +99,7 @@
 
 
 (def-tuple-op vector3d-vertex3d 
-    ((vector3d vec (x y z)))
+    ((vec vector3d (x y z)))
   (:return vertex3d
            (vertex3d-tuple x y z 1.0)))
 

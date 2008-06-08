@@ -232,7 +232,7 @@
   `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
-                 :fill-pointer (* ,(tuple-size type-name) fill-pointer)
+                 :fill-pointer (when fill-pointer (* ,(tuple-size type-name) fill-pointer))
                  :element-type ',(tuple-element-type type-name))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))
@@ -382,4 +382,3 @@
 ; tester
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
-;; 

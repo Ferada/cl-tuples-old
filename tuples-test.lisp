@@ -5,8 +5,6 @@
 
 (in-package :cl-tuples-test)
 
-
-
 (defmacro with-test (test-sym test &rest forms)
   (cl-tuples::with-gensyms (result)
     `(progn
@@ -44,6 +42,21 @@
        (= *result* 4))
   (setf *test-pair* (make-pair (map-pair-tuples #'+ #{ 1 2 } #{ 2 3 } #{ 4 5 })))
   (setf *result* (reduce-pair-tuple #'* #{ 2 2 })))
+
+;; test with- forms
+(with-test *result*
+  (equalp *result* '(7 10))
+  (setf *result*
+        (with-pair (pair *test-pair*) (a b)
+          (list a b))))
+
+(with-test *result*
+  (equalp *result* '((3 4) (3 4) (6 7)))
+  (setf *result*
+        (loop
+           for i from 0 below (pair-array-dimensions *pair-array*)
+           collect
+           (with-pair-aref (*pair-array* i (a b))  (list a b)))))
 
 ;; basic vector math
 (defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } )) 
@@ -150,7 +163,8 @@
      (setf (vector3d-aref *vector-array* i)
            (cl-tuples::transform-vector3d 
             (matrix44 *concat-transform*)
-            (vector3d-aref *vector-array* i))))
+            (vector3d-aref *vector-array* i)))
+     (with-vector3d-aref   ))
   
 
 

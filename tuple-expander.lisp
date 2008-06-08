@@ -145,7 +145,7 @@
                                      `(aref ,array-name (+,counter-sym ,array-index-sym))
                                      `(incf ,counter-sym)))
                                 element-syms))
-            (declare (ignorable ,@element-syms) (type ','(tuple-element-type type-name)))
+            (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name)))
             (progn ,@forms))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setter)))

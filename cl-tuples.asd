@@ -18,6 +18,7 @@
                (:file "quaternion")
                (:file "matrix")
                (:file "colour")
+               (:file "triangle")
                (:file "rect")))
 
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))

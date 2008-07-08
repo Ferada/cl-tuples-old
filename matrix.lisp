@@ -38,35 +38,30 @@
            collect `(* ,col-sym ,row-sym))))))
 
 
-(defmacro transform-vertex2d (matrix33 vertex2d)
-  `(with-vertex2d 
-       ,vertex2d (x y w)
-       (with-matrix33 
-           ,matrix33 (e00 e01 e02
-                      e10 e11 e12
-                      e20 e21 e22)
-           (vertex2d-tuple
+(def-tuple-op transform-vertex2d 
+    ((matrix33 mat (e00 e01 e02 e10 e11 e12 e20 e21 e22))
+     (vertex2d vert (x y w)))
+  (:return vertex2d
+           (vertex2d*
             (+ (* x e00) (* y e01) (* w e02))
             (+ (* x e10) (* y e11) (* w e12))
-            (+ (* x e20) (* y e21) (* w e22))))))
+            (+ (* x e20) (* y e21) (* w e22)))))
 
-(defmacro transform-vector2d (matrix33 vector2d)
-  `(with-vector2d 
-       ,vector2d (x y)
-       (with-matrix33 
-           ,matrix33 (e00 e01 e02 
-                      e10 e11 e12
-                      e20 e21 e22)
-           (vector2d-tuple
+
+(def-tuple-op transform-vector2d 
+    ((matrix33 mat (e00 e01 e02 e10 e11 e12 e20 e21 e22))
+     (vector2d vec (x y)))
+  (:return vector2d
+           (vector2d*
             (+ (* x e00) (* y e01))
-            (+ (* x e10) (* y e11))
-            (+ (* x e20) (* y e21))))))
+            (+ (* x e10) (* y e11)))))
+
 
 (def-tuple-op matrix33-product 
     ((m0 matrix33 (e000 e001 e002 e010 e011 e012 e020 e021 e022))
      (m1 matrix33 (e100 e101 e102 e110 e111 e112 e120 e121 e122)))
-    (:return matrix33-tuple
-             (matrix33-tuple
+    (:return matrix33
+             (matrix33*
               (matrix-dot 3 0 0)
               (matrix-dot 3 0 1)
               (matrix-dot 3 0 2)
@@ -88,7 +83,7 @@
            e30 e31 e32 e33))
      (vert vertex3d (x y z w)))
   (:return vertex3d
-           (vertex3d-tuple
+           (vertex3d*
             (+ (* x e00) (* y e01) (* z e02) (* w e03))
             (+ (* x e10) (* y e11) (* z e02) (* w e13))
             (+ (* x e20) (* y e21) (* z e02) (* w e23))
@@ -102,7 +97,7 @@
            e30 e31 e32 e33))
      (vect vector3d (x y z)))
   (:return vertex3d
-           (vertex3d-tuple
+           (vertex3d*
             (+ (* x e00) (* y e01) (* z e02) )
             (+ (* x e10) (* y e11) (* z e02) )
             (+ (* x e20) (* y e21) (* z e02) )
@@ -113,7 +108,7 @@
     ((m0 matrix44 (e000 e001 e002 e003 e010 e011 e012 e013  e020 e021 e022 e023  e030 e031 e032 e033))
      (m1 matrix44 (e100 e101 e102 e103 e110 e111 e112 e113  e120 e121 e122 e123  e130 e131 e132 e133)))
   (:return matrix44
-           (matrix44-tuple
+           (matrix44*
             (matrix-dot 4 0 0)
             (matrix-dot 4 0 1)
             (matrix-dot 4 0 2)
@@ -137,7 +132,7 @@
 (def-tuple-op identity-matrix44 
     ()  
   (:return matrix44
-         (matrix44-tuple
+         (matrix44*
           1.0 0.0 0.0 0.0
           0.0 1.0 0.0 0.0
           0.0 0.0 1.0 0.0
@@ -149,7 +144,7 @@
      (tz single-float))
   "Return a matrix that represents a translation transformation"
   (:return matrix44
-           (matrix44-tuple
+           (matrix44*
             0.0 0.0 0.0 tx
             0.0 0.0 0.0 ty
             0.0 0.0 0.0 tz
@@ -160,7 +155,7 @@
     ((rotation single-float))
   "Return a matrix for rotating around the x axis."
   (:return matrix44
-           (matrix44-tuple
+           (matrix44*
             1.0  0.0   0.0   0.0
             0.0 (cos rotation) (sin rotation)  0.0
             0.0 (sin rotation) (cos rotation)   0.0
@@ -172,7 +167,7 @@
     ((rotation single-float))
   "Return a matrix for rotating around the y axis."
   (:return matrix44
-           (matrix44-tuple
+           (matrix44*
             (cos rotation)   0.0     (sin rotation)   0.0
             0.0     1.0     0.0     0.0
             (sin rotation)  0.0    (cos rotation)   0.0
@@ -182,7 +177,7 @@
     ((rotation single-float))
   "Return a matrix for rotating around the z axis."
   (:return matrix44
-           (matrix44-tuple
+           (matrix44*
             (cos rotation)   0.0   (sin rotation)  0.0
             (sin rotation)   0.0   (cos rotation)   0.0
             0.0     0.0   1.0     0.0
@@ -192,7 +187,7 @@
   ()
   "Return a matrix for testing purposes"
   (:return matrix44
-          (matrix44-tuple
+          (matrix44*
            1.0  2.0  3.0  4.0
            5.0  6.0  7.0  8.0
            9.0  10.0 11.0 12.0

@@ -7,6 +7,9 @@
   "Create an alias for values for this tuple.eg (vector3d-tuple #{ 1.0 0.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple))
 
+(defmacro def-tuple-typespec (type-name)
+  (tuple-expansion-fn type-name :def-tuple-type))
+
 (defmacro def-tuple-getter (type-name)
   "Create an access macro such as (vector3d vec) that takes an instance of an array and unpacks it to tuples (aka multiple values)"
   (tuple-expansion-fn type-name :def-tuple-getter))
@@ -120,6 +123,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
 (defmacro make-tuple-operations (type-name)
   `(progn
      (def-tuple ,type-name)
+     (def-tuple-typespec ,type-name)
      (def-tuple-array-dimensions ,type-name)
      (def-tuple-getter ,type-name)
      (def-tuple-aref ,type-name)

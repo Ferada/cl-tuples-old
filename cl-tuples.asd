@@ -19,7 +19,8 @@
                (:file "matrix")
                (:file "colour")
                (:file "triangle")
-               (:file "rect")))
+;;                (:file "rect")
+))
 
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
   (operate 'asdf:load-op :cl-tuples-tests)

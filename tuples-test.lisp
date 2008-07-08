@@ -24,9 +24,9 @@
 (with-test *result*
   (and (equalp *test-pair* #(3 4))
        (equalp *pair-array* #( 3 4)))
-  (defparameter *test-pair* (make-pair (pair-tuple 1 2)))
+  (defparameter *test-pair* (make-pair (pair* 1 2)))
   (defparameter *pair-array* (make-pair-array 2 :adjustable t :fill-pointer 1))
-  (setf *test-pair* (make-pair #{ 3 4 }))
+  (setf *test-pair* (make-pair (the pair #{ 3 4 })))
   (setf (pair-aref *pair-array* 0) (pair *test-pair*)))
 
 
@@ -34,14 +34,14 @@
 (with-test *result*
   (equalp *pair-array* #(3 4 3 4 6 7))
   (pair-vector-push (pair *test-pair*) *pair-array*)
-  (pair-vector-push-extend (pair-tuple  6 7) *pair-array*))
+  (pair-vector-push-extend (pair*  6 7) *pair-array*))
 
 ;; map/reduce
 (with-test *result* 
   (and (equalp *test-pair* #(7 10))
        (= *result* 4))
-  (setf *test-pair* (make-pair (map-pair-tuples #'+ #{ 1 2 } #{ 2 3 } #{ 4 5 })))
-  (setf *result* (reduce-pair-tuple #'* #{ 2 2 })))
+  (setf *test-pair* (make-pair (map-pair #'+ #{ 1 2 } #{ 2 3 } #{ 4 5 })))
+  (setf *result* (reduce-pair #'* #{ 2 2 })))
 
 ;; test with- forms
 (with-test *result*
@@ -67,8 +67,8 @@
 
 (defparameter *test-vector* (new-vector3d))
 
-(map-vector3d-tuples #'+ (vector3d  *vector0*) (vector3d *vector1*))
-(reduce-vector3d-tuple #'- (vector3d *vector1*))
+(map-vector3d #'+ (vector3d  *vector0*) (vector3d *vector1*))
+(reduce-vector3d #'- (vector3d *vector1*))
 
 (with-test *result*
   (= *result* 0.0)
@@ -156,15 +156,14 @@
 ;; to do - doesnt extend array properly
 (vector3d-vector-push-extend (vector3d *vectorz*) *vector-array*)
 
-;; iterate across array, apply transforms
+;; ;; iterate across array, apply transforms
 (loop
    for i from 0 below (vector3d-array-dimensions *vector-array*)
    do
      (setf (vector3d-aref *vector-array* i)
            (cl-tuples::transform-vector3d 
             (matrix44 *concat-transform*)
-            (vector3d-aref *vector-array* i)))
-     (with-vector3d-aref   ))
+            (vector3d-aref *vector-array* i))))
   
 
 

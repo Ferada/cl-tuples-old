@@ -17,7 +17,7 @@
 
 (def-tuple-op quaternion-conjugate 
   ((q quaternion (x y z w)))
-  (quaternion-tuple (- x) (- y) (- z) w))
+  (quaternion* (- x) (- y) (- z) w))
 
 
 (def-tuple-op quaternion-dot 
@@ -25,27 +25,27 @@
      (quaternion-rhs quaternion (x1 y1 z1 w1)))
     "Dot product of two quaternions."
     (:return quaternion
-             (reduce-quaternion-tuple 
-              #'+ (map-quaternion-tuples #'* 
-                    (quaternion-tuple x0 y0 z0 w0) 
-                    (quaternion-tuple x1 y1 z1 w1)))))
+             (reduce-quaternion* 
+              #'+ (map-quaternion*s #'* 
+                    (quaternion* x0 y0 z0 w0) 
+                    (quaternion* x1 y1 z1 w1)))))
 
 (def-tuple-op quaternion-inverse 
   ((q quarternion (x y z w)))
     "Inverse of quaternion"
    (let ((dot-recip 
           (/ 1.0 (quaternion-dot 
-                  (quaternion-tuple x y z w) 
-                  (quaternion-tuple)))))    
-     (map-quaternion-tuples
+                  (quaternion* x y z w) 
+                  (quaternion*)))))    
+     (map-quaternion*s
          #'(lambda (t) (* t dot-recip))
-         (quaternion-conjugate (quaternion-tuple x y z w)))))
+         (quaternion-conjugate (quaternion* x y z w)))))
 
 (def-tuple-op quaternion-product
     ((q-lhs quaternion (x1 y1 z1 w1))
      (q-rhs quaternion (x2 y2 z2 w2)))
   "Multiple of two quaternions"
-  (quaternion-tuple (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
+  (quaternion* (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
                     (- (+ (* w1 y2) (* y1 w2) (* z1 x2)) (* x1 z2))
                     (- (+ (* w1 z2) (* x1 y2) (* z1 w2)) (* y1 x2))
                     (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2))))
@@ -66,7 +66,7 @@
        (x y z a)
      (let ((,cosa (cos (/ a 2.0)))
            (,sina (sin (/ a 2.0))))
-       (quaternion-tuple (* x ,sina) (* y ,sina) (* z ,sina) (* a ,cosa))))))
+       (quaternion* (* x ,sina) (* y ,sina) (* z ,sina) (* a ,cosa))))))
                 
     
 (def-tuple-op quaternion-transform-vector3d
@@ -76,8 +76,8 @@
   (with-quaternion 
       (quaternion-product
        (quaternion-product
-        (quaternion-tuple qx qy qz qw)
-        (quaternion-tuple vx vy vz 0.0))
-       (quaternion-conjugate (quaternion-tuple qx qy qz qw)))
+        (quaternion* qx qy qz qw)
+        (quaternion* vx vy vz 0.0))
+       (quaternion-conjugate (quaternion* qx qy qz qw)))
       (rx ry rz rw)
     (vector3d-tuple rx ry rz)))

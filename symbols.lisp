@@ -54,9 +54,26 @@ is stored in the property list of the symbol."
   (assert (or (symbolp type-name) (stringp type-name)))
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
+(defun tuple-gensyms (type-name)
+  "Return a list of gensyms, one for each element of the tuple"
+  (assert (or (symbolp type-name) (stringp type-name)))
+  (loop 
+     for i from 0 below (tuple-size type-name)
+     collect (gensym)))
+
 (defun tuple-typespec (type-name)
-  "Return typespec of tuple."
+  "Return typespec of tuple as multiple value."
   `(values ,@(loop 
                for i from 0 below (tuple-size type-name) 
                 collect (tuple-element-type type-name))))
 
+(defun tuple-typespec* (type-name)
+  "Return typespec of tuple as array"
+  `(vector ,(tuple-element-type type-name) (,(tuple-size type-name))))
+
+(defun tuple-places (type-name array-name)
+  "Return a list of (aref *) forms to turn at tuple represeted and array into individual places."
+  (loop 
+     for i from 0 below (tuple-size type-name)
+     collect `(aref ,array-name ,i)))
+  

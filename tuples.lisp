@@ -4,10 +4,11 @@
 
 
 (defmacro def-tuple (type-name)
-  "Create an alias for values for this tuple.eg (vector3d-tuple #{ 1.0 0.0 0.0 })"
+  "Create an alias for values for this tuple.eg (vector3d* #{ 1.0 0.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple))
 
 (defmacro def-tuple-typespec (type-name)
+  "Create an alias typespec eg. (deftype vector3d () `(values 'single-float 'single-float 'single-float))"
   (tuple-expansion-fn type-name :def-tuple-type))
 
 (defmacro def-tuple-getter (type-name)

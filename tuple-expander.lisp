@@ -2,7 +2,7 @@
 (in-package :cl-tuples)
 
 (defparameter *tuple-expander-keywords* 
-  '(:def-tuple-type :def-tuple-getter :def-tuple-aref 
+  '(:def-tuple :def-tuple-getter :def-tuple-aref 
     :def-with-tuple :def-with-tuple* :def-with-tuple-aref 
     :def-tuple-setter :def-tuple-aref-setter 
     :def-tuple-vector-push :def-tuple-vector-push-extend 

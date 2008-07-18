@@ -36,16 +36,9 @@
   (pair-vector-push (pair *test-pair*) *pair-array*)
   (pair-vector-push-extend (pair*  6 7) *pair-array*))
 
-;; map/reduce
-(with-test *result* 
-  (and (equalp *test-pair* #(7 10))
-       (= *result* 4))
-  (setf *test-pair* (make-pair (map-pair #'+ #{ 1 2 } #{ 2 3 } #{ 4 5 })))
-  (setf *result* (reduce-pair #'* #{ 2 2 })))
-
 ;; test with- forms
 (with-test *result*
-  (equalp *result* '(7 10))
+  (equalp *result* '(3 4))
   (setf *result*
         (with-pair (pair *test-pair*) (a b)
           (list a b))))
@@ -66,9 +59,6 @@
 (defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
 
 (defparameter *test-vector* (new-vector3d))
-
-(map-vector3d #'+ (vector3d  *vector0*) (vector3d *vector1*))
-(reduce-vector3d #'- (vector3d *vector1*))
 
 (with-test *result*
   (= *result* 0.0)
@@ -106,7 +96,7 @@
 
 (with-test *result*
   (equalp *test-vector* #(1.0 1.0 1.0))
-  (setf *test-vector* (make-vector3d (delta-vector3d (vector3d  *vertex0*) (vector3d *vertex1*)))))
+  (setf *test-vector* (make-vector3d (delta-vector3d  (vertex3d  *vertex0*)  (vertex3d *vertex1*)))))
 
 (with-test *result*
   (= *result* 1.7320508)

@@ -8,8 +8,7 @@
     :def-tuple-vector-push :def-tuple-vector-push-extend 
     :def-new-tuple :def-tuple-maker :def-tuple-maker* 
     :def-tuple-array-maker :def-tuple-array-dimensions 
-    :def-tuple-setf :def-tuple-array-setf 
-    :def-tuple-map :def-tuple-reduce))
+    :def-tuple-setf :def-tuple-array-setf))
 
 (defgeneric tuple-symbol (type-name expansion))
 ;;  "Given the expansion, return the name of the macro/function associated with it."
@@ -69,13 +68,6 @@
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))    
   (make-suffixed-symbol type-name "AREF"))
 
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-map)))    
-  (make-adorned-symbol type-name :prefix "MAP"))
-
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-reduce)))    
-  (make-adorned-symbol type-name :prefix "REDUCE"))
-
-
 ;; to do -- break this up into methods specialised by key
 (defgeneric tuple-expansion-fn (type-name expansion))
 
@@ -112,14 +104,15 @@
            (counter-sym (gensym)))
       `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index))
              (,counter-sym 0))
-         (values ,@(mapcar #'(lambda (x)
-                               (declare (ignore x))
-                               (list
-                                'prog1
-                                `(aref ,tuple-array
+         (the ,',(tuple-typespec type-name)
+           (values ,@(mapcar #'(lambda (x)
+                                 (declare (ignore x))
+                                 (list
+                                  'prog1
+                                `(aref (the ,',(tuple-typespec** type-name) ,tuple-array)
                                        (+ ,counter-sym ,array-index-sym))
                                 `(incf ,counter-sym)))
-                          varlist))))))
+                             varlist)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-with-tuple)))
   "Create a wrapper that will bind a tuple value form to symbols during evaluation of the body."
@@ -128,7 +121,7 @@
      `(multiple-value-bind
           ,element-syms
           ,tuple
-        (declare (ignorable ,@element-syms))
+        (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
         (progn ,@forms))))
 
 
@@ -139,7 +132,7 @@
      `(multiple-value-bind
           ,element-syms
           (,',type-name ,tuple-array)
-        (declare (ignorable ,@element-syms))
+        (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
         (progn ,@forms))))
 
 ;; possibly don't need this, syntatic sugar, anyone?
@@ -158,7 +151,7 @@
                                     (declare (ignore x))
                                     (list
                                      'prog1
-                                     `(aref ,array-name (+,counter-sym ,array-index-sym))
+                                     `(aref (the ,',(tuple-typespec** type-name) ,array-name) (+,counter-sym ,array-index-sym))
                                      `(incf ,counter-sym)))
                                 element-syms))
             (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name)))
@@ -170,16 +163,17 @@
      (let* ((varlist (gensym-list ,(tuple-size type-name))))
        `(multiple-value-bind
             ,varlist
-            ,tuple-values
+            ,tuple-values         
+          (declare (type ,',(tuple-element-type type-name) ,@varlist))
           (values
            ,@(loop
                 for index from 0 below ,(tuple-size type-name)
                 collect
-                  `(setf (aref ,tuple-place ,index) ,(nth index varlist))))))))
+                  `(setf (aref (the ,',(tuple-typespec*  type-name) ,tuple-place) ,index) ,(nth index varlist))))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))
   "Create a macro that will set an indexed array of tuple array forms to the values of a tuple value form"
-  `(defmacro ,(tuple-symbol type-name :def-tuple-aref-setter) (array-name array-index tuple)
+  `(defmacro ,(tuple-symbol type-name :def-tuple-aref-setter) (array-name array-index tuple-values)
      (let* ((varlist (gensym-list ,(tuple-size type-name)))
             (array-index-sym (gensym))
             (counter-sym (gensym)))
@@ -187,13 +181,14 @@
               (,counter-sym 0))
           (multiple-value-bind
                 ,varlist
-              ,tuple
+              ,tuple-values
+            (declare (type ,',(tuple-element-type type-name) ,@varlist))
             (values ,@(mapcar #'(lambda (x)
                                   (list
                                    'prog1
-                                   `(setf (aref ,array-name
-                                                (+ ,counter-sym ,array-index-sym)) ,x)
-                                   `(incf ,counter-sym)))
+                                   `(setf (aref (the ,',(tuple-typespec** type-name) ,array-name)
+                                                (the fixnum (+ (the fixnum ,counter-sym) ,array-index-sym))) ,x)
+                                   `(incf (the fixnum ,counter-sym))))
                               varlist)))))))
 
 ;; tuple-vector-push
@@ -204,10 +199,11 @@
        `(multiple-value-bind
             ,varlist
             ,tuple-values
+          (declare (type ,',(tuple-element-type type-name) ,@varlist))
           ,@(loop
               for index from 0 below ,(tuple-size type-name)
               collect
-                `(vector-push ,(nth index varlist) ,array-name))))))
+                `(vector-push ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
   "Create a macro that will push a tuple value form into an array of existing tuple forms, extending if adjustable."
@@ -216,35 +212,39 @@
        `(multiple-value-bind
             ,varlist
             ,tuple-values
+          (declare (type ,',(tuple-element-type type-name) ,@varlist))
           ,@(loop
              for index from 0 below ,(tuple-size type-name)
              collect
-               `(vector-push-extend ,(nth index varlist) ,array-name ,',(tuple-size type-name)))))))
+               `(vector-push-extend ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name) ,',(tuple-size type-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-new-tuple)))
   "Create a macro that creates a new tuple array form"
   `(defmacro ,(tuple-symbol type-name :def-new-tuple) ()
-     `(make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
+     `(the ,',(tuple-typespec* type-name) (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name)))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker)))
-  "Create a macro that creates new tuple array, form and initialize it"
-  `(defmacro ,(tuple-symbol type-name :def-tuple-maker) (tuple)
+  "Create a macro that creates new tuple array, form and initialize it with values"
+  `(defmacro ,(tuple-symbol type-name :def-tuple-maker) (tuple-values)
      (let ((varlist (gensym-list ,(tuple-size type-name)))
            (tuple-sym (gensym))
            (counter-sym 0))
-  `(let  ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
-     (multiple-value-bind
-         ,varlist
-         ,tuple
-       (progn ,@(mapcar #'(lambda (x)
-                            (prog1
-                                `(setf (aref ,tuple-sym ,counter-sym) ,x)
-                              (incf counter-sym)))
-                        varlist)
-              ,tuple-sym))))))
+       (declare (type fixnum counter-sym))
+       `(let  ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
+          (declare (type ,',(tuple-typespec* type-name) ,tuple-sym))
+          (multiple-value-bind
+                ,varlist
+              ,tuple-values
+            (declare (type ,',(tuple-element-type type-name) ,@varlist))
+            (progn ,@(mapcar #'(lambda (x)
+                                 (prog1
+                                     `(setf (aref ,tuple-sym (the fixnum ,counter-sym)) ,x)
+                                   (incf counter-sym)))
+                             varlist)
+                   ,tuple-sym))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker*)))
-  "Create a macro that creates new tuple array form and initialize it from an existing tuple array form"
+  "Create a macro that creates new tuple array form and initialize it from a list of elements"
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker*) (&rest elements)
      (let ((tuple-sym (gensym)))
        `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
@@ -272,48 +272,6 @@
   "Expand form that creates generalized reference to tuple-arrays"
   `(defsetf ,(tuple-symbol type-name :def-tuple-aref)
      ,(tuple-symbol type-name :def-tuple-aref-setter)))
-
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-map)))
-  "Expand def-tuple-map form"
-  `(defmacro ,(tuple-symbol type-name :def-tuple-map)  (fn &body tuples)
-     `(macrolet
-          ((map-values-aux (fn n gensym-lists &body v)
-                           (if v
-                               (let* ((gensym-list-sym (gensym-list n)))
-                                 `(multiple-value-bind
-                                      ,gensym-list-sym
-                                      ,(car v)
-                             (map-values-aux ,fn ,n (,@gensym-lists ,gensym-list-sym) ,@(cdr v))))
-                             `(values
-                               ,@(loop
-                                  for index from 0 below (length (car gensym-lists))
-                                  collect
-                                  `(funcall ,fn
-                                            ,@(loop
-                                               for gensym-list in gensym-lists
-                                               collect (nth index gensym-list))))))))
-        (map-values-aux ,fn ,(tuple-size ',type-name) nil ,@tuples))))
-
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-reduce)))
-  "Expand def-tuple-reduce form"
-  `(defmacro ,(tuple-symbol type-name :def-tuple-reduce) (fn  tuples)
-     `(macrolet
-          ((reduce-values-body (fn n syms v)
-                               (cond
-                                ((= (length syms) 1)
-                                 (list (car syms)))
-                                ((= (length syms) 2)
-                                 `(funcall ,fn ,(car syms) ,(cadr syms)))
-                                ((> (length syms) 2)
-                                 `(funcall ,fn ,(car syms) (reduce-values-body ,fn ,n ,(cdr syms) ,v)))))
-           (reduce-values (fn n v)
-                          (let*
-                              ((gensym-list-sym (gensym-list n)))
-                            `(multiple-value-bind
-                                 ,gensym-list-sym
-                                 ,v
-                               (reduce-values-body ,fn ,n ,gensym-list-sym ,v)))))
-        (reduce-values ,fn  ,(tuple-size ',type-name)  ,tuples))))
 
 
 ;; -- def-tuple-op expanders begin here ------------------------------------

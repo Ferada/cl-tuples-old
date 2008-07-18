@@ -50,7 +50,7 @@ is stored in the property list of the symbol."
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'element-type))
 
 (defun tuple-elements (type-name)
-  "Return the size of the type"
+  "Return a list of element names"
   (assert (or (symbolp type-name) (stringp type-name)))
   (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'elements))
 
@@ -68,8 +68,12 @@ is stored in the property list of the symbol."
                 collect (tuple-element-type type-name))))
 
 (defun tuple-typespec* (type-name)
-  "Return typespec of tuple as array"
-  `(vector ,(tuple-element-type type-name) (,(tuple-size type-name))))
+  "Return typespec of tuple as bounded array"
+  `(vector ,(tuple-element-type type-name) ,(tuple-size type-name)))
+
+(defun tuple-typespec** (type-name)
+  "Return typespec of tuple as unbounded array"
+  `(vector ,(tuple-element-type type-name) *))
 
 (defun tuple-places (type-name array-name)
   "Return a list of (aref *) forms to turn at tuple represeted and array into individual places."

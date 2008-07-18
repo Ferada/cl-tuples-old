@@ -2,7 +2,6 @@
 
 (in-package :cl-tuples)
 
-
 (defmacro def-tuple (type-name)
   "Create an alias for values for this tuple.eg (vector3d* #{ 1.0 0.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple))
@@ -72,17 +71,6 @@
 (defmacro def-tuple-array-setf (type-name)
   (tuple-expansion-fn type-name :def-tuple-array-setf))
 
-(defmacro def-tuple-map (type-name)
-  "Creates a macro called maps-{tuple-type}-values. Which maps a the
-function across a list of values, where it expects to recieve the same
-number of values as the named type.
-e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
-  (tuple-expansion-fn type-name :def-tuple-map))
-
-(defmacro def-tuple-reduce (type-name)
-  "Creates a macro called reduce-{tuple-type}-values. Which applies the reduction function to each value in it's second parameter, where it expects to recieve the same number of values as the named type. e.g (def-tuple-reduce vector2d) produces (reduce-vector2d-values fn tuples)"
-  (tuple-expansion-fn type-name :def-tuple-reduce))
-
 (defun document-tuple-type (type-name)
   `(progn
      ;; instead of setf, need some form that can use the symbol in the format
@@ -115,11 +103,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (setf (documentation ',(tuple-symbol type-name :def-tuple-array-maker) 'function)
            (format nil  "Create an array suitable for holding a number of ~A's " ,type-name))
      (setf (documentation ,'(tuple-symbol type-name :def-tuple-array-dimensions) 'function)
-           (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,type-name ,type-name))
-     (setf (documentation ',(tuple-symbol type-name :def-tuple-map) 'function)
-           (format nil  "Map a function over an arbitrary number of ~A's expressed as multiple values and return a ~A mutiple value" ,type-name ,type-name ,type-name))
-     (setf (documentation ',(tuple-symbol type-name :def-tuple-reduce) 'function)
-           (format nil "Reduce a ~A to a single value (the same type as it's element) by repated application of the function" ,type-name))))
+           (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,type-name ,type-name))))
 
 (defmacro make-tuple-operations (type-name)
   `(progn
@@ -140,9 +124,7 @@ e.g (def-tuple-map vector2d) produces (map-vector2d-values fn &rest values)"
      (def-tuple-maker* ,type-name)
      (def-tuple-array-maker ,type-name)
      (def-tuple-setf  ,type-name)
-     (def-tuple-array-setf  ,type-name)
-     (def-tuple-map ,type-name)
-     (def-tuple-reduce ,type-name)))
+     (def-tuple-array-setf  ,type-name)))
 
 (defmacro export-tuple-operations (type-name)
   `(progn

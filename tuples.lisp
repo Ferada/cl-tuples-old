@@ -106,6 +106,9 @@
            (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,(string type-name) ,(string type-name)))
      (values)))
 
+(defmacro def-tuple-documentation (type-name)
+  (document-tuple-type type-name))
+
 (defmacro make-tuple-operations (type-name)
   `(progn
      (def-tuple ,type-name)
@@ -140,7 +143,7 @@
   `(eval-when (:compile-toplevel :execute :load-toplevel)
      (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',elements)
      (make-tuple-operations ,tuple-type-name)
-     (document-tuple-type ',tuple-type-name)))
+     (def-tuple-documentation ,tuple-type-name)))
 
 
 ;; full syntax (def-tuple-op name ((name type (elements)) ..) (

@@ -13,7 +13,8 @@
 
 (defun as-private-accessor (class-sym slot-sym)
   "Create an accessor for the slot named by sym"
-  (intern (concatenate 'string (string class-sym) "-" (string slot-sym) "%")))
+  (declare (ignore class-sym))
+  (intern (concatenate 'string (string slot-sym) "-OF%")))
 
 (defun as-accessor (sym)
   "Create an accessor for the slot named by sym"
@@ -58,6 +59,7 @@
            (the ,(tuple-typespec type)
              (,(tuple-symbol type  :def-tuple-getter) (the ,(tuple-typespec* type) (,(as-private-accessor class-name name) self))))))))
 
+;; to do -- detect when we have a slot with same name but different types
 (defun slot->slot-writer (class-name slot-spec)
   "Expand a generic method body for writing a tuple slot of a def-tuples-class form"
   (destructuring-bind (name &key (type nil)  (array nil) (readonly nil) (allocation nil))
@@ -71,7 +73,7 @@
                    (annotated-tuple-gensym-list (mapcar #'(lambda (x) ``(the ,',(tuple-element-type type)  ,,x)) tuple-gensym-list)))
               `(defsetf  ,(as-accessor name) (object index)  ,tuple-gensym-list
                  `(setf (,',(tuple-symbol type :def-tuple-aref)
-                            (the ,',(tuple-typespec** type) (,',(as-private-accessor class-name name) (the ,',class-name ,object))) 
+                            (the ,',(tuple-typespec** type) (,',(as-private-accessor class-name name)  ,object))
                             (the fixnum ,index))
                         (the ,',(tuple-typespec type)
                           (,',(tuple-symbol type :def-tuple)
@@ -82,7 +84,7 @@
                    (annotated-tuple-gensym-list (mapcar #'(lambda (x) ``(the ,',(tuple-element-type type)  ,,x)) tuple-gensym-list)))
               `(defsetf  ,(as-accessor name) (object)  ,tuple-gensym-list
                  `(setf (,',(tuple-symbol type :def-tuple-getter)
-                            (the ,',(tuple-typespec* type) (,',(as-private-accessor class-name name) (the ,',class-name ,object))))
+                            (the ,',(tuple-typespec* type) (,',(as-private-accessor class-name name)  ,object)))
                         (the ,',(tuple-typespec type)
                                  (,',(tuple-symbol type :def-tuple)
                                      ,,@annotated-tuple-gensym-list))))))))))

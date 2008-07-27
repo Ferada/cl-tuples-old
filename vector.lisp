@@ -125,7 +125,7 @@
     ((start vertex3d (ox oy oz ow))
      (end vertex3d (ex ey ez ew)))
   (:return single-float
-           (vector3d-length (values (- ex ox) (- ey oy) (- ez oz)))))
+           (vector3d-length (vector3d* (- ex ox) (- ey oy) (- ez oz)))))
 
 (def-tuple-op delta-vector3d
     ((start vertex3d (ox oy oz ow))

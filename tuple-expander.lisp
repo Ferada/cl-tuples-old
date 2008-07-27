@@ -87,7 +87,7 @@
         (values  ,@elements))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-getter)))
-  "Create a macro that will return the contents of an array representing our tuple as a value form"
+  "Create a macro that will return the contents of a place representing our tuple as a value form"
   `(defmacro ,type-name (tuple-array-name)
   `(the (values ,@',(loop for i from 0 below (tuple-size type-name) collect (tuple-element-type type-name)))
      (values
@@ -126,12 +126,12 @@
 
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql  :def-with-tuple*)))
-  "Create a wrapper that will bind a tuple array form to symbols during evaluation of the body."
-  `(defmacro ,(tuple-symbol type-name :def-with-tuple*) (tuple-array element-syms &body forms)
+  "Create a wrapper that will bind a tuple place  to symbols during evaluation of the body."
+  `(defmacro ,(tuple-symbol type-name :def-with-tuple*) (tuple-place element-syms &body forms)
      (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple*")
      `(multiple-value-bind
           ,element-syms
-          (,',type-name ,tuple-array)
+          (,',type-name ,tuple-place)
         (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
         (progn ,@forms))))
 
@@ -158,7 +158,7 @@
             (progn ,@forms))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setter)))
-  "Create a macro that will set an tuple array form to the values of a tuple value form"
+  "Create a macro that will set an tuple place form to the values of a tuple value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-setter) (tuple-place tuple-values)
      (let* ((varlist (gensym-list ,(tuple-size type-name))))
        `(multiple-value-bind
@@ -172,7 +172,7 @@
                   `(setf (aref (the ,',(tuple-typespec*  type-name) ,tuple-place) ,index) ,(nth index varlist))))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))
-  "Create a macro that will set an indexed array of tuple array forms to the values of a tuple value form"
+  "Create a macro that will set an indexed array of tuple places to the values of a tuple value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-aref-setter) (array-name array-index tuple-values)
      (let* ((varlist (gensym-list ,(tuple-size type-name)))
             (array-index-sym (gensym))
@@ -193,7 +193,7 @@
 
 ;; tuple-vector-push
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push)))
-  "Create a macro that will push a tuple value form into an array of existing tuple forms."
+  "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push) (tuple-values array-name)
      (let* ((varlist (gensym-list ,(tuple-size type-name))))
        `(multiple-value-bind
@@ -206,7 +206,7 @@
                 `(vector-push ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
-  "Create a macro that will push a tuple value form into an array of existing tuple forms, extending if adjustable."
+  "Create a macro that will push a tuple value form into an array of existing tuple places, extending if adjustable."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple-values array-name)
      (let* ((varlist (gensym-list ,(tuple-size type-name))))
        `(multiple-value-bind
@@ -219,12 +219,12 @@
                `(vector-push-extend ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name) ,',(tuple-size type-name)))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-new-tuple)))
-  "Create a macro that creates a new tuple array form"
+  "Create a macro that creates a new tuple place."
   `(defmacro ,(tuple-symbol type-name :def-new-tuple) ()
      `(the ,',(tuple-typespec* type-name) (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name)))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker)))
-  "Create a macro that creates new tuple array, form and initialize it with values"
+  "Create a macro that creates new tuple place, form and initialize it with values"
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker) (tuple-values)
      (let ((varlist (gensym-list ,(tuple-size type-name)))
            (tuple-sym (gensym))
@@ -244,7 +244,7 @@
                    ,tuple-sym))))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker*)))
-  "Create a macro that creates new tuple array form and initialize it from a list of elements"
+  "Create a macro that creates new tuple place and initialize it from a list of elements"
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker*) (&rest elements)
      (let ((tuple-sym (gensym)))
        `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
@@ -252,7 +252,7 @@
           ,tuple-sym))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
-  "Create macro that creates a array of tuple array forms"
+  "Create macro that creates a array of tuple array places."
   `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
@@ -260,12 +260,12 @@
                  :element-type ',(tuple-element-type type-name))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))
-  "Create macro that returns the number of tuple forms in an array of tuple forms."
+  "Create macro that returns the number of tuples in an array of tuple places."
   `(defun ,(tuple-symbol  type-name :def-tuple-array-dimensions) (tuple-array)
    (/ (length tuple-array) ,(tuple-size type-name))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf)))
-  "Expand form that creates generalized reference to tuples"  
+  "Expand form that creates generalized reference to a tuple place"  
   `(defsetf ,(tuple-symbol type-name :def-tuple-getter) ,(tuple-symbol type-name :def-tuple-setter)))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))

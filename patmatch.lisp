@@ -2,6 +2,8 @@
 ;;;; Code from Paradigms of AI Programming
 ;;;; Copyright (c) 1991 Peter Norvig
 
+(in-package :cl-tuples)
+
 ;;;; File pat-match.lisp: Pattern matcher from section 6.2
 
 ;;; Two bug fixes By Richard Fateman, rjf@cs.berkeley.edu  October 92.

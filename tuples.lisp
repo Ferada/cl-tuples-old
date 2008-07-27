@@ -11,7 +11,7 @@
   (tuple-expansion-fn type-name :def-tuple-type))
 
 (defmacro def-tuple-getter (type-name)
-  "Create an access macro such as (vector3d vec) that takes an instance of an array and unpacks it to tuples (aka multiple values)"
+  "Create an access macro such as (vector3d vec) that takes a tuple place and unpacks it to tuples (aka multiple values)"
   (tuple-expansion-fn type-name :def-tuple-getter))
 
 (defmacro def-tuple-aref (type-name)
@@ -23,19 +23,19 @@
   (tuple-expansion-fn type-name :def-with-tuple))
 
 (defmacro def-with-tuple* (type-name)
-  "Create a macro that can be used to bind members of the tuples array to symbols to symbols e-g (with-vector* thing-vec #(x y z w)  &body forms)"
+  "Create a macro that can be used to bind members of the tuples place to symbols to symbols e-g (with-vector* thing-vec #(x y z w)  &body forms)"
   (tuple-expansion-fn type-name :def-with-tuple*))
 
 (defmacro def-with-tuple-aref (type-name)
-  "Create a macro that can be used to bind elements of an array of tuples to symbols to symbols e-g (with-vector3d-aref (thing-vec 5 (x y z w))  (+ x y z w))"
+  "Create a macro that can be used to bind elements of an array of tuples to symbols e-g (with-vector3d-aref (thing-vec 5 (x y z w))  (+ x y z w))"
   (tuple-expansion-fn type-name :def-with-tuple-aref))
 
 (defmacro def-tuple-setter (type-name)
-  "Creates a tuple-setter for setting a tuple array from a mutiple-value tuple. eg (vector3d-setter up #{ 0.0 1.0 0.0 })"
+  "Creates a tuple-setter for setting a tuple place from a mutiple-value tuple. eg (vector3d-setter up #{ 0.0 1.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple-setter))
 
 (defmacro def-tuple-aref-setter (type-name)
-  "Create an aref-setter macro for setting an element in an array of tuples  from a multiple-value tuple. eg (vector3d-aref-setter up 2 #{ 0.0 1.0 0.0 })"
+  "Create an aref-setter macro for setting an element in an array of tuples from a multiple-value tuple. eg (vector3d-aref-setter up 2 #{ 0.0 1.0 0.0 })"
   (tuple-expansion-fn type-name :def-tuple-aref-setter))
 
 (defmacro def-tuple-vector-push (type-name)
@@ -45,23 +45,23 @@
     (tuple-expansion-fn type-name :def-tuple-vector-push-extend))
 
 (defmacro def-new-tuple (type-name)
-  "Create a function to create an array suitable for holding an individual tuple. eg (new-vector3d)"
+  "Create a function to create a place suitable for holding an individual tuple. eg (new-vector3d)"
   (tuple-expansion-fn type-name :def-new-tuple))
 
 (defmacro def-tuple-maker (type-name)
-  "Create a function to create an array suitable for holding an individual tuple, and initialise elements from multiple-value tuple. eg (make-vector3d (values 1.0 2.0 2.0 ))"
+  "Create a function to create an place suitable for holding an individual tuple, and initialise elements from multiple-value tuple. eg (make-vector3d (values 1.0 2.0 2.0 ))"
   (tuple-expansion-fn type-name :def-tuple-maker))
 
 (defmacro def-tuple-maker* (type-name)
-  "Create a function to create an array suitable for holding an individual tuple, and initialise elements from array tuple. eg (make-vector3d* #( 1.0 2.0 2.0 ))"
+  "Create a function to create an place suitable for holding an individual tuple, and initialise elements from array tuple. eg (make-vector3d* #( 1.0 2.0 2.0 ))"
   (tuple-expansion-fn type-name :def-tuple-maker*))
 
 (defmacro def-tuple-array-maker (type-name)
-  "Create a function to create an array suitable for holding an number of individual tuples. ie an array of array tuples. eg (make-vector3d-array 5 :adjustable t)"
+  "Create a function to create an array suitable for holding an number of individual tuples. ie an array of tuple places. eg (make-vector3d-array 5 :adjustable t)"
   (tuple-expansion-fn type-name :def-tuple-array-maker))
 
 (defmacro def-tuple-array-dimensions (type-name)
-  "Create a function that will return the number of tuples in the array of array tuples."
+  "Create a function that will return the number of tuples in the array of tuple places."
   (tuple-expansion-fn type-name :def-tuple-array-dimensions))
 
 (defmacro def-tuple-setf (type-name)
@@ -75,35 +75,36 @@
   `(progn
      ;; instead of setf, need some form that can use the symbol in the format
      (setf (documentation ',(tuple-symbol type-name :def-tuple) 'function)
-           (format nil "Convert ~A forms to multiple values." ,type-name))
+           (format nil "Convert ~A forms to multiple values." ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-getter) 'function)
-           (format nil "Unpack array representation of an ~A and convert to multiple values." ,type-name))
-     (setf (documentation ,'(tuple-symbol type-name :def-tuple-aref) 'function)
-           (format nil "Unpack individual ~A to multiple values from an array of ~As." ,type-name ,type-name))
+           (format nil "Unpack array representation of an ~A and convert to multiple values." ,(string type-name)))
+     (setf (documentation ',(tuple-symbol type-name :def-tuple-aref) 'function)
+           (format nil "Unpack individual ~A to multiple values from an array of ~As." ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple) 'function)
-           (format nil "Bind elements of a ~A multiple value to symbols."  ,type-name))
+           (format nil "Bind elements of a ~A multiple value to symbols."  ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple*) 'function)
-           (format nil "Bind elements of a ~A vector to symbols."  ',type-name))
+           (format nil "Bind elements of a ~A vector to symbols."  ',(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-with-tuple-aref) 'function)
-           (format nil  "Bind the elements of a ~A from vector of ~A's to symbols"))
+           (format nil  "Bind the elements of a ~A from vector of ~A's to symbols" ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-setter) 'function)
-           (format nil "Creates a macro for setting an ~A vector from a multiple values ~A" ,type-name ,type-name))
+           (format nil "Creates a macro for setting an ~A vector from a multiple values ~A" ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-aref-setter) 'function)
-           (format nil "Creates a macro for setting an ~A vector in a vector of ~As from a multiple values ~A" ,type-name ,type-name ,type-name))
+           (format nil "Creates a macro for setting an ~A vector in a vector of ~As from a multiple values ~A" ,(string type-name) ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push) 'function)
-           (format nil "Push a ~A multiple value onto the end of a vector of ~A's ", type-name ,type-name))
+           (format nil "Push a ~A multiple value onto the end of a vector of ~A's " ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push-extend) 'function)
-           (format nil  "Push a ~A multiple value onto the end of a vector of ~A's with the possibility of extension", type-name ,type-name))
+           (format nil  "Push a ~A multiple value onto the end of a vector of ~A's with the possibility of extension" ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-new-tuple) 'function)
-           (format nil  "Create an array suitable for holding a single ~A" ,type-name))
+           (format nil  "Create an array suitable for holding a single ~A" ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-maker) 'function)
-           (format nil  "Create an array sutable for holding a single ~A and initialize it from a multiple-values form" ,type-name))
+           (format nil  "Create an array sutable for holding a single ~A and initialize it from a multiple-values form" ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-maker*) 'function)
-           (format nil   "Create an array sutable for holding a single ~A and initialize it from a  form" ,type-name))
+           (format nil   "Create an array sutable for holding a single ~A and initialize it from a  form" ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-array-maker) 'function)
-           (format nil  "Create an array suitable for holding a number of ~A's " ,type-name))
-     (setf (documentation ,'(tuple-symbol type-name :def-tuple-array-dimensions) 'function)
-           (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,type-name ,type-name))))
+           (format nil  "Create an array suitable for holding a number of ~A's " ,(string type-name)))
+     (setf (documentation ',(tuple-symbol type-name :def-tuple-array-dimensions) 'function)
+           (format nil  "Return the size of a vector of ~A's (ie how many ~A's it contains)" ,(string type-name) ,(string type-name)))
+     (values)))
 
 (defmacro make-tuple-operations (type-name)
   `(progn

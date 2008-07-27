@@ -3,26 +3,27 @@
 ;;;; Copyright (c) 1991 Peter Norvig
 ;;;; Some derived portions (C) 2008 John Connors
 
+(in-package :cl-tuples)
 
 ;;; From student.lisp:
 (defstruct (rule (:type list)) pattern response)
-(defstruct (exp (:type list)
+(defstruct (expression (:type list)
                 (:constructor mkexp (lhs op rhs)))
   op lhs rhs)
 
-(defun exp-p (x) (consp x))
-(defun exp-args (x) (rest x))
+(defun expression-p (x) (consp x))
+(defun expression-args (x) (rest x))
 
-(defun binary-exp-p (x)
-  (and (exp-p x) (= (length (exp-args x)) 2)))
+(defun binary-expression-p (x)
+  (and (expression-p x) (= (length (expression-args x)) 2)))
 
-(defun prefix->infix (exp)
+(defun prefix->infix (expression)
   "Translate prefix to infix expressions."
-  (if (atom exp) exp
+  (if (atom expression) expression
       (mapcar #'prefix->infix
-              (if (binary-exp-p exp)
-                  (list (exp-lhs exp) (exp-op exp) (exp-rhs exp))
-                  exp))))
+              (if (binary-expression-p expression)
+                  (list (expression-lhs expression) (expression-op expression) (expression-rhs expression))
+                  expression))))
 
 ;; Define x+ and y+ as a sequence:
 (pat-match-abbrev 'x+ '(?+ x))
@@ -34,13 +35,12 @@
 (pat-match-abbrev 's '(?is s not-numberp))
 
 ;; defint t as a tuple-type
-(pat-match-abbrev 't '(?is t tuple-typep))
+(pat-match-abbrev 'v '(?is ?v tuple-typep))
 
 
 (defparameter *infix->prefix-rules*
   (mapcar #'expand-pat-match-abbrev
-    '(((x+ = y+) (= x y))
-      ((- x+)    (- x))
+    '(((- x+)    (- x))
       ((+ x+)    (+ x))
       ((x+ + y+) (+ x y))
       ((x+ - y+) (- x y))
@@ -48,14 +48,27 @@
       ((Int y+ d x) (int y x))      ;*** New rule
       ((x+ * y+) (* x y))
       ((x+ / y+) (/ x y))
-      ((x+ ^ y+) (^ x y)))))
+      ((x+ ^ y+) (^ x y)))) 
+  "Rules to translate from infix to prefix")
 
-(defun infix->prefix (exp)
+
+(defun infix->prefix (expression)
   "Translate an infix expression into prefix notation."
   ;; Note we cannot do implicit multiplication in this system
-  (cond ((atom exp) exp)
-        ((= (length exp) 1) (infix->prefix (first exp)))
-        ((rule-based-translator exp *infix->prefix-rules*
+  (cond ((atom expression) expression)
+        ((= (length expression) 1) (infix->prefix (first expression)))
+        ((rule-based-translator expression *infix->prefix-rules*
+           :rule-if #'rule-pattern :rule-then #'rule-response
+           :action
+           #'(lambda (bindings response)
+               (identity (list :bindings bindings :response response)))))))
+
+(defun infix->prefix (expression)
+  "Translate an infix expression into prefix notation."
+  ;; Note we cannot do implicit multiplication in this system
+  (cond ((atom expression) expression)
+        ((= (length expression) 1) (infix->prefix (first expression)))
+        ((rule-based-translator expression *infix->prefix-rules*
            :rule-if #'rule-pattern :rule-then #'rule-response
            :action
            #'(lambda (bindings response)
@@ -65,8 +78,7 @@
                                    (infix->prefix (rest pair))))
                          bindings)
                        response))))
-        ((symbolp (first exp))
-         (list (first exp) (infix->prefix (rest exp))))
-        (t (error "Illegal exp"))))
+        ((symbolp (first expression))
+         (list (first expression) (infix->prefix (rest expression))))
+        (t (error "Illegal expression"))))
 
-;;((vector3d thing) + (vector3d thang))

@@ -11,7 +11,7 @@
   :author "John Connors"
   :version "1.0"
   :licence "MIT"
-  :description "Experimental Tuple Types"
+  :description "Experimental Tuple Types Facade"
   :serial t
   :components ((:file "package")
                (:file "utils")
@@ -34,9 +34,10 @@
   :description "Pattern matching and infix<->prefix conversion code from Paradigms of Artificial Intelligence Programming applied to cl-tuples"
   :serial t
   :depends-on (:cl-tuples)
-  :components ((:file "aufxns.lisp")
-               (:file "patmatch.lisp")
-               (:file "infix-prefix.lisp")))
+  :components ((:file "auxfns")
+               (:file "patmatch")
+               (:file "prefix-infix")
+               (:file "tuple-infix")))
 
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
   (operate 'asdf:load-op :cl-tuples-tests)

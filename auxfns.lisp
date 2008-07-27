@@ -7,8 +7,10 @@
 
 ;;;; Implementation-Specific Details
 
+(in-package :cl-tuples)
+
 (eval-when (eval compile load)
-  ;; Make it ok to place a function definition on a built-in LISP symbol.
+;;  Make it ok to place a function definition on a built-in LISP symbol.
   #+allegro
   (dolist (pkg '(excl common-lisp common-lisp-user))
     (setf (excl:package-definition-lock (find-package pkg)) nil))
@@ -25,8 +27,8 @@
 	(setf (ext:package-lock pkg) nil)
 	(setf (ext:package-definition-lock pkg) nil))))
 
-  ;; Don't warn if a function is defined in multiple files --
-  ;; this happens often since we refine several programs.
+;;   Don't warn if a function is defined in multiple files --
+;;   this happens often since we refine several programs.
   #+Lispworks
   (setq *PACKAGES-FOR-WARN-ON-REDEFINITION* nil)
 
@@ -34,99 +36,26 @@
    (compiler-options :warnings nil)
   )
 
-;;;; REQUIRES
-
-;;; The function REQUIRES is used in subsequent files to state dependencies
-;;; between files.  The current definition just loads the required files,
-;;; assumming they match the pathname specified in *PAIP-DIRECTORY*.
-;;; You should change that to match where you have stored the files.
-;;; A more sophisticated REQUIRES would only load it if it has not yet
-;;; been loaded, and would search in different directories if needed.
-
-(defun requires (&rest files)
-  "The arguments are files that are required to run an application."
-  (mapc #'load-paip-file files))
-
-(defvar *paip-files*
-  `("auxfns" "tutor" "examples" 
-    "intro" "simple" "overview" "gps1" "gps" "eliza1" "eliza" "patmatch" 
-    "eliza-pm" "search" "gps-srch" "student" "macsyma" "macsymar" "unify" 
-    "prolog1" "prolog" "prologc1" "prologc2" "prologc" "prologcp" 
-    "clos" "krep1" "krep2" "krep" "cmacsyma" "mycin" "mycin-r" "waltz" 
-    "othello" "othello2" "syntax1" "syntax2" "syntax3" "unifgram" 
-    "grammar" "lexicon" "interp1" "interp2" "interp3" 
-    "compile1" "compile2" "compile3" "compopt"))
-
-(defparameter *paip-directory*
-  (make-pathname :name nil :type nil
-		 :defaults
-		 #-common-lisp-controller (or (and (boundp '*load-truename*) *load-truename*)
-					      (truename ""))
-		 #+common-lisp-controller (parse-namestring
-					  "/usr/share/common-lisp/source/paip/")
-		 )
-  
-  "The location of the source files for this book.  If things don't work,
-  change it to reflect the location of the files on your computer.")
-
-(defparameter *paip-source* 
-  (make-pathname :name nil :type "lisp" ;;???  Maybe Change this
-		 :defaults *paip-directory*)) 
-
-(defparameter *paip-binary*
-  (make-pathname
-   :name nil
-   :type (pathname-type (compile-file-pathname "foo.lisp"))
-   :directory
-   #+common-lisp-controller
-   (pathname-directory (c-l-c:source-root-path-to-fasl-path (namestring *load-truename*)))
-   #-common-lisp-controller
-   (append (pathname-directory *paip-source*) '("bin"))
-   :defaults *paip-directory*))
-
-(defun paip-pathname (name &optional (type :lisp))
-  (make-pathname :name name 
-		 :defaults (ecase type
-			     ((:lisp :source) *paip-source*)
-			     ((:binary :bin) *paip-binary*))))
-
-(defun compile-all-paip-files ()
-  (mapc #'compile-paip-file *paip-files*))
-
-(defun compile-paip-file (name)
-  (let ((path (paip-pathname name :lisp)))
-    (load path)
-    (compile-file path :output-file (paip-pathname name :binary))))
-
-(defun load-paip-file (file)
-  "Load the binary file if it exists and is newer, else load the source."
-  (let* ((src (paip-pathname file :lisp))
-	 (src-date (file-write-date src))
-	 (bin (paip-pathname file :binary))
-	 (bin-date (file-write-date bin)))
-    (load (if (and (probe-file bin) src-date bin-date (>= bin-date src-date))
-	      bin
-	    src))))
-
 ;;;; Macros (formerly in auxmacs.lisp: that file no longer needed)
 
 (eval-when (load eval compile)
-  (defmacro once-only (variables &rest body)
-    "Returns the code built by BODY.  If any of VARIABLES
-  might have side effects, they are evaluated once and stored
-  in temporary variables that are then passed to BODY."
-    (assert (every #'symbolp variables))
-    (let ((temps nil))
-      (dotimes (i (length variables)) (push (gensym) temps))
-      `(if (every #'side-effect-free? (list .,variables))
-	(progn .,body)
-	(list 'let
-	 ,`(list ,@(mapcar #'(lambda (tmp var)
-			       `(list ',tmp ,var))
-			   temps variables))
-	 (let ,(mapcar #'(lambda (var tmp) `(,var ',tmp))
-		       variables temps)
-	   .,body)))))
+
+;;   (defmacro once-only (variables &rest body)
+;;     "Returns the code built by BODY.  If any of VARIABLES
+;;   might have side effects, they are evaluated once and stored
+;;   in temporary variables that are then passed to BODY."
+;;     (assert (every #'symbolp variables))
+;;     (let ((temps nil))
+;;       (dotimes (i (length variables)) (push (gensym) temps))
+;;       `(if (every #'side-effect-free? (list .,variables))
+;; 	(progn .,body)
+;; 	(list 'let
+;; 	 ,`(list ,@(mapcar #'(lambda (tmp var)
+;; 			       `(list ',tmp ,var))
+;; 			   temps variables))
+;; 	 (let ,(mapcar #'(lambda (var tmp) `(,var ',tmp))
+;; 		       variables temps)
+;; 	   .,body)))))
 
   (defun side-effect-free? (exp)
     "Is exp a constant, variable, or function,
@@ -529,174 +458,174 @@
 
 ;;; ==============================
 
-;;;; CLtL2 and ANSI CL Compatibility
+;; ;;;; CLtL2 and ANSI CL Compatibility
 
-(unless (fboundp 'defmethod)
-(defmacro defmethod (name args &rest body)
-  `(defun ',name ',args ,@body))
-)
+;; (unless (fboundp 'defmethod)
+;; (defmacro defmethod (name args &rest body)
+;;   `(defun ',name ',args ,@body))
+;; )
 
-(unless (fboundp 'map-into)
-(defun map-into (result-sequence function &rest sequences)
-  "Destructively set elements of RESULT-SEQUENCE to the results
-  of applying FUNCTION to respective elements of SEQUENCES."
-  (let ((arglist (make-list (length sequences)))
-        (n (if (listp result-sequence)
-               most-positive-fixnum
-               (array-dimension result-sequence 0))))
-    ;; arglist is made into a list of args for each call
-    ;; n is the length of the longest vector
-    (when sequences
-      (setf n (min n (loop for seq in sequences
-                           minimize (length seq)))))
-    ;; Define some shared functions:
-    (flet
-      ((do-one-call (i)
-         (loop for seq on sequences
-               for arg on arglist
-               do (if (listp (first seq))
-                      (setf (first arg)
-                            (pop (first seq)))
-                      (setf (first arg)
-                            (aref (first seq) i))))
-         (apply function arglist))
-       (do-result (i)
-         (if (and (vectorp result-sequence)
-                  (array-has-fill-pointer-p result-sequence))
-             (setf (fill-pointer result-sequence) 
-                   (max i (fill-pointer result-sequence))))))
-      (declare (inline do-one-call))
-      ;; Decide if the result is a list or vector,
-      ;; and loop through each element
-      (if (listp result-sequence)
-          (loop for i from 0 to (- n 1)
-                for r on result-sequence
-                do (setf (first r)
-                         (do-one-call i))
-                finally (do-result i))
-          (loop for i from 0 to (- n 1)
-                do (setf (aref result-sequence i)
-                         (do-one-call i))
-                finally (do-result i))))
-      result-sequence))
+;; (unless (fboundp 'map-into)
+;; (defun map-into (result-sequence function &rest sequences)
+;;   "Destructively set elements of RESULT-SEQUENCE to the results
+;;   of applying FUNCTION to respective elements of SEQUENCES."
+;;   (let ((arglist (make-list (length sequences)))
+;;         (n (if (listp result-sequence)
+;;                most-positive-fixnum
+;;                (array-dimension result-sequence 0))))
+;;     ;; arglist is made into a list of args for each call
+;;     ;; n is the length of the longest vector
+;;     (when sequences
+;;       (setf n (min n (loop for seq in sequences
+;;                            minimize (length seq)))))
+;;     ;; Define some shared functions:
+;;     (flet
+;;       ((do-one-call (i)
+;;          (loop for seq on sequences
+;;                for arg on arglist
+;;                do (if (listp (first seq))
+;;                       (setf (first arg)
+;;                             (pop (first seq)))
+;;                       (setf (first arg)
+;;                             (aref (first seq) i))))
+;;          (apply function arglist))
+;;        (do-result (i)
+;;          (if (and (vectorp result-sequence)
+;;                   (array-has-fill-pointer-p result-sequence))
+;;              (setf (fill-pointer result-sequence) 
+;;                    (max i (fill-pointer result-sequence))))))
+;;       (declare (inline do-one-call))
+;;       ;; Decide if the result is a list or vector,
+;;       ;; and loop through each element
+;;       (if (listp result-sequence)
+;;           (loop for i from 0 to (- n 1)
+;;                 for r on result-sequence
+;;                 do (setf (first r)
+;;                          (do-one-call i))
+;;                 finally (do-result i))
+;;           (loop for i from 0 to (- n 1)
+;;                 do (setf (aref result-sequence i)
+;;                          (do-one-call i))
+;;                 finally (do-result i))))
+;;       result-sequence))
 
-)
+;; )
 
-(unless (fboundp 'complement)
-(defun complement (fn)
-  "If FN returns y, then (complement FN) returns (not y)."
-  #'(lambda (&rest args) (not (apply fn args))))
-)
+;; (unless (fboundp 'complement)
+;; (defun complement (fn)
+;;   "If FN returns y, then (complement FN) returns (not y)."
+;;   #'(lambda (&rest args) (not (apply fn args))))
+;; )
 
-(unless (fboundp 'with-compilation-unit)
-(defmacro with-compilation-unit (options &body body)
-  "Do the body, but delay compiler warnings until the end."
-  ;; That way, undefined function warnings that are really
-  ;; just forward references will not be printed at all.
-  ;; This is defined in Common Lisp the Language, 2nd ed.
-  (declare (ignore options))
-  `(,(read-time-case
-       #+Lispm 'compiler:compiler-warnings-context-bind
-       #+Lucid 'with-deferred-warnings
-               'progn)
-    .,body))
-)
+;; (unless (fboundp 'with-compilation-unit)
+;; (defmacro with-compilation-unit (options &body body)
+;;   "Do the body, but delay compiler warnings until the end."
+;;   ;; That way, undefined function warnings that are really
+;;   ;; just forward references will not be printed at all.
+;;   ;; This is defined in Common Lisp the Language, 2nd ed.
+;;   (declare (ignore options))
+;;   `(,(read-time-case
+;;        #+Lispm 'compiler:compiler-warnings-context-bind
+;;        #+Lucid 'with-deferred-warnings
+;;                'progn)
+;;     .,body))
+;; )
 
-;;;; Reduce
+;; ;;;; Reduce
 
-(when nil ;; Change this to T if you need REDUCE with :key keyword.
+;; (when nil ;; Change this to T if you need REDUCE with :key keyword.
 
-(defun reduce* (fn seq from-end start end key init init-p)
-  (funcall (if (listp seq) #'reduce-list #'reduce-vect)
-           fn seq from-end (or start 0) end key init init-p))
+;; (defun reduce* (fn seq from-end start end key init init-p)
+;;   (funcall (if (listp seq) #'reduce-list #'reduce-vect)
+;;            fn seq from-end (or start 0) end key init init-p))
 
-(defun reduce (function sequence &key from-end start end key
-               (initial-value nil initial-value-p))
-  (reduce* function sequence from-end start end
-           key initial-value initial-value-p))
+;; (defun reduce (function sequence &key from-end start end key
+;;                (initial-value nil initial-value-p))
+;;   (reduce* function sequence from-end start end
+;;            key initial-value initial-value-p))
 
-(defun reduce-vect (fn seq from-end start end key init init-p)
-  (if (null end) (setf end (length seq)))
-  (assert (<= 0 start end (length seq)) (start end)
-          "Illegal subsequence of ~a --- :start ~d :end ~d"
-          seq start end)
-  (case (- end start)
-    (1 (if init-p
-           (funcall fn init (funcall-if key (aref seq start)))
-           (funcall-if key (aref seq start))))
-    (0 (if init-p init (funcall fn)))
-    (t (if (not from-end)
-           (let ((result
-                   (if init-p
-                       (funcall
-                         fn init
-                         (funcall-if key (aref seq start)))
-                       (funcall
-                         fn
-                         (funcall-if key (aref seq start))
-                         (funcall-if key (aref seq (+ start 1)))))))
-             (loop for i from (+ start (if init-p 1 2))
-                   to (- end 1)
-                   do (setf result
-                            (funcall
-                              fn result
-                              (funcall-if key (aref seq i)))))
-             result)
-           (let ((result
-                   (if init-p
-                       (funcall
-                         fn
-                         (funcall-if key (aref seq (- end 1)))
-                         init)
-                       (funcall
-                         fn
-                         (funcall-if key (aref seq (- end 2)))
-                         (funcall-if key (aref seq (- end 1)))))))
-             (loop for i from (- end (if init-p 2 3)) downto start
-                   do (setf result
-                            (funcall
-                              fn
-                              (funcall-if key (aref seq i))
-                              result)))
-             result)))))
+;; (defun reduce-vect (fn seq from-end start end key init init-p)
+;;   (if (null end) (setf end (length seq)))
+;;   (assert (<= 0 start end (length seq)) (start end)
+;;           "Illegal subsequence of ~a --- :start ~d :end ~d"
+;;           seq start end)
+;;   (case (- end start)
+;;     (1 (if init-p
+;;            (funcall fn init (funcall-if key (aref seq start)))
+;;            (funcall-if key (aref seq start))))
+;;     (0 (if init-p init (funcall fn)))
+;;     (t (if (not from-end)
+;;            (let ((result
+;;                    (if init-p
+;;                        (funcall
+;;                          fn init
+;;                          (funcall-if key (aref seq start)))
+;;                        (funcall
+;;                          fn
+;;                          (funcall-if key (aref seq start))
+;;                          (funcall-if key (aref seq (+ start 1)))))))
+;;              (loop for i from (+ start (if init-p 1 2))
+;;                    to (- end 1)
+;;                    do (setf result
+;;                             (funcall
+;;                               fn result
+;;                               (funcall-if key (aref seq i)))))
+;;              result)
+;;            (let ((result
+;;                    (if init-p
+;;                        (funcall
+;;                          fn
+;;                          (funcall-if key (aref seq (- end 1)))
+;;                          init)
+;;                        (funcall
+;;                          fn
+;;                          (funcall-if key (aref seq (- end 2)))
+;;                          (funcall-if key (aref seq (- end 1)))))))
+;;              (loop for i from (- end (if init-p 2 3)) downto start
+;;                    do (setf result
+;;                             (funcall
+;;                               fn
+;;                               (funcall-if key (aref seq i))
+;;                               result)))
+;;              result)))))
 
-(defun reduce-list (fn seq from-end start end key init init-p)
-  (if (null end) (setf end (length seq)))
-  (cond ((> start 0)
-         (reduce-list fn (nthcdr start seq) from-end 0
-                      (- end start) key init init-p))
-        ((or (null seq) (eql start end))
-         (if init-p init (funcall fn)))
-        ((= (- end start) 1)
-         (if init-p
-             (funcall fn init (funcall-if key (first seq)))
-             (funcall-if key (first seq))))
-        (from-end
-         (reduce-vect fn (coerce seq 'vector) t start end
-                      key init init-p))
-        ((null (rest seq))
-         (if init-p
-             (funcall fn init (funcall-if key (first seq)))
-             (funcall-if key (first seq))))
-        (t (let ((result
-                   (if init-p
-                       (funcall
-                         fn init
-                         (funcall-if key (pop seq)))
-                       (funcall
-                         fn
-                         (funcall-if key (pop seq))
-                         (funcall-if key (pop seq))))))
-             (if end
-                 (loop repeat (- end (if init-p 1 2)) while seq
-                    do (setf result
-                             (funcall
-                               fn result
-                               (funcall-if key (pop seq)))))
-                 (loop while seq
-                    do (setf result
-                             (funcall
-                               fn result
-                               (funcall-if key (pop seq))))))
-             result))))
-)
+;; (defun reduce-list (fn seq from-end start end key init init-p)
+;;   (if (null end) (setf end (length seq)))
+;;   (cond ((> start 0)
+;;          (reduce-list fn (nthcdr start seq) from-end 0
+;;                       (- end start) key init init-p))
+;;         ((or (null seq) (eql start end))
+;;          (if init-p init (funcall fn)))
+;;         ((= (- end start) 1)
+;;          (if init-p
+;;              (funcall fn init (funcall-if key (first seq)))
+;;              (funcall-if key (first seq))))
+;;         (from-end
+;;          (reduce-vect fn (coerce seq 'vector) t start end
+;;                       key init init-p))
+;;         ((null (rest seq))
+;;          (if init-p
+;;              (funcall fn init (funcall-if key (first seq)))
+;;              (funcall-if key (first seq))))
+;;         (t (let ((result
+;;                    (if init-p
+;;                        (funcall
+;;                          fn init
+;;                          (funcall-if key (pop seq)))
+;;                        (funcall
+;;                          fn
+;;                          (funcall-if key (pop seq))
+;;                          (funcall-if key (pop seq))))))
+;;              (if end
+;;                  (loop repeat (- end (if init-p 1 2)) while seq
+;;                     do (setf result
+;;                              (funcall
+;;                                fn result
+;;                                (funcall-if key (pop seq)))))
+;;                  (loop while seq
+;;                     do (setf result
+;;                              (funcall
+;;                                fn result
+;;                                (funcall-if key (pop seq))))))
+;;              result))))
+;; )

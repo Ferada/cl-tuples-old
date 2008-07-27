@@ -5,6 +5,15 @@
   (:use :cl)
   (:export make-tuple-symbol
 
+           tuple-typep
+           tuple-size
+           tuple-element-type
+           tuple-elelents
+           tuple-gensyms
+           tuple-typespec
+           tuple-typespec*
+           tuple-typespec**
+           
            def-tuple-type
            def-tuple-op
 
@@ -51,6 +60,8 @@
            quaternion-matrix33
            angle-axis-quaternion
            quaternion-transform-vector3d
+
+           def-tuple-class
 
            width
            height)

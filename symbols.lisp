@@ -17,8 +17,9 @@
 (set-macro-character #\} (get-macro-character #\) nil))
 
 (defun make-tuple-symbol (type-name tuple-element-type elements)
-  "Makes a symbol used to identify a typle type. Information about the tuple type
-is stored in the property list of the symbol."
+  "Makes a symbol used to identify a typle type and interns it in the
+package used for holding metadata about the tuple types. Information
+about the tuple type is stored in the property list of the symbol."
   (assert (listp elements))
   (let
       ((type-name-sym (intern (string  type-name) :tuple-types)))

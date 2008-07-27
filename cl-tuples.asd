@@ -1,6 +1,10 @@
 ;;;; Silly emacs, this is -*- Lisp -*-
 
-(in-package :asdf)
+(defpackage :cl-tuples-system
+  (:use :cl :asdf))
+
+(in-package :cl-tuples-system)
+
 
 (defsystem :cl-tuples
   :name "cl-tuples"
@@ -15,12 +19,24 @@
                (:file "tuple-expander")
                (:file "tuples") 
                (:file "clos-wrapper")
+               (:file "clos-wrapper-macro")
                (:file "vector")
                (:file "quaternion")
                (:file "matrix")
                (:file "colour")
                (:file "triangle")
                (:file "rect")))
+
+(defsystem :cl-tuples-infix
+  :name "paip-infix"
+  :licence "http://norvig.com/license.html"
+  :author "Peter Norvig and John Connors."
+  :description "Pattern matching and infix<->prefix conversion code from Paradigms of Artificial Intelligence Programming applied to cl-tuples"
+  :serial t
+  :depends-on (:cl-tuples)
+  :components ((:file "aufxns.lisp")
+               (:file "patmatch.lisp")
+               (:file "infix-prefix.lisp")))
 
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
   (operate 'asdf:load-op :cl-tuples-tests)

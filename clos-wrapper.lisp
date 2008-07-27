@@ -52,11 +52,11 @@
         `(defmethod ,(as-accessor name) ((self ,class-name) index)
            (the ,(tuple-typespec type)
              (,(tuple-symbol type  :def-tuple-aref) 
-               (the ,',(tuple-typespec** type) (,(as-private-accessor class-name name) self)) (the fixnum index))))
+               (the ,(tuple-typespec** type) (,(as-private-accessor class-name name) self)) (the fixnum index))))
         ;; scalar form
         `(defmethod ,(as-accessor name) ((self ,class-name))
            (the ,(tuple-typespec type)
-             (,(tuple-symbol type  :def-tuple-getter) (the ,',(tuple-typespec* type) (,(as-private-accessor class-name name) self))))))))
+             (,(tuple-symbol type  :def-tuple-getter) (the ,(tuple-typespec* type) (,(as-private-accessor class-name name) self))))))))
 
 (defun slot->slot-writer (class-name slot-spec)
   "Expand a generic method body for writing a tuple slot of a def-tuples-class form"
@@ -88,51 +88,3 @@
                                      ,,@annotated-tuple-gensym-list))))))))))
 
 
-(defmacro def-tuple-class (class-name slot-specs)
-  "Define a class that contains optimzed tuple type slots as well as normal CLOS slots."
-    `(progn
-       (defclass ,class-name ()
-         ,(destructuring-bind
-           (&key tuples slots)
-           slot-specs
-           (append
-            (mapcar #'(lambda (slot-spec)
-                        (slot->defclass-slot class-name slot-spec)) tuples)
-            (mapcar #'identity `(,@slots)))))
-       ,@(destructuring-bind
-         (&key tuples slots)
-         slot-specs
-         (declare (ignore slots))
-         (mapcar #'(lambda (slot-spec)
-                     (slot->slot-reader class-name slot-spec))
-                 tuples))
-       ,@(destructuring-bind
-             (&key tuples slots)
-           slot-specs
-         (declare (ignore slots))
-         (mapcar #'(lambda (slot-spec)
-                     (slot->slot-writer class-name slot-spec))
-                 tuples))))
-
-
-;; quick test case
-
-(def-tuple-class camera
-     (:tuples
-      ((up :type cl-tuples::vector3d)
-       (forward :type vector3d)
-       (location :type vertex3d)
-       (vertices :type vertex3d :array 5))
-      :slots
-      ((focal-length :type single-float :accessor focal-length-of)
-       (id :allocation :class :reader id-of))))
-
-;; *test stanza*
-;; (defparameter *test-camera* (make-instance 'camera))
-;; (setf (up-of *test-camera*) #{ 0.0 0.0 0.0 })
-;; (up-of *test-camera*)
-;; (setf (up-of *test-camera*) #{ 1.0 2.0 3.0 })
-;; (setf (vertices-of *test-camera* 3) #{ 2.0 3.0 -2.5 1.0 })
-;; (vertices-of *test-camera* 3)
-;; (vertices-of *test-camera* 4)
-;; (vertices-of *test-camera* 1)

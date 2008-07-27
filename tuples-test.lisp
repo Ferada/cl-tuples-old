@@ -157,3 +157,24 @@
   
 
 
+;; quick test case for clos wrapper
+
+(def-tuple-class camera
+     (:tuples
+      ((up :type cl-tuples::vector3d)
+       (forward :type vector3d)
+       (location :type vertex3d)
+       (vertices :type vertex3d :array 5))
+      :slots
+      ((focal-length :type single-float :accessor focal-length-of)
+       (id :allocation :class :reader id-of))))
+
+;;*test stanza*
+(defparameter *test-camera* (make-instance 'camera))
+(setf (up-of *test-camera*) #{ 0.0 0.0 0.0 })
+(up-of *test-camera*)
+(setf (up-of *test-camera*) #{ 1.0 2.0 3.0 })
+(setf (vertices-of *test-camera* 3) #{ 2.0 3.0 -2.5 1.0 })
+(vertices-of *test-camera* 3)
+(vertices-of *test-camera* 4)
+(vertices-of *test-camera* 1)

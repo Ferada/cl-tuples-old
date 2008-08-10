@@ -24,11 +24,8 @@
     ((quaternion-lhs quaternion (x0 y0 z0 w0)) 
      (quaternion-rhs quaternion (x1 y1 z1 w1)))
     "Dot product of two quaternions."
-    (:return quaternion
-             (reduce-quaternion* 
-              #'+ (map-quaternion*s #'* 
-                    (quaternion* x0 y0 z0 w0) 
-                    (quaternion* x1 y1 z1 w1)))))
+    (:return single-float
+             (+ (* x0 x1) (* y0 y1) (* z0 z1) (* w0 w1))))
 
 (def-tuple-op quaternion-inverse 
   ((q quarternion (x y z w)))
@@ -45,10 +42,11 @@
     ((q-lhs quaternion (x1 y1 z1 w1))
      (q-rhs quaternion (x2 y2 z2 w2)))
   "Multiple of two quaternions"
-  (quaternion* (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
-                    (- (+ (* w1 y2) (* y1 w2) (* z1 x2)) (* x1 z2))
-                    (- (+ (* w1 z2) (* x1 y2) (* z1 w2)) (* y1 x2))
-                    (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2))))
+  (:return quaternion
+           (quaternion* (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
+                        (- (+ (* w1 y2) (* y1 w2) (* z1 x2)) (* x1 z2))
+                        (- (+ (* w1 z2) (* x1 y2) (* z1 w2)) (* y1 x2))
+                        (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2)))))xs
 
 (def-tuple-op quaternion-matrix33 
   ((q quaternion (x y z w)))
@@ -59,14 +57,12 @@
       (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y))))
      
 
-(defmacro angle-axis-quaternion (aa)
-  "Convert an angle-axis tuple to a quaternion"
-  (with-gensyms (cosa sina)
-  `(with-angle-axis ,aa
-       (x y z a)
-     (let ((,cosa (cos (/ a 2.0)))
-           (,sina (sin (/ a 2.0))))
-       (quaternion* (* x ,sina) (* y ,sina) (* z ,sina) (* a ,cosa))))))
+(def-tuple-op angle-axis-quaternion
+  ((aa angle-axis (x y z a)))
+  "Convert an angle-axis tuple to a quaternion tuple"
+  (:return quaternion
+           (quaternion* (* x (sin a)) (* y (sin a)) (* z (sin a)) (* a (cos a)))))
+  
                 
     
 (def-tuple-op quaternion-transform-vector3d

@@ -70,7 +70,7 @@
                 
     
 (def-tuple-op quaternion-transform-vector3d
-    ((vector vector3d (vx vy vz vw))
+    ((vector vector3d (vx vy vz))
      (quat quaternion (qx qy qz qw)))
   "Transform a 3d vector with a quaternion"
   (with-quaternion 
@@ -80,4 +80,4 @@
         (quaternion* vx vy vz 0.0))
        (quaternion-conjugate (quaternion* qx qy qz qw)))
       (rx ry rz rw)
-    (vector3d-tuple rx ry rz)))
+    (vector3d* rx ry rz)))

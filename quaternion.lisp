@@ -19,6 +19,12 @@
   ((q quaternion (x y z w)))
   (quaternion* (- x) (- y) (- z) w))
 
+(def-tuple-op quaternion-scale 
+    ((q quaternion (x y z w))
+     (scale single-float))
+  (;return quaternion
+   (quaternion*
+    (* s x) (* s y) (* s z) (* s  w))))
 
 (def-tuple-op quaternion-dot 
     ((quaternion-lhs quaternion (x0 y0 z0 w0)) 
@@ -30,14 +36,12 @@
 (def-tuple-op quaternion-inverse 
   ((q quarternion (x y z w)))
     "Inverse of quaternion"
-   (let ((dot-recip 
-          (/ 1.0 (quaternion-dot 
-                  (quaternion* x y z w) 
-                  (quaternion*)))))    
-     (map-quaternion*s
-         #'(lambda (t) (* t dot-recip))
-         (quaternion-conjugate (quaternion* x y z w)))))
-
+    (:return quaternion     
+     (quaternion-scale 
+      (quaternion-conjugate q)
+      (/ 1.0 (quaternion-dot 
+              (quaternion* x y z w))))))
+     
 (def-tuple-op quaternion-product
     ((q-lhs quaternion (x1 y1 z1 w1))
      (q-rhs quaternion (x2 y2 z2 w2)))

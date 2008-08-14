@@ -178,3 +178,37 @@
 (vertices-of *test-camera* 3)
 (vertices-of *test-camera* 4)
 (vertices-of *test-camera* 1)
+
+(defparameter *test-shape* (make-vector3d-array 4)) 
+
+(setf (vector3d-aref *test-shape* 0) (vector3d* 3.14 0.0 3.14))
+(setf (vector3d-aref *test-shape* 1) (vector3d* 3.14 0.0 -3.14))
+(setf (vector3d-aref *test-shape* 2) (vector3d* -3.14 0.0 -3.14))
+(setf (vector3d-aref *test-shape* 3) (vector3d* -3.14 0.0 3.14))
+ 
+
+(defparameter *test-quaternion* (make-quaternion
+                                 (angle-axis-quaternion
+                                  (angle-axis* 0.0 1.0 0.0 (/ 3.14 2.0)))))
+
+
+(defparameter *test-matrix* 
+  (make-matrix33
+   (quaternion-matrix33 (quaternion *test-quaternion*))))
+   
+
+(loop 
+     for index from 0 below (vector3d-array-dimensions *test-shape*)
+     do 
+     (setf (vector3d-aref *test-shape* index) 
+           (quaternion-transform-vector3d
+            (vector3d-aref *test-shape* index)
+            (quaternion *test-quaternion*))))
+
+(loop 
+     for index from 0 below (vector3d-array-dimensions *test-shape*)
+     do 
+     (setf (vector3d-aref *test-shape* index) 
+           (transform-vector3d  
+            (matrix44-matrix33 (matrix44 *rotatey*))
+            (vector3d-aref *test-shape* index))))

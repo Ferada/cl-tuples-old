@@ -50,6 +50,8 @@
            transform-vector3d
            matrix33-product
            matrix44-product
+           matrix44-matrix33
+           matrix33-marrix44
 
            quaternion-conjugate
            quaternion-dot

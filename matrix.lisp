@@ -85,23 +85,21 @@
   (:return vertex3d
            (vertex3d*
             (+ (* x e00) (* y e01) (* z e02) (* w e03))
-            (+ (* x e10) (* y e11) (* z e02) (* w e13))
-            (+ (* x e20) (* y e21) (* z e02) (* w e23))
+            (+ (* x e10) (* y e11) (* z e12) (* w e13))
+            (+ (* x e20) (* y e21) (* z e22) (* w e23))
             (+ (* x e30) (* y e31) (* z e32) (* w e33)))))
 
 (def-tuple-op transform-vector3d 
-    ((mat matrix44 
-          (e00 e01 e02 e03
-           e10 e11 e12 e13
-           e20 e21 e22 e23
-           e30 e31 e32 e33))
+    ((mat matrix33 
+          (e00 e01 e02 
+           e10 e11 e12 
+           e20 e21 e22))
      (vect vector3d (x y z)))
-  (:return vertex3d
-           (vertex3d*
+  (:return vector3d
+           (vector3d*
             (+ (* x e00) (* y e01) (* z e02) )
-            (+ (* x e10) (* y e11) (* z e02) )
-            (+ (* x e20) (* y e21) (* z e02) )
-            (+ (* x e30) (* y e31) (* z e32) ))))
+            (+ (* x e10) (* y e11) (* z e12) )
+            (+ (* x e20) (* y e21) (* z e12) ))))
 
 
 (def-tuple-op matrix44-product
@@ -156,10 +154,10 @@
   "Return a matrix for rotating around the x axis."
   (:return matrix44
            (matrix44*
-            1.0  0.0   0.0   0.0
-            0.0 (cos rotation) (sin rotation)  0.0
-            0.0 (sin rotation) (cos rotation)   0.0
-            0.0  0.0  0.0     1.0)))
+            1.0  0.0            0.0                0.0
+            0.0 (cos rotation) (- (sin rotation))  0.0
+            0.0 (sin rotation) (cos rotation)      0.0
+            0.0  0.0           0.0                 1.0)))
 
 
 
@@ -168,17 +166,17 @@
   "Return a matrix for rotating around the y axis."
   (:return matrix44
            (matrix44*
-            (cos rotation)   0.0     (sin rotation)   0.0
-            0.0     1.0     0.0     0.0
-            (sin rotation)  0.0    (cos rotation)   0.0
-            0.0     0.0     0.0     1.0)))
+            (cos rotation)      0.0    (sin rotation)   0.0
+            0.0     1.0         0.0     0.0
+            (- (sin rotation))  0.0    (cos rotation)   0.0
+            0.0     0.0         0.0     1.0)))
 
 (def-tuple-op rotatez-matrix44
     ((rotation single-float))
   "Return a matrix for rotating around the z axis."
   (:return matrix44
            (matrix44*
-            (cos rotation)   0.0   (sin rotation)  0.0
+            (cos rotation)   0.0   (- (sin rotation))  0.0
             (sin rotation)   0.0   (cos rotation)   0.0
             0.0     0.0   1.0     0.0
             0.0     0.0   0.0     1.0)))
@@ -205,3 +203,28 @@
            (format t "~A ~A ~A ~A ~%" e10 e11 e12 e13)
            (format t "~A ~A ~A ~A ~%" e20 e21 e22 e23)
            (format t "~A ~A ~A ~A ~%" e30 e31 e32 e33)))
+
+
+(def-tuple-op matrix44-matrix33 
+    ((mat44 matrix44 
+            (e00 e01 e02 e03
+             e10 e11 e12 e13
+             e20 e21 e22 e23
+             e30 e31 e32 e33)))
+  "Convert a 4x4 matrix to a 3x3 matrix"
+  (:return matrix33
+           (matrix33* e00 e01 e02 e10 e11 e12 e20 e21 e22)))
+
+(def-tuple-op matrix33-matrix44
+    ((mat3 matrix33 
+            (e00 e01 e02
+             e10 e11 e12
+             e20 e21 e22)))
+  "Convert a 3x3 matrix to a 4x4 matrix"
+  (:return matrix44
+           (matrix44* e00 e01 e02 1.0 
+                      e10 e11 e12 1.0 
+                      e20 e21 e22 0.0 
+                      0.0 0.0 0.0 0.0)))
+  
+            

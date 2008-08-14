@@ -151,7 +151,7 @@
                                     (declare (ignore x))
                                     (list
                                      'prog1
-                                     `(aref (the ,',(tuple-typespec** type-name) ,array-name) (+,counter-sym ,array-index-sym))
+                                     `(aref (the ,',(tuple-typespec** type-name) ,array-name) (+ ,counter-sym ,array-index-sym))
                                      `(incf ,counter-sym)))
                                 element-syms))
             (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name)))

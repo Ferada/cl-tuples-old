@@ -50,14 +50,14 @@
            (quaternion* (- (+ (* w1 x2) (* x1 w2) (* y1 z2)) (* z1 y2))
                         (- (+ (* w1 y2) (* y1 w2) (* z1 x2)) (* x1 z2))
                         (- (+ (* w1 z2) (* x1 y2) (* z1 w2)) (* y1 x2))
-                        (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2)))))xs
+                        (- (* w1 w2) (* x1 x2) (* y1 y2) (* z1 z2)))))
 
 (def-tuple-op quaternion-matrix33 
   ((q quaternion (x y z w)))
    "Convert a quaternion to a 3x3 rotation matrix."
-     (matrix33-tuple
+     (matrix33*
       (- 1 (* 2 y y) (* 2 z z))   (- (* 2 x y) (* 2 w z))   (+ (* 2 x z) (* 2 w y))
-      (+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w x))
+      (+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w z))
       (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y))))
      
 
@@ -65,7 +65,10 @@
   ((aa angle-axis (x y z a)))
   "Convert an angle-axis tuple to a quaternion tuple"
   (:return quaternion
-           (quaternion* (* x (sin a)) (* y (sin a)) (* z (sin a)) (* a (cos a)))))
+           (quaternion* (* x (sin (* 0.5 a))) 
+                        (* y (sin (* 0.5 a))) 
+                        (* z (sin (* 0.5 a))) 
+                        (cos (* 0.5 a)))))
   
                 
     

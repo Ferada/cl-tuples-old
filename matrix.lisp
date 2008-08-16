@@ -227,4 +227,18 @@
                       e20 e21 e22 0.0 
                       0.0 0.0 0.0 0.0)))
   
-            
+(def-tuple-op vector3d-matrix3d 
+    ((zvec vector3d (zx zy zz))
+     (yvec vector3d (yx yy yz)))
+  "Construct a rotation matrix from 2 vectors"
+  (:return matrix33
+           (with-vector3d
+               (vector3d-cross 
+                zvec yvec) 
+             (xx xy xz)
+             (matrix33*
+              (xx yx zx 
+               xy yy zy 
+               xz yz zz)))))
+
+              

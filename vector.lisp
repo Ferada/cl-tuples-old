@@ -1,6 +1,9 @@
 
 (in-package :cl-tuples)
 
+;; type defs
+
+;; vectors
 
 (def-tuple-type vector2d 
     :tuple-element-type single-float 
@@ -8,11 +11,6 @@
 
 (export-tuple-operations vector2d)
 
-(def-tuple-type vertex2d 
-    :tuple-element-type single-float 
-    :elements (x y w))
-
-(export-tuple-operations vertex3d)
 
 (def-tuple-type vector3d 
     :tuple-element-type single-float 
@@ -20,12 +18,22 @@
 
 (export-tuple-operations vector3d)
 
+
+
+;; vertices
+(def-tuple-type vertex2d 
+    :tuple-element-type single-float 
+    :elements (x y w))
+
+(export-tuple-operations vertex3d)
+
 (def-tuple-type vertex3d 
     :tuple-element-type single-float
     :elements (x y z w))
 
 (export-tuple-operations vertex3d)
 
+;; primitives
 
 (def-tuple-op vector2d-length 
     ((vec vector2d (x y)))

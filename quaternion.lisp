@@ -76,11 +76,32 @@
     ((vector vector3d (vx vy vz))
      (quat quaternion (qx qy qz qw)))
   "Transform a 3d vector with a quaternion"
-  (with-quaternion 
-      (quaternion-product
-       (quaternion-product
-        (quaternion* qx qy qz qw)
-        (quaternion* vx vy vz 0.0))
-       (quaternion-conjugate (quaternion* qx qy qz qw)))
-      (rx ry rz rw)
-    (vector3d* rx ry rz)))
+  (:return vector3d
+           (with-quaternion 
+               (quaternion-product
+                (quaternion-product
+                 (quaternion* qx qy qz qw)
+                 (quaternion* vx vy vz 0.0))
+                (quaternion-conjugate (quaternion* qx qy qz qw)))
+               (rx ry rz rw)
+             (vector3d* rx ry rz))))
+
+
+(def-tuple-op vector3d-quaternion 
+    ((vector vector3d (vx vy vz)))
+  "Convert a 3d vector into q auqt for angular velocity purposes"
+  (quaternion* vx vy vz 0.0))
+
+
+(def-tuple-op angluar-velocity 
+  ((vector vector3d (vx vy vz))
+   (quat quaternion (qx qy qz qw)))
+  "Calculate dq/dt as a quat from an angular velocity"
+  (:return quaternion
+           (quaternion-scale 
+            (quaternion-product
+             (vector3d-quaternion vector)
+             quat)))
+  0.5)
+     
+             

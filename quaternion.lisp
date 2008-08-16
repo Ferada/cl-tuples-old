@@ -21,10 +21,34 @@
 
 (def-tuple-op quaternion-scale 
     ((q quaternion (x y z w))
-     (scale single-float))
-  (;return quaternion
+     (s single-float))
+  "Multiply a quat by a scalar"
+  (:return quaternion
    (quaternion*
     (* s x) (* s y) (* s z) (* s  w))))
+
+(def-tuple-op quaternion-norm
+ ((q quaternion (x y z w)))
+  (:return single-float
+           (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))
+           
+
+
+(def-tuple-op quaternion-unitize 
+  ((q quaternion (x y z w)))
+  "Ensure a quaternion is a unit"
+  (:return quaternion             
+           (let ((1/mag
+                  (the single-float
+                    (/ 1.0 (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))))
+             (quaternion* (* x 1/mag) (* y 1/mag) (* z 1/mag) (* w 1/mag)))))
+
+(def-tuple-op quaternion-sum
+  ((q0 quaternion (x0 y0 z0 w0))
+   (q1 quaternion (x1 y1 z1 w1)))  
+  "Sum the components of two quaternions"
+  (:return quaternion
+           (quaternion* (+ x0 x1) (+ y0 y1) (+ z0 z1) (+ w0 w1))))
 
 (def-tuple-op quaternion-dot 
     ((quaternion-lhs quaternion (x0 y0 z0 w0)) 
@@ -37,11 +61,15 @@
   ((q quarternion (x y z w)))
     "Inverse of quaternion"
     (:return quaternion     
-     (quaternion-scale 
-      (quaternion-conjugate q)
-      (/ 1.0 (quaternion-dot 
-              (quaternion* x y z w))))))
-     
+             (let* ((mag 
+                     (the single-float 
+                       (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))
+                    (1/mag2  
+                     (the single-float (/ 1.0 (* mag mag)))))
+                    (declare (single-float mag2))
+                    (quaternion* (/ x mag2) (/ y mag2) (/ z mag2) (/ w mag2)))))
+               
+                       
 (def-tuple-op quaternion-product
     ((q-lhs quaternion (x1 y1 z1 w1))
      (q-rhs quaternion (x2 y2 z2 w2)))
@@ -55,11 +83,12 @@
 (def-tuple-op quaternion-matrix33 
   ((q quaternion (x y z w)))
    "Convert a quaternion to a 3x3 rotation matrix."
-     (matrix33*
-      (- 1 (* 2 y y) (* 2 z z))   (- (* 2 x y) (* 2 w z))   (+ (* 2 x z) (* 2 w y))
-      (+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w z))
-      (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y))))
-     
+   (:return matrix33
+            (matrix33*
+             (- 1 (* 2 y y) (* 2 z z))   (- (* 2 x y) (* 2 w z))   (+ (* 2 x z) (* 2 w y))
+             (+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w z))
+             (-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y)))))
+   
 
 (def-tuple-op angle-axis-quaternion
   ((aa angle-axis (x y z a)))
@@ -90,18 +119,9 @@
 (def-tuple-op vector3d-quaternion 
     ((vector vector3d (vx vy vz)))
   "Convert a 3d vector into q auqt for angular velocity purposes"
-  (quaternion* vx vy vz 0.0))
-
-
-(def-tuple-op angluar-velocity 
-  ((vector vector3d (vx vy vz))
-   (quat quaternion (qx qy qz qw)))
-  "Calculate dq/dt as a quat from an angular velocity"
   (:return quaternion
-           (quaternion-scale 
-            (quaternion-product
-             (vector3d-quaternion vector)
-             quat)))
-  0.5)
+           (quaternion* vx vy vz 0.0)))
+
+
      
              

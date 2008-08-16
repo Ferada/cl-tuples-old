@@ -35,6 +35,12 @@
 
 ;; primitives
 
+(def-tuple-op vector2d-scale 
+    ((vec vector2d (x y))
+     (s single-float))
+  (:return vector3d
+           (vector2d* (* s x) (* s y))))
+
 (def-tuple-op vector2d-length 
     ((vec vector2d (x y)))
   (:return single-float
@@ -65,9 +71,13 @@
   (:return vector2d
            (vector2d* x y)))
 
-;; make 33 matrix from 2 2d vectors
 
-
+(def-tuple-op vector3d-scale 
+    ((vec vector3d (x y z))
+     (s single-float))
+  (:return vector3d
+           (vector3d* (* s x) (* s y) (* s z))))
+  
 (def-tuple-op vector3d-length
     ((vec vector3d (x y z)))
   (:return single-float

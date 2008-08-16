@@ -25,6 +25,7 @@
 
            vertex2d-vector2d
 
+           vector3d-scale
            vector3d-dot
            vector3d-sum
            vector3d-difference
@@ -33,9 +34,9 @@
            vector3d-normal
            vector3d-cross
            vector3d-vertex3d
-
            vertex3d-vector3d
            vertex3d-distance
+
            delta-vector3d 
 
            identity-matrix44
@@ -53,6 +54,10 @@
            matrix44-matrix33
            matrix33-marrix44
 
+           quaternion-sum
+           quaternion-unitize
+           quaternion-norm
+           quaternion-scale
            quaternion-conjugate
            quaternion-dot
            quaternion-mag-square
@@ -62,6 +67,7 @@
            quaternion-matrix33
            angle-axis-quaternion
            quaternion-transform-vector3d
+           verctor3d-quaternion
 
            def-tuple-class
 

@@ -67,7 +67,7 @@
            quaternion-matrix33
            angle-axis-quaternion
            quaternion-transform-vector3d
-           verctor3d-quaternion
+           vector3d-quaternion
 
            def-tuple-class
 

@@ -101,6 +101,17 @@
             (+ (* x e10) (* y e11) (* z e12) )
             (+ (* x e20) (* y e21) (* z e12) ))))
 
+(def-tuple-op transpose-matrix33
+    ((mat33 matrix33 
+            (e00 e01 e02 
+             e10 e11 e12 
+             e20 e21 e22)))
+  "Return the transpose of the matrix"
+  (:return matrix33
+           (matrix33*
+            e00 e10 e20 
+            e01 e11 e21 
+            e02 e12 e22)))
 
 (def-tuple-op matrix44-product
     ((m0 matrix44 (e000 e001 e002 e003 e010 e011 e012 e013  e020 e021 e022 e023  e030 e031 e032 e033))
@@ -136,10 +147,20 @@
           0.0 0.0 1.0 0.0
           0.0 0.0 0.0 1.0)))
 
-(def-tuple-op translation-matrix 
+(def-tuple-op translation-matrix44 
     ((tx single-float)
      (ty single-float)
      (tz single-float))
+  "Return a matrix that represents a translation transformation"
+  (:return matrix44
+           (matrix44*
+            0.0 0.0 0.0 tx
+            0.0 0.0 0.0 ty
+            0.0 0.0 0.0 tz
+            0.0 0.0 0.0 1.0)))
+
+(def-tuple-op vertex3d-translation-matrix44 
+    ((vert vertex3d (tx ty tz tw)))
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44*
@@ -180,6 +201,20 @@
             (sin rotation)   0.0   (cos rotation)   0.0
             0.0     0.0   1.0     0.0
             0.0     0.0   0.0     1.0)))
+
+(def-tuple-op transpose-matrix44
+    ((mat44 matrix44 
+            (e00 e01 e02 e03
+             e10 e11 e12 e13
+             e20 e21 e22 e23
+             e30 e31 e32 e33)))
+  "Return the transpose of the matrix"
+  (:return matrix44
+           (matrix44*
+            e00 e10 e20 e30
+            e01 e11 e21 e31
+            e02 e12 e22 e32
+            e03 e13 e23 e33)))
 
 (def-tuple-op make-test-matrix44
   ()

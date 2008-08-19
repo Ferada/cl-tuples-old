@@ -39,11 +39,14 @@
 
            delta-vector3d 
 
+           transpose-matrix33
            identity-matrix44
            translation-matrix44
+           vertex3d-translation-matrix44
            rotatex-matrix44
            rotatey-matrix44
            rotatez-matrix44
+           transpose-matrix44
 
            transform-vertex2d
            transform-vertex3d
@@ -52,7 +55,7 @@
            matrix33-product
            matrix44-product
            matrix44-matrix33
-           matrix33-marrix44
+           matrix33-matrix44
 
            quaternion-sum
            quaternion-unitize

@@ -154,9 +154,9 @@
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44*
-            0.0 0.0 0.0 tx
-            0.0 0.0 0.0 ty
-            0.0 0.0 0.0 tz
+            1.0 0.0 0.0 tx
+            0.0 1.0 0.0 ty
+            0.0 0.0 1.0 tz
             0.0 0.0 0.0 1.0)))
 
 (def-tuple-op vertex3d-translation-matrix44 
@@ -164,9 +164,9 @@
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44*
-            0.0 0.0 0.0 tx
-            0.0 0.0 0.0 ty
-            0.0 0.0 0.0 tz
+            1.0 0.0 0.0 tx
+            0.0 1.0 0.0 ty
+            0.0 0.0 1.0 tz
             0.0 0.0 0.0 1.0)))
 
 

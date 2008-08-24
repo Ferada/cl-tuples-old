@@ -25,7 +25,8 @@
                (:file "matrix")
                (:file "colour")
                (:file "triangle")
-               (:file "rect")))
+               (:file "rect")
+               (:file "aabb"))
 
 (defsystem :cl-tuples-infix
   :name "paip-infix"

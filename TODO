@@ -1,9 +1,10 @@
 * cl-tuples
 
-** TODO with-tuple-* to (with-tuple (vector3d thing (elements))) ? -- FIXED
-** TODO documentation doesn't work! -- FIXED
 
-** TODO refactor clos wrapper to handle situation where accessor-name * 2 != type * 2
-** TODO operator overloading
-** TODO (:return :element-type ).. in def-tuple-op automatically replaces :element-type with type of tuple
+** TODO allow constructors to specify values for new-{tuple} so frinstance quats automatically are init'd as 0.0 0.0 0.0 1.0
+** TODO look at metaclass protocol for clos wrapper?
+** TODO look at cl-walker for re-implementation of def-tuple-op so as to allow ..
+** TODO ..operator overloading
+** TODO write a global illumination thing
+
 

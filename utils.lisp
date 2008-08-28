@@ -2,6 +2,8 @@
 
 (in-package :cl-tuples)
 
+;; float that fits within range of x86 hardware flops
+(deftype fast-float () `(single-float   (#.(- (expt 2f0 64))) (#.(expt 2f0 64))))
 
 (defmacro with-gensyms ((&rest names) &body body)
   "Classic macro for creating named unique symbols."

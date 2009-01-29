@@ -15,58 +15,58 @@
 
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-type)))
-  (make-adorned-symbol type-name :package :cl-tuples))
+  (make-adorned-symbol type-name ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple)))
-   (make-adorned-symbol type-name :asterisk t :package :cl-tuples))
+   (make-adorned-symbol type-name :asterisk t ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-getter))) 
-  (make-adorned-symbol type-name :package :cl-tuples))
+  (make-adorned-symbol type-name ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref)))    
-  (make-adorned-symbol type-name :suffix "AREF" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "AREF" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple)))    
-  (make-adorned-symbol type-name :prefix "WITH" :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "WITH" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple*)))    
-  (make-adorned-symbol type-name :prefix "WITH" :asterisk t :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "WITH" :asterisk t ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple-aref)))    
-  (make-adorned-symbol type-name :prefix "WITH" :suffix "AREF" :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "WITH" :suffix "AREF" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setter)))    
-  (make-adorned-symbol type-name :suffix "SETTER" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "SETTER" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))    
-  (make-adorned-symbol type-name :suffix "AREF-SETTER" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "AREF-SETTER" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push)))    
-  (make-adorned-symbol type-name :suffix "VECTOR-PUSH" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "VECTOR-PUSH" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))    
-  (make-adorned-symbol type-name :suffix "VECTOR-PUSH-EXTEND" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "VECTOR-PUSH-EXTEND" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-new-tuple)))    
-  (make-adorned-symbol type-name :prefix "NEW" :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "NEW" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-maker)))    
-  (make-adorned-symbol type-name :prefix "MAKE" :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "MAKE" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-maker*)))    
-  (make-adorned-symbol type-name :prefix "MAKE" :asterisk t :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "MAKE" :asterisk t ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-maker)))    
-  (make-adorned-symbol type-name :prefix "MAKE" :suffix "ARRAY" :package :cl-tuples))
+  (make-adorned-symbol type-name :prefix "MAKE" :suffix "ARRAY" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))    
-  (make-adorned-symbol type-name :suffix "ARRAY-DIMENSIONS" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "ARRAY-DIMENSIONS" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf)))    
-  (make-adorned-symbol type-name :suffix "SETTER" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "SETTER" ))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))    
-  (make-adorned-symbol type-name :suffix "AREF" :package :cl-tuples))
+  (make-adorned-symbol type-name :suffix "AREF" ))
 
 ;; to do -- break this up into methods specialised by key
 (defgeneric tuple-expansion-fn (type-name expansion))

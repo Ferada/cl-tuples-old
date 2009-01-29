@@ -6,14 +6,14 @@
 ;; vectors
 
 (def-tuple-type vector2d 
-    :tuple-element-type single-float 
+    :tuple-element-type fast-float 
     :elements (x y))
 
 (export-tuple-operations vector2d)
 
 
 (def-tuple-type vector3d 
-    :tuple-element-type single-float 
+    :tuple-element-type fast-float 
     :elements (x y z))
 
 (export-tuple-operations vector3d)

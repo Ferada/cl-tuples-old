@@ -253,9 +253,10 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
   "Create macro that creates a array of tuple array places."
-  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer)
+  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer initial-element)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
+				 :inital-element initial-element
                  :fill-pointer (when fill-pointer (* ,(tuple-size type-name) fill-pointer))
                  :element-type ',(tuple-element-type type-name))))
 
@@ -275,6 +276,16 @@
 
 
 ;; -- def-tuple-op expanders begin here ------------------------------------
+
+;; (in-package :tuple-types)
+
+;; (defclass %tuple-fun ()
+;;   ((name :intiarg :fun-name)
+;;    (params :initarg :params)
+;;    (types :initarg :types)
+;;    (elements :initarg :elements)))
+
+;; (in-package :cl-tuples)
 
 (defun symbol-macro-expander-fn (n names types elements gensyms body)
   "Wrap the body of def tuple op in symbol macros mapped to gensyms to prevent

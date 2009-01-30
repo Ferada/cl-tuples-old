@@ -1,10 +1,7 @@
 * cl-tuples
 
 
-** TODO allow constructors to specify values for new-{tuple} so frinstance quats automatically are init'd as 0.0 0.0 0.0 1.0
-** TODO look at metaclass protocol for clos wrapper?
-** TODO look at cl-walker for re-implementation of def-tuple-op so as to allow ..
-** TODO ..operator overloading
-** TODO write a global illumination thing
-
+** TODO define typespec for tuple array
+** TODO specify initial-element for fresh arrays
+** TODO investigate struct wrapper
 

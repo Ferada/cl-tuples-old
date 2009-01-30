@@ -137,11 +137,11 @@
 
 ;; possibly we also need a deftype form to describe a tuple array?
 
-(defmacro def-tuple-type (tuple-type-name &key tuple-element-type elements)
+(defmacro def-tuple-type (tuple-type-name &key tuple-element-type initial-element elements)
   "Create a tuple type. To be used from the top level.
  For example (def-tuple-type vector3d single-float (x y z)) will create several macros and functions. Firstly, the accessor functions (vector3d array) (vector3d-aref array index). Secondly,  the context macros (with-vector3d tuple (element-symbols) forms..) and  (with-vector3d-array tuple (element-symbols) index forms..),  thirdly the constructors (new-vector3d) and (make-vector3d tuple),  (make-vector3d-array dimensions &key adjustable fill-pointer), forthly generalised access as in  (setf (vector3d array) tuple) and (setf (vector3d-aref array) index tuple), fiftly and finally, the  funcional macros (map-vector3d fn tuples..) (reduce-vector3d fn tuple)."
   `(eval-when (:compile-toplevel :execute :load-toplevel)
-     (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',elements)
+     (make-tuple-symbol ',tuple-type-name ',tuple-element-type ',initial-element ',elements)
      (make-tuple-operations ,tuple-type-name)
      (def-tuple-documentation ,tuple-type-name)))
 

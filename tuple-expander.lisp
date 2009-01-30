@@ -15,7 +15,9 @@
 
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-type)))
-  (make-adorned-symbol type-name ))
+  (make-adorned-symbol type-name :suffix "-TYPE"))
+
+;; we need a tuple array type..
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple)))
    (make-adorned-symbol type-name :asterisk t ))
@@ -221,7 +223,10 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-new-tuple)))
   "Create a macro that creates a new tuple place."
   `(defmacro ,(tuple-symbol type-name :def-new-tuple) ()
-     `(the ,',(tuple-typespec* type-name) (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name)))))
+     `(the ,',(tuple-typespec* type-name) 
+		(make-array (list ,',(tuple-size type-name)) 
+					:initial-element ',',(tuple-initial-element type-name)
+					:element-type ',',(tuple-element-type type-name)))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker)))
   "Create a macro that creates new tuple place, form and initialize it with values"
@@ -230,7 +235,10 @@
            (tuple-sym (gensym))
            (counter-sym 0))
        (declare (type fixnum counter-sym))
-       `(let  ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
+       `(let  ((,tuple-sym 
+				(make-array (list ,',(tuple-size type-name)) 
+							:intial-element ',',(tuple-initial-element type-name)
+							:element-type ',',(tuple-element-type type-name))))
           (declare (type ,',(tuple-typespec* type-name) ,tuple-sym))
           (multiple-value-bind
                 ,varlist
@@ -247,7 +255,10 @@
   "Create a macro that creates new tuple place and initialize it from a list of elements"
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker*) (&rest elements)
      (let ((tuple-sym (gensym)))
-       `(let ((,tuple-sym (make-array (list ,',(tuple-size type-name)) :element-type ',',(tuple-element-type type-name))))
+       `(let ((,tuple-sym 
+			   (make-array (list ,',(tuple-size type-name)) 
+						   :initial-element ',',(tuple-initial-element type-name)
+						   :element-type ',',(tuple-element-type type-name))))
           (,',(tuple-symbol type-name :def-tuple-setter) ,tuple-sym (values  ,@elements))
           ,tuple-sym))))
 
@@ -256,7 +267,7 @@
   `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer initial-element)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
-				 :inital-element initial-element
+				 :inital-element ',(tuple-initial-element typename)
                  :fill-pointer (when fill-pointer (* ,(tuple-size type-name) fill-pointer))
                  :element-type ',(tuple-element-type type-name))))
 

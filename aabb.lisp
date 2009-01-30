@@ -6,7 +6,7 @@
 ;; axis aligned bounding boxes
 
 (def-tuple-type aabb
-    :tuple-element-type single-float 
+    :tuple-element-type fast-float 
     :elements (minx maxx miny maxy minz maxz))
 
 (export-tuple-operations aabb)
@@ -20,12 +20,12 @@
         (height1 (- maxy1 miny1))
         (width0 (- maxx0 minx0))
         (width1 (- maxx1 minx1))
-        (centrex0 (- maxx0 (/ 2.0 width0)))
-        (centrex1 (- maxx1 (/ 2.0 width1)))
-        (centrey0 (- maxx0 (/ 2.0 height0)))
-        (centrey1 (- maxx1 (/ 2.0 height1)))
-        (centrez0 (- maxx0 (/ 2.0 depth0)))
-        (centrez1 (- maxx1 (/ 2.0 depth1))))
+        (centrex0 (- maxx0 (* 0.5f0 width0)))
+        (centrex1 (- maxx1 (/ 0.5f0 width1)))
+        (centrey0 (- maxx0 (/ 0.5f0 height0)))
+        (centrey1 (- maxx1 (/ 0.5f0 height1)))
+        (centrez0 (- maxx0 (/ 0.5f0 depth0)))
+        (centrez1 (- maxx1 (/ 0.5f0 depth1))))
     (and (<= (abs (- centrex0 centrex1)) (+ (width0 width1)))
          (<= (abs (- centrey0 centrey1)) (+ (height0 height1)))
          (<= (abs (- centrez0 centrez1)) (+ (depth0 depth1))))))

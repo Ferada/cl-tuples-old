@@ -2,7 +2,7 @@
 (in-package :cl-tuples)
 
 (def-tuple-type matrix33 
-    :tuple-element-type single-float 
+    :tuple-element-type fast-float 
     :elements (e00 e01 e02
                e10 e11 e12
                e20 e21 e22))
@@ -10,7 +10,7 @@
 (export-tuple-operations matrix33)
 
 (def-tuple-type matrix44 
-    :tuple-element-type single-float
+    :tuple-element-type fast-float
     :elements (e00 e01 e02 e03
                e10 e11 e12 e13
                e20 e21 e22 e23
@@ -142,65 +142,65 @@
     ()  
   (:return matrix44
          (matrix44*
-          1.0 0.0 0.0 0.0
-          0.0 1.0 0.0 0.0
-          0.0 0.0 1.0 0.0
-          0.0 0.0 0.0 1.0)))
+          1.0f0 0.0f0 0.0f0 0.0f0
+          0.0f0 1.0f0 0.0f0 0.0f0
+          0.0f0 0.0f0 1.0f0 0.0f0
+          0.0f0 0.0f0 0.0f0 1.0f0)))
 
 (def-tuple-op translation-matrix44 
-    ((tx single-float)
-     (ty single-float)
-     (tz single-float))
+    ((tx fast-float)
+     (ty fast-float)
+     (tz fast-float))
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44*
-            1.0 0.0 0.0 tx
-            0.0 1.0 0.0 ty
-            0.0 0.0 1.0 tz
-            0.0 0.0 0.0 1.0)))
+            1.0f0 0.0f0 0.0f0 tx
+            0.0f0 1.0f0 0.0f0 ty
+            0.0f0 0.0f0 1.0f0 tz
+            0.0f0 0.0f0 0.0f0 1.0f0)))
 
 (def-tuple-op vertex3d-translation-matrix44 
     ((vert vertex3d (tx ty tz tw)))
   "Return a matrix that represents a translation transformation"
   (:return matrix44
            (matrix44*
-            1.0 0.0 0.0 tx
-            0.0 1.0 0.0 ty
-            0.0 0.0 1.0 tz
-            0.0 0.0 0.0 1.0)))
+            1.0f0 0.0f0 0.0f0 tx
+            0.0f0 1.0f0 0.0f0 ty
+            0.0f0 0.0f0 1.0f0 tz
+            0.0f0 0.0f0 0.0f0 1.0f0)))
 
 
 (def-tuple-op rotatex-matrix44 
-    ((rotation single-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the x axis."
   (:return matrix44
            (matrix44*
-            1.0  0.0            0.0                0.0
-            0.0 (cos rotation) (- (sin rotation))  0.0
-            0.0 (sin rotation) (cos rotation)      0.0
-            0.0  0.0           0.0                 1.0)))
+            1.0f0  0.0f0            0.0f0                0.0f0
+            0.0f0 (cos rotation) (- (sin rotation))  0.0f0
+            0.0f0 (sin rotation) (cos rotation)      0.0f0
+            0.0f0  0.0f0           0.0f0                 1.0f0)))
 
 
 
 (def-tuple-op rotatey-matrix44    
-    ((rotation single-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the y axis."
   (:return matrix44
            (matrix44*
-            (cos rotation)      0.0    (sin rotation)   0.0
-            0.0     1.0         0.0     0.0
-            (- (sin rotation))  0.0    (cos rotation)   0.0
-            0.0     0.0         0.0     1.0)))
+            (cos rotation)      0.0f0    (sin rotation)   0.0f0
+            0.0f0     1.0f0         0.0f0     0.0f0
+            (- (sin rotation))  0.0f0    (cos rotation)   0.0f0
+            0.0f0     0.0f0         0.0f0     1.0f0)))
 
 (def-tuple-op rotatez-matrix44
-    ((rotation single-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the z axis."
   (:return matrix44
            (matrix44*
-            (cos rotation)   0.0   (- (sin rotation))  0.0
-            (sin rotation)   0.0   (cos rotation)   0.0
-            0.0     0.0   1.0     0.0
-            0.0     0.0   0.0     1.0)))
+            (cos rotation)   0.0f0   (- (sin rotation))  0.0f0
+            (sin rotation)   0.0f0   (cos rotation)   0.0f0
+            0.0f0     0.0f0   1.0f0     0.0f0
+            0.0f0     0.0f0   0.0f0     1.0f0)))
 
 (def-tuple-op transpose-matrix44
     ((mat44 matrix44 
@@ -221,10 +221,10 @@
   "Return a matrix for testing purposes"
   (:return matrix44
           (matrix44*
-           1.0  2.0  3.0  4.0
-           5.0  6.0  7.0  8.0
-           9.0  10.0 11.0 12.0
-           13.0 14.0 15.0 16.0)))
+           1.0f0  2.0f0  3.0f0  4.0f0
+           5.0f0  6.0f0  7.0f0  8.0f0
+           9.0f0  10.0f0 11.0f0 12.0f0
+           13.0f0 14.0f0 15.0f0 16.0f0)))
 
 
 (def-tuple-op print-matrix44
@@ -257,10 +257,10 @@
              e20 e21 e22)))
   "Convert a 3x3 matrix to a 4x4 matrix"
   (:return matrix44
-           (matrix44* e00 e01 e02 1.0 
-                      e10 e11 e12 1.0 
-                      e20 e21 e22 0.0 
-                      0.0 0.0 0.0 0.0)))
+           (matrix44* e00 e01 e02 1.0f0 
+                      e10 e11 e12 1.0f0 
+                      e20 e21 e22 0.0f0 
+                      0.0f0 0.0f0 0.0f0 0.0f0)))
   
 (def-tuple-op vector3d-matrix3d 
     ((zvec vector3d (zx zy zz))

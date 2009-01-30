@@ -12,6 +12,7 @@
   :version "1.0"
   :licence "MIT"
   :description "Experimental Tuple Types Facade"
+  :depends-on (:cl-walker)
   :serial t
   :components ((:file "package")
                (:file "utils")

@@ -15,7 +15,7 @@
 
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-type)))
-  (make-adorned-symbol type-name :suffix "-TYPE"))
+  (make-adorned-symbol type-name))
 
 ;; we need a tuple array type..
 
@@ -237,7 +237,7 @@
        (declare (type fixnum counter-sym))
        `(let  ((,tuple-sym 
 				(make-array (list ,',(tuple-size type-name)) 
-							:intial-element ',',(tuple-initial-element type-name)
+							:initial-element ',',(tuple-initial-element type-name)
 							:element-type ',',(tuple-element-type type-name))))
           (declare (type ,',(tuple-typespec* type-name) ,tuple-sym))
           (multiple-value-bind
@@ -267,7 +267,7 @@
   `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer initial-element)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
-				 :inital-element ',(tuple-initial-element typename)
+				 :initial-element ',(tuple-initial-element type-name)
                  :fill-pointer (when fill-pointer (* ,(tuple-size type-name) fill-pointer))
                  :element-type ',(tuple-element-type type-name))))
 

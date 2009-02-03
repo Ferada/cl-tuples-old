@@ -30,7 +30,7 @@ about the tuple type is stored in the property list of the symbol."
       ;; store the # of elements ( a bit redundant )
       (setf (get  type-name-sym 'tuple-length) (length elements))
 	  ;; store-value to use as inital array element
-	  (setf (get typename-sym 'initial-element) tuple-initial-element)
+	  (setf (get type-name-sym 'initial-element) tuple-initial-element)
       ;; store-value the type of the elements
       (setf (get type-name-sym 'element-type) tuple-element-type)
       ;; store-value a flag us to make sure it's a tuple-type symbol
@@ -50,7 +50,7 @@ about the tuple type is stored in the property list of the symbol."
 (defun tuple-initial-element (type-name)
   "Return the inital element type of a tuple array"
   (assert (or (symbolp type-name) (stringp type-name)))
-  (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'initial-element)))
+  (get (find-symbol (string-upcase (string type-name)) :tuple-types)  'initial-element))
 
 (defun tuple-element-type (type-name)
   "Return the size of the type"

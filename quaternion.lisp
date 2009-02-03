@@ -3,12 +3,14 @@
 
 (def-tuple-type quaternion
     :tuple-element-type fast-float
+	:initial-element 0.0f0
     :elements (x y z w))
 
 (export-tuple-operations quaternion)
 
 (def-tuple-type angle-axis
     :tuple-element-type fast-float
+	:initial-element 0.0f0
     :elements (x y z a))
 
 (export-tuple-operations angle-axis)

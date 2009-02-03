@@ -3,42 +3,45 @@
 
 (def-tuple-type line2d 
     :tuple-element-type single-float
+	:initial-element 0.0f0
     :elements (sx sy ex ey))
 
 (def-tuple-type line3d 
     :tuple-element-type single-float
+	:initial-element 0.0f0
     :elements (sx sy sz ex ey ez))
 
-(defmacro line->vector2d (line2d)
-  (with-line2d ,line2d
-    (sx sy ex ey)
-    (values (- ex sx) (- ey sy))))
+(def-tuple-op line->vector2d 
+	((line line2d (sx sy ex ey)))
+  (:return vector2d
+		   (vector2d* (- ex sx) (- ey sy))))
 
-(defmacro line-start->vertex2d (line2d)
-  (with-line2d ,line2d
-      (sx sy ex ey)
-    (values sx sy 1)))
+(def-tuple-op line-start->vertex2d
+	((line line2d (sx sy ex ey)))
+  (:return vertex2d
+		   (vector2d* sx sy)))
 
-(defmacro line-end->vertex2d (line2d)
-  (with-line2d ,line2d
-      (sx sy ex ey)
-    (values ex ey 1)))
+(def-tuple-op line-end->vertex2d
+	((line line2d (sx sy ex ey)))
+  (:return vertex2d
+		   (vector2d* sx sy)))
+		   
 
 (def-tuple-type line3d 
     :tuple-element-type single-float
     :elements (sx sy sz ex ey ez))
 
-(defmacro line-start->vertex3d (line3d)
-  (with-line3d ,line3d
-      (sx sy sz ex ey ez)
-    (values sx sy sz 1)))
+(def-tuple-op line->vector3d 
+	((line line3d (sx sy ex ey)))
+  (:return vector3d
+		   (vector3d* (- ex sx) (- ey sy) (- ez sz))))
 
-(defmacro line-end->vertex3d (line3d)
-  (with-line3d ,line3d
-      (sx sy sz ex ey ez)
-    (values ex ey ez 1)))
+(def-tuple-op line-start->vertex3d
+	((line line3d (sx sy ex ey)))
+  (:return vertex3d
+		   (vector3d* sx sy sz)))
 
-(defmacro line->vector3d (line3d)
-  (with-line2d ,line2d
-    (sx sy sz ex ey ez)
-    (values (- ex sx) (- ey sy) (- sz ez))))
+(def-tuple-op line-end->vertex3d
+	((line line3d (sx sy ex ey)))
+  (:return vertex3d
+		   (vector3d* sx sy sz)))

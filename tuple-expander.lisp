@@ -2,7 +2,9 @@
 (in-package :cl-tuples)
 
 (defparameter *tuple-expander-keywords* 
-  '(:def-tuple :def-tuple-getter :def-tuple-aref 
+  '(:def-tuple :def-tuple-type :def-tuple-array-typespec 
+	:def-tuple-struct
+	:def-tuple-getter :def-tuple-aref 
     :def-with-tuple :def-with-tuple* :def-with-tuple-aref 
     :def-tuple-setter :def-tuple-aref-setter 
     :def-tuple-vector-push :def-tuple-vector-push-extend 
@@ -14,16 +16,24 @@
 ;;  "Given the expansion, return the name of the macro/function associated with it."
 
 
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-type)))
-  (make-adorned-symbol type-name))
 
 ;; we need a tuple array type..
+
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple)))
    (make-adorned-symbol type-name :asterisk t ))
 
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-type)))
+  (make-adorned-symbol type-name))
+
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-type)))
+  (make-adorned-symbol type-name :suffix "ARRAY"))
+
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-struct)))
+  (make-adorned-symbol type-name))
+
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-getter))) 
-  (make-adorned-symbol type-name ))
+  (make-adorned-symbol type-name))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref)))    
   (make-adorned-symbol type-name :suffix "AREF" ))
@@ -81,6 +91,18 @@
       ,@(loop for i from 0 below (tuple-size type-name)
            collect
             ` (quote ,(tuple-element-type type-name))))))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-type)))
+  "Expand the deftype form for an array of tuples"
+  `(deftype ,(tuple-symbol type-name expansion) ()
+	 (vector ,(tuple-element-type type-name) *)))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-struct)))
+  `(defstruct (,(tuple-symbol type-name expansion) (:type vector))
+	 ,@(loop 
+		  for e in (tuple-elements type-name)
+		  collect
+			(list e (tuple-initial-element type-name) :type (tuple-element-type type-name)))))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple)))
   "Expand to a macro that will create a values form representing our tuple type."

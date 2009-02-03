@@ -10,6 +10,12 @@
   "Create an alias typespec eg. (deftype vector3d () `(values 'single-float 'single-float 'single-float))"
   (tuple-expansion-fn type-name :def-tuple-type))
 
+(defmacro def-tuple-array-typespec (type-name)
+  (tuple-expansion-fn :def-tuple-array-type))
+
+(defmacro def-tuple-struct (type-name)
+  (tuple-expansion-fn type-name :def-tuple-struct))
+
 (defmacro def-tuple-getter (type-name)
   "Create an access macro such as (vector3d vec) that takes a tuple place and unpacks it to tuples (aka multiple values)"
   (tuple-expansion-fn type-name :def-tuple-getter))
@@ -113,6 +119,8 @@
   `(progn
      (def-tuple ,type-name)
      (def-tuple-typespec ,type-name)
+;; def-tuple-array-typespec
+	 (def-tuple-struct-spec ,type-name)
      (def-tuple-array-dimensions ,type-name)
      (def-tuple-getter ,type-name)
      (def-tuple-aref ,type-name)

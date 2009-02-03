@@ -7,7 +7,7 @@
 
 (def-tuple-type aabb
     :tuple-element-type fast-float 
-	:intial-element 0.0f0
+	:initial-element 0.0f0
     :elements (minx maxx miny maxy minz maxz))
 
 (export-tuple-operations aabb)

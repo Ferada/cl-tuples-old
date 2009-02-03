@@ -7,6 +7,7 @@
 
 (def-tuple-type vector2d 
     :tuple-element-type fast-float 
+	:initial-element 0.0f0
     :elements (x y))
 
 (export-tuple-operations vector2d)
@@ -14,6 +15,7 @@
 
 (def-tuple-type vector3d 
     :tuple-element-type fast-float 
+	:initial-element 0.0f0
     :elements (x y z))
 
 (export-tuple-operations vector3d)

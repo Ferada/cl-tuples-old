@@ -11,7 +11,7 @@
   (tuple-expansion-fn type-name :def-tuple-type))
 
 (defmacro def-tuple-array-typespec (type-name)
-  (tuple-expansion-fn :def-tuple-array-type))
+  (tuple-expansion-fn type-name :def-tuple-array-type))
 
 (defmacro def-tuple-struct (type-name)
   (tuple-expansion-fn type-name :def-tuple-struct))
@@ -118,9 +118,10 @@
 (defmacro make-tuple-operations (type-name)
   `(progn
      (def-tuple ,type-name)
-     (def-tuple-typespec ,type-name)
+;;     (def-tuple-typespec ,type-name)
+;;	 (def-tuple-array-typespec ,type-name)
 ;; def-tuple-array-typespec
-	 (def-tuple-struct-spec ,type-name)
+	 (def-tuple-struct ,type-name)
      (def-tuple-array-dimensions ,type-name)
      (def-tuple-getter ,type-name)
      (def-tuple-aref ,type-name)
@@ -132,7 +133,7 @@
      (def-tuple-vector-push ,type-name)
      (def-tuple-vector-push-extend ,type-name)
      (def-new-tuple ,type-name)
-     (def-tuple-maker ,type-name)
+;;     (def-tuple-maker ,type-name)
      (def-tuple-maker* ,type-name)
      (def-tuple-array-maker ,type-name)
      (def-tuple-setf  ,type-name)

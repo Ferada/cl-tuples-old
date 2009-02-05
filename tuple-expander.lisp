@@ -2,7 +2,7 @@
 (in-package :cl-tuples)
 
 (defparameter *tuple-expander-keywords* 
-  '(:def-tuple :def-tuple-type :def-tuple-array-typespec 
+  '(:def-tuple :def-tuple-type :def-tuple-array-type
 	:def-tuple-struct
 	:def-tuple-getter :def-tuple-aref 
     :def-with-tuple :def-with-tuple* :def-with-tuple-aref 
@@ -286,7 +286,7 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
   "Create macro that creates a array of tuple array places."
-  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer initial-element)
+  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable fill-pointer)
      (make-array (* ,(tuple-size type-name) dimensions)
                  :adjustable adjustable
 				 :initial-element ',(tuple-initial-element type-name)

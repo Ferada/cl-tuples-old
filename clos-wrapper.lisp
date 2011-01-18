@@ -52,7 +52,7 @@
         ;; array form
         `(defmethod ,(as-accessor name) ((self ,class-name) index)
            (the ,(tuple-typespec type)
-             (,(tuple-symbol type  :def-tuple-aref) 
+             (,(tuple-symbol type  :def-tuple-aref*) 
                (the ,(tuple-typespec** type) (,(as-private-accessor class-name name) self)) (the fixnum index))))
         ;; scalar form
         `(defmethod ,(as-accessor name) ((self ,class-name))
@@ -72,7 +72,7 @@
             (let* ((tuple-gensym-list (tuple-gensyms type))
                    (annotated-tuple-gensym-list (mapcar #'(lambda (x) ``(the ,',(tuple-element-type type)  ,,x)) tuple-gensym-list)))
               `(defsetf  ,(as-accessor name) (object index)  ,tuple-gensym-list
-                 `(setf (,',(tuple-symbol type :def-tuple-aref)
+                 `(setf (,',(tuple-symbol type :def-tuple-aref*)
                             (the ,',(tuple-typespec** type) (,',(as-private-accessor class-name name)  ,object))
                             (the fixnum ,index))
                         (the ,',(tuple-typespec type)

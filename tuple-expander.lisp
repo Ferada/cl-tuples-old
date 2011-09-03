@@ -17,7 +17,7 @@
 
 (defparameter *tuple-expander-keywords*
   '(:def-tuple-type :def-tuple-array-type
-	`:def-tuple-struct
+	:def-tuple-struct
 	:def-tuple-getter :def-tuple-aref* :def-tuple-aref
 	:def-nth-tuple
 	:def-with-tuple :def-with-tuple* :def-with-tuple-aref
@@ -27,7 +27,8 @@
 	:def-new-tuple  :def-tuple-maker
 	:def-tuple-maker*
 	:def-tuple-array-maker :def-tuple-array-dimensions
-	:def-tuple-setf* :def-tuple-array-setf*))
+	:def-tuple-setf* :def-tuple-array-setf*
+	:def-tuple-array-setf))
 
 (defgeneric tuple-symbol (type-name expansion))
 
@@ -177,14 +178,14 @@
 	 (make-array ,(tuple-size type-name) :displaced-to tuple-place :displaced-index-offset (* ,(tuple-size type-name) index))))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))
-  (make-adorned-symbol type-name :suffix "AREF"))
+  (make-adorned-symbol type-name :suffix "AREF-SETTER"))
 	
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))
   "Create a macro that will set an indexed array of tuple places to the values of a tuple struct form"
-  `(defun (setf ,(tuple-symbol type-name :def-tuple-aref-setter)) (tuple tuple-array tuple-index)
-	 (setf (subseq tuple-array 
+  `(defun ,(tuple-symbol type-name :def-tuple-aref-setter) (tuple-name tuple-index tuple)
+	 (setf (subseq tuple-name
 				   (* ,(tuple-size type-name) tuple-index)
-				   (* (1+ ,(tuple-size type-name)) tuple-index))
+				   (* ,(tuple-size type-name) (1+ tuple-index)))
 		   tuple)))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref)))
@@ -195,7 +196,7 @@
   `(defun  ,(tuple-symbol type-name :def-tuple-aref) (tuple-array tuple-index)
 	 (subseq tuple-array 
 			 (* ,(tuple-size type-name) tuple-index)
-			 (* (1+ ,(tuple-size type-name)) tuple-index))))
+			 (* ,(tuple-size type-name) (1+ tuple-index)))))
 		  
 
 ;; create a setter macro (for generalised setf places) that will set a tuple value form into an indexed array
@@ -229,6 +230,11 @@
   "Expand form that creates generalized reference to tuple-arrays"
   `(defsetf ,(tuple-symbol type-name :def-tuple-aref*)
 	   ,(tuple-symbol type-name :def-tuple-aref-setter*)))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
+  "Expand form that creates generalized reference to tuple-arrays"
+  `(defsetf ,(tuple-symbol type-name :def-tuple-aref)
+	   ,(tuple-symbol type-name :def-tuple-aref-setter)))
 
 ;; create a function that returns the dimensions of an array scaled down to tuple units
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))

@@ -1,6 +1,6 @@
 
 
-(defsystem cl-tuples-tests
+(defsystem cl-tuples-test
   :description "Tests for cl-tuples"
   :depends-on (cl-tuples)
   :components 

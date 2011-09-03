@@ -37,34 +37,42 @@
 
 (defparameter *quad* (make-quad 3 7 5 9))
 
-(multiple-value-list (quad* *quad*))
+(assert (equalp *quad* #(3 7 5 9)))
+
+(assert (equalp (multiple-value-list (quad* *quad*)) '(3 7 5 9))) 
 
 (cl-tuples::def-tuple-set quad)
 
 (set-quad *quad* 5 1 2 3)
 
+(assert (equalp *quad* #(5 1 2 3)))
+
 (quad-setter* *quad* #{9 10 7 6})
+
+(assert (equalp *quad* #(9 10 7 6)))
 
 (cl-tuples::def-new-tuple quad)
 
 (new-quad)
 
-(make-quad 5 6 10 11)
+(assert (equalp (make-quad 5 6 10 11) #(5 6 10 11)))
 
 (cl-tuples::def-tuple-maker* quad)
 
-(make-quad* #{ 5 2 9 12 })
+(assert (equalp (make-quad* #{ 5 2 9 12 }) #(5 2 9 12)))
 
 (cl-tuples::def-tuple-array-maker quad)
 
-(defparameter *quads* (make-quad-array 4 :initial-element t :adjustable t :fill-pointer 2))
+(defparameter *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
 ;; here..
 
 (cl-tuples::def-tuple-aref* quad)
 
-(quad-aref* *quads* 1)
+(assert (equalp (quad-aref* *quads* 1) #{0 0 0 0}))
 
 (cl-tuples::def-tuple-aref quad)
+
+(assert (equalp (quad-aref *quads* 1) #(0 0 0 0)))
 
 (quad-aref *quads* 1)
 
@@ -72,29 +80,35 @@
 
 (quad-aref-setter* *quads* 1 #{ 4 5 6 19 })
 
+(assert (equalp (quad-aref *quads* 1) #(4 5 6 19)))
+
 (cl-tuples::def-tuple-array-dimensions quad)
 
-(quad-array-dimensions *quads*)
+(assert (= (quad-array-dimensions *quads*) 2))
 
 (cl-tuples::def-tuple-vector-push quad)
 
 (quad-vector-push*  #{ 8 9 22 34 } *quads*)
 
+(assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
+
 (cl-tuples::def-tuple-vector-push-extend quad)
 
-(quad-vector-push*   #{ 27 28 29 34 } *quads*)
+(quad-vector-push-extend*   #{ 27 28 29 34 } *quads*)
+
+(assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
 
 (cl-tuples::def-with-tuple quad)
 
-(with-quad *quad* (e1 e2 e3 e4) (format t "e1 ~A e2 ~A e3 ~A e4 ~A " e1 e2 e3 e4))
+(with-quad *quad* (e1 e2 e3 e4) (assert (equalp (list e1 e2 e3 e4) '(9 10 7 6))))
 
 (cl-tuples::def-with-tuple* quad)
 
-(with-quad* #{ 5 6 7 9 } (e1 e2 e3 e4) (format t "e1 ~A e2 ~A e3 ~A e4 ~A " e1 e2 e3 e4))
+(with-quad* #{ 5 6 7 9 } (e1 e2 e3 e4) (assert (equalp (list e1 e2 e3 e4) '(5 6 7 9))))
 
 (cl-tuples::def-with-tuple-aref quad)
 
-(with-quad-aref (*quads* 1 (el1 el2 el3 el4)) (format  t "e1 ~A e2 ~A e3 ~A e4 ~A " el1 el2 el3 el4))
+(with-quad-aref (*quads* 1 (el1 el2 el3 el4)) (assert (equalp (vector el1 el2 el3 el4) (quad-aref *quads* 1))))
 
 ;; generalised reference ?
 
@@ -102,9 +116,21 @@
 
 (setf (quad* *quad*)  #{ -6 -6 -6 5})
 
+(assert (equalp *quad* #(-6 -6 -6 5)))
+
 (cl-tuples::def-tuple-array-setf*  quad)
 
 (setf (quad-aref* *quads* 1) #{ -1 -2 -3 -5})
+
+(assert (equalp (quad-aref *quads* 1) #(-1 -2 -3 -5)))
+
+(cl-tuples::def-tuple-aref-setter quad)
+
+(cl-tuples::def-tuple-array-setf quad)
+
+(setf (quad-aref *quads* 3)  #( -3 -3 -7 -9))
+
+(assert (equalp (quad-aref *quads* 3)  #( -3 -3 -7 -9)))
 
 (def-tuple-type pair
 	:tuple-element-type (unsigned-byte 8)

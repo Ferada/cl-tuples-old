@@ -26,8 +26,9 @@
 	:def-tuple-vector-push  :def-tuple-vector-push-extend
 	:def-tuple-vector-push* :def-tuple-vector-push-extend*
 	:def-new-tuple  :def-tuple-maker
-	:def-tuple-maker*
-	:def-tuple-array-maker :def-tuple-array-dimensions
+	:def-tuple-maker*	:def-tuple-array-maker 
+	:def-tuple-array-dimensions 
+	:def-tuple-fill-pointer :def-tuple-sef-fill-pointer
 	:def-tuple-setf* :def-tuple-array-setf*
 	:def-tuple-array-setf))
 
@@ -246,6 +247,24 @@
   `(defun ,(tuple-symbol  type-name :def-tuple-array-dimensions) (tuple-array)
 	 (the fixnum (/ (the fixnum (length tuple-array)) (the fixnum ,(tuple-size type-name))))))
 
+;; create a function that returns the fillpoiinter of an array scaled down to tuple units
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-fill-pointer)))
+  (make-adorned-symbol type-name :suffix "FILL-POINTER"))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-fill-pointer)))
+  "Create macro that returns the number of tuples in an array of tuple places."
+  `(defun ,(tuple-symbol  type-name :def-tuple-fill-pointer) (tuple-array)
+	 (the fixnum (/ (the fixnum (fill-pointer tuple-array)) (the fixnum ,(tuple-size type-name))))))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf-fill-pointer)))
+  "Create macro that returns the number of tuples in an array of tuple places."
+  (with-gensyms (actual-fill-ptr)
+	`(defun (setf ,(tuple-symbol  type-name :def-tuple-fill-pointer)) (value tuple-array)
+	   (declare (type (fixnum value)))
+	   (let ((,actual-fill-ptr
+			  (the fixnum (/ value (the fixnum ,(tuple-size type-name))))))
+		 (setf (fill-pointer tuple-array) ,actual-fill-ptr)))))
+
 ;; --- vectors --
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push)))
@@ -267,7 +286,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defun ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple array-name)
-	 (declare (type ,(tuple-typespec* ,type-name) (type ,(tuple-typespec** ,type-name)))
+	 (declare (type ,(tuple-typespec* type-name) (type ,(tuple-typespec** type-name))))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
 		do (vector-push-extend (aref tuple index) array-name))))

@@ -87,6 +87,14 @@
   "Create a function that will return the number of tuples in the array of tuple places."
   (tuple-expansion-fn type-name :def-tuple-array-dimensions))
 
+(defmacro def-tuple-fill-pointer (type-name)
+  "Create a function that will return a vector fill pointer in terms of tuple size"
+  (tuple-expansion-fn type-name :def-tuple-fill-pointer))
+
+(defmacro def-tuple-setf-fill-pointer (type-name)
+  "Create a function that will adjust a vector fill pointer in terms of tuple size"
+  (tuple-expansion-fn type-name :def-tuple-setf-fill-pointer))
+
 (defmacro def-tuple-setf* (type-name)
   "Create generalised variable macros for tuple of type-name with the given elements."
   (tuple-expansion-fn type-name :def-tuple-setf*))
@@ -147,10 +155,12 @@
      (def-tuple-aref-setter*  ,type-name)
 	 (def-tuple-aref-setter ,type-name)
      (def-tuple-array-dimensions ,type-name)
+     (def-tuple-fill-pointer ,type-name)
+     (def-tuple-setf-fill-pointer ,type-name)
      (def-with-tuple ,type-name)
      (def-with-tuple* ,type-name)
      (def-with-tuple-aref ,type-name)
-     (def-tuple-setter  ,type-name)1
+     (def-tuple-setter  ,type-name)
      (def-tuple-vector-push ,type-name)
      (def-tuple-vector-push-extend ,type-name)
      (def-tuple-vector-push* ,type-name)

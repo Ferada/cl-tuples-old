@@ -87,6 +87,8 @@
 
 (assert (= (quad-array-dimensions *quads*) 2))
 
+;; to do fill pointer
+
 ;; array extension
 (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
 
@@ -101,6 +103,15 @@
 (quad-vector-push-extend   #( 27 28 29 34 ) *quads*)
 
 (assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
+
+;; fill pointer
+(cl-tuples::def-tuple-fill-pointer quad)
+
+(quad-fill-pointer *quads*)
+
+(cl-tuples::def-tuple-setf-fill-pointer quad)
+
+(setf (quad-fill-pointer *quads*) 3)
 
 ;; array extension (values)
 (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))

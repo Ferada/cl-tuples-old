@@ -82,10 +82,12 @@
 
 (assert (equalp (quad-aref *quads* 1) #(4 5 6 19)))
 
+;; array dimensions
 (cl-tuples::def-tuple-array-dimensions quad)
 
 (assert (= (quad-array-dimensions *quads*) 2))
 
+;; array extension
 (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
 
 (cl-tuples::def-tuple-vector-push quad)
@@ -98,6 +100,9 @@
 
 (quad-vector-push-extend   #( 27 28 29 34 ) *quads*)
 
+(assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
+
+;; array extension (values)
 (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
 
 (cl-tuples::def-tuple-vector-push* quad)

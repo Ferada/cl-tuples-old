@@ -255,7 +255,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defun ,(tuple-symbol type-name :def-tuple-vector-push) (tuple array-name)
-;;	 (declare (type (tuple-typespec* tuple)) (type (tuple-typespec** array-name)))
+	 (declare (type ,(tuple-typespec* type-name)) (type ,(tuple-typespec** type-name)))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
 		do (vector-push (aref tuple index) array-name))))
@@ -266,8 +266,8 @@
 ;; tuple-vector-push
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
-  `(defun ,(tuple-symbol type-name :def-tuple-vector-push) (tuple array-name)
-;;	 (declare (type ,(tuple-typespec* tuple)) (type ,(tuple-typespec** array-name)))
+  `(defun ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple array-name)
+	 (declare (type ,(tuple-typespec* ,type-name) (type ,(tuple-typespec** ,type-name)))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
 		do (vector-push-extend (aref tuple index) array-name))))

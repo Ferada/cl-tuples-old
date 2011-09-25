@@ -23,7 +23,8 @@
 	:def-with-tuple :def-with-tuple* :def-with-tuple-aref
 	:def-tuple-set :def-tuple-setter :def-tuple-aref-setter*
 	:def-tuple-aref-setter
-	:def-tuple-vector-push :def-tuple-vector-push-extend
+	:def-tuple-vector-push  :def-tuple-vector-push-extend
+	:def-tuple-vector-push* :def-tuple-vector-push-extend*
 	:def-new-tuple  :def-tuple-maker
 	:def-tuple-maker*
 	:def-tuple-array-maker :def-tuple-array-dimensions
@@ -247,14 +248,38 @@
 
 ;; --- vectors --
 
-;; eg. (vector3d-push* vecs #{ 0.0 1.0 3.0 })
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push)))
-  (make-adorned-symbol type-name :suffix "VECTOR-PUSH" :asterisk t))
+  (make-adorned-symbol type-name :suffix "VECTOR-PUSH"))
 
 ;; tuple-vector-push
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
-  `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push) (tuple-values array-name)
+  `(defun ,(tuple-symbol type-name :def-tuple-vector-push) (tuple array-name)
+;;	 (declare (type (tuple-typespec* tuple)) (type (tuple-typespec** array-name)))
+	 (loop
+		for index from 0 below ,(tuple-size type-name)
+		do (vector-push (aref tuple index) array-name))))
+
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
+  (make-adorned-symbol type-name :suffix "VECTOR-PUSH-EXTEND"))
+
+;; tuple-vector-push
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
+  "Create a macro that will push a tuple value form into an array of existing tuple places."
+  `(defun ,(tuple-symbol type-name :def-tuple-vector-push) (tuple array-name)
+;;	 (declare (type ,(tuple-typespec* tuple)) (type ,(tuple-typespec** array-name)))
+	 (loop
+		for index from 0 below ,(tuple-size type-name)
+		do (vector-push-extend (aref tuple index) array-name))))
+
+;; eg. (vector3d-push* vecs #{ 0.0 1.0 3.0 })
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push*)))
+  (make-adorned-symbol type-name :suffix "VECTOR-PUSH" :asterisk t))
+
+;; tuple-vector-push
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push*)))
+  "Create a macro that will push a tuple value form into an array of existing tuple places."
+  `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push*) (tuple-values array-name)
 	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
 	   `(multiple-value-bind
 			  ,varlist
@@ -266,12 +291,12 @@
 				 `(vector-push ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name)))))))
 
 ;; eg. (vector3d-push-extend* vecs #{ 0.0 1.0 3.0 })
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend*)))
   (make-adorned-symbol type-name :suffix "VECTOR-PUSH-EXTEND" :asterisk t))
 
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend*)))
   "Create a macro that will push a tuple value form into an array of existing tuple places, extending if adjustable."
-  `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple-values array-name)
+  `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push-extend*) (tuple-values array-name)
 	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
 	   `(multiple-value-bind
 			  ,varlist

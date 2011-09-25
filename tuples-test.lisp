@@ -1,7 +1,7 @@
 
 ;; TO DO -- rewrite this to use assert instead of silly with-result macro
 
-;;(asdf:oos 'asdf:load-op 'cl-tuples)
+(asdf:oos 'asdf:load-op 'cl-tuples)
 
 (defpackage :cl-tuples-test
   (:use :cl-tuples :cl)
@@ -86,13 +86,27 @@
 
 (assert (= (quad-array-dimensions *quads*) 2))
 
+(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+
 (cl-tuples::def-tuple-vector-push quad)
+
+(quad-vector-push  #( 8 9 22 34 ) *quads*)
+
+(assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
+
+(cl-tuples::def-tuple-vector-push-extend quad)
+
+(quad-vector-push-extend   #( 27 28 29 34 ) *quads*)
+
+(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+
+(cl-tuples::def-tuple-vector-push* quad)
 
 (quad-vector-push*  #{ 8 9 22 34 } *quads*)
 
 (assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
 
-(cl-tuples::def-tuple-vector-push-extend quad)
+(cl-tuples::def-tuple-vector-push-extend* quad)
 
 (quad-vector-push-extend*   #{ 27 28 29 34 } *quads*)
 
@@ -148,10 +162,10 @@
 
 
 ;; ;; array extension
-;; (with-test *result*
-;;   (equalp *pair-array* #(3 4 3 4 6 7))
-;;   (pair-vector-push (pair *test-pair*) *pair-array*)
-;;   (pair-vector-push-extend (pair*  6 7) *pair-array*))
+(with-test *result*
+  (equalp *pair-array* #(3 4 3 4 6 7))
+  (pair-vector-push (pair *test-pair*) *pair-array*)
+  (pair-vector-push-extend (pair*  6 7) *pair-array*))
 
 ;; ;; test with- forms
 ;; (with-test *result*

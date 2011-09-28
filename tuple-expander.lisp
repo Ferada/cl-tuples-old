@@ -28,7 +28,7 @@
 	:def-new-tuple  :def-tuple-maker
 	:def-tuple-maker*	:def-tuple-array-maker 
 	:def-tuple-array-dimensions 
-	:def-tuple-fill-pointer :def-tuple-sef-fill-pointer
+	:def-tuple-fill-pointer :def-tuple-setf-fill-pointer
 	:def-tuple-setf* :def-tuple-array-setf*
 	:def-tuple-array-setf))
 
@@ -127,8 +127,8 @@
 			`(setf (aref tuple-place ,index) ,(nth index (tuple-elements type-name))))))
 
 ;; generalised reference to a tuple place
-;;(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf*)))
-;;  (make-adorned-symbol type-name :suffix "SETTER"))
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf*)))
+ (make-adorned-symbol type-name :suffix "SETTER" :asterisk t))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf*)))
   "Expand form that creates generalized reference to a tuple place"
@@ -226,12 +226,15 @@
 
 ;; generalised reference to an array of tuples via value forms
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf*)))
-  (make-adorned-symbol type-name :suffix "AREF" ))
+  (make-adorned-symbol type-name :suffix "AREF" :asterisk t ))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf*)))
   "Expand form that creates generalized reference to tuple-arrays"
   `(defsetf ,(tuple-symbol type-name :def-tuple-aref*)
 	   ,(tuple-symbol type-name :def-tuple-aref-setter*)))
+
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
+  (make-adorned-symbol type-name :suffix "AREF" ))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
   "Expand form that creates generalized reference to tuple-arrays"
@@ -256,13 +259,17 @@
   `(defun ,(tuple-symbol  type-name :def-tuple-fill-pointer) (tuple-array)
 	 (the fixnum (/ (the fixnum (fill-pointer tuple-array)) (the fixnum ,(tuple-size type-name))))))
 
+;; create a function that returns the fillpoiinter of an array scaled down to tuple units
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf-fill-pointer)))
+  (make-adorned-symbol type-name :suffix "FILL-POINTER"))
+
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf-fill-pointer)))
   "Create macro that returns the number of tuples in an array of tuple places."
   (with-gensyms (actual-fill-ptr)
 	`(defun (setf ,(tuple-symbol  type-name :def-tuple-fill-pointer)) (value tuple-array)
-	   (declare (type (fixnum value)))
+	   (declare (type fixnum value))
 	   (let ((,actual-fill-ptr
-			  (the fixnum (/ value (the fixnum ,(tuple-size type-name))))))
+			  (the fixnum (* value (the fixnum ,(tuple-size type-name))))))
 		 (setf (fill-pointer tuple-array) ,actual-fill-ptr)))))
 
 ;; --- vectors --
@@ -286,7 +293,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defun ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple array-name)
-	 (declare (type ,(tuple-typespec* type-name) (type ,(tuple-typespec** type-name))))
+	 (declare (type ,(tuple-typespec* type-name) tuple) (type ,(tuple-typespec** type-name) array-name))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
 		do (vector-push-extend (aref tuple index) array-name))))

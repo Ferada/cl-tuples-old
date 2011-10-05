@@ -21,20 +21,27 @@
 package used for holding metadata about the tuple types. Information
 about the tuple type is stored in the property list of the symbol."
   (assert (listp elements))
-  (let
-      ((type-name-sym (intern (string-upcase (string  type-name)) :tuple-types)))
+  (let*	  
+      ((type-string (string-upcase (string  type-name)))
+	   (type-name-sym (intern  type-string :tuple-types))
+	   (value-name-sym (intern (concatenate 'string type-string "*") :tuple-types)))
     (progn
       ;; deqfine the symbol
       ;; store-value the elements
       (setf (get type-name-sym :elements) elements)
+      (setf (get value-name-sym :elements) elements)
       ;; store the # of elements ( a bit redundant )
       (setf (get  type-name-sym :tuple-length) (length elements))
+      (setf (get  value-name-sym :tuple-length) (length elements))
 	  ;; store-value to use as inital array element
 	  (setf (get type-name-sym :initial-element) tuple-initial-element)
+	  (setf (get value-name-sym :initial-element) tuple-initial-element)
       ;; store-value the type of the elements
       (setf (get type-name-sym :element-type) tuple-element-type)
+      (setf (get value-name-sym :element-type) tuple-element-type)
       ;; store-value a flag us to make sure it's a tuple-type symbol
-      (setf (get type-name-sym :is-tuple) t))))
+      (setf (get type-name-sym :is-tuple) t)
+      (setf (get value-name-sym :is-tuple) t))))
 
 
 (defun tuple-typep (type-name)

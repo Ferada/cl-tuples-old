@@ -60,6 +60,11 @@
 (defun make-prefixed-symbol (name prefix)
   (make-adorned-symbol name :prefix prefix))
 
+(defun is-asterisk-symbol (s)
+  (let 
+	  ((ss (symbol-to-string s)))
+	(eql (aref ss (1- (length ss))) #\*)))
+
 (defun make-element-names (elements type-name)
   "Given a list of element names form a set of symbols of the form
      <type-name>-<element-name> as used in struct elements."

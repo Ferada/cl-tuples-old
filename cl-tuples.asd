@@ -14,21 +14,17 @@
   :depends-on (:iterate)
   :serial t
   :components ((:file "package")
-               (:file "utils")
-               (:file "symbols")
-               (:file "tuple-expander")
-               (:file "tuples")
-			   ;;(:file "tuples-test")
-               ;; (:file "clos-wrapper")
-               ;; (:file "clos-wrapper-macro")
-               ;; (:file "vector")
-               ;; (:file "quaternion")
-               ;; (:file "matrix")
-               ;; (:file "colour")
-               ;; (:file "triangle")
-               ;; (:file "rect")
-               ;; (:file "aabb")
-))
+			   (:file "utils")
+			   (:file "symbols")
+			   (:file "tuple-expander")
+			   (:file "tuples")
+			   (:file "vector")
+			   (:file "quaternion")
+			   (:file "matrix")
+			   (:file "colour")
+			   (:file "triangle")
+			   (:file "rect")
+			   (:file "aabb")))
 
 (defsystem :cl-tuples-infix
   :name "paip-infix"
@@ -38,9 +34,9 @@
   :serial t
   :depends-on (:cl-tuples)
   :components ((:file "auxfns")
-               (:file "patmatch")
-               (:file "prefix-infix")
-               (:file "tuple-infix")))
+			   (:file "patmatch")
+			   (:file "prefix-infix")
+			   (:file "tuple-infix")))
 
 (defsystem :cl-tuples-tests
   :serial t
@@ -53,4 +49,4 @@
 (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples))))
   (operate 'asdf:load-op :cl-tuples-tests)
   (operate 'asdf:test-op :cl-tuples-tests))
-                  
+

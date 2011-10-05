@@ -5,17 +5,19 @@
     :tuple-element-type single-float
     :elements (x y z d))
 
-(defmacro plane->vector3d (plane)
-  `(with-plane ,plane
-     (x y z d)
-     (values x y z)))
+(def-tuple-op plane-normal 
+	((p plane (px py px pd)))
+  (:return vector3d
+		   (vector3d-values* px py pz)))
 
-(defmacro plane->displacement (plane)
-  `(with-plane ,plane
-     (x y z d)
-     d))
+(def-tuple-op plane-displacement 
+	((p plane (px py px pd)))
+  (:return fast-float
+		   pd))
 
-(defmacro vector3d->plane (vector displacement)
-  `(with-vector3d ,vector
-       (x y z)
-     (values x y z ,displacement)))
+(def-tuple-op normal-displacement-plane 
+	((vec vector3d (x y z))
+	 (d fast-float))
+  (:return plane
+		   (plane-values x y z d)))
+

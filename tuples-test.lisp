@@ -176,34 +176,15 @@
   (setf (pair* *test-pair*) (pair-values*  3 4))
   (setf (pair-aref* *pair-array* 0) (pair* *test-pair*)))
 
+(defparameter *vector2d* (make-vector2d* #{ 0.0 0.0 0.0 }))
+(vector2d-scale *vector2d* 0.5)
 
-;; ;; array extension
-(with-test *result*
-  (equalp *pair-array* #(3 4 3 4 6 7))
-  (pair-vector-push (pair *test-pair*) *pair-array*)
-  (pair-vector-push-extend (pair*  6 7) *pair-array*))
-
-;; ;; test with- forms
-;; (with-test *result*
-;;   (equalp *result* '(3 4))
-;;   (setf *result*
-;; 		(with-pair (pair *test-pair*) (a b)
-;; 				   (list a b))))
-
-;; (with-test *result*
-;;   (equalp *result* '((3 4) (3 4) (6 7)))
-;;   (setf *result*
-;; 		(loop
-;; 		   for i from 0 below (pair-array-dimensions *pair-array*)
-;; 		   collect
-;; 			 (with-pair-aref (*pair-array* i (a b))  (list a b)))))
-
-;; ;; basic vector math
-;; (defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
-;; (defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
-;; (defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
-;; (defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
-;; (defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
+;; basic vector math
+(defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
+(defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
+(defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
+(defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
+(defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
 
 ;; (defparameter *test-vector* (new-vector3d))
 

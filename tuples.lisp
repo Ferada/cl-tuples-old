@@ -164,7 +164,11 @@
 
 (defmacro def-tuple-type (tuple-type-name &key tuple-element-type initial-element elements)
   "Create a tuple type. To be used from the top level.
- For example (def-tuple-type vector3d single-float (x y z)) will create several macros and functions. Firstly, the accessor functions (vector3d array) (vector3d-aref array index). Secondly,  the context macros (with-vector3d tuple (element-symbols) forms..) and  (with-vector3d-array tuple (element-symbols) index forms..),  thirdly the constructors (new-vector3d) and (make-vector3d tuple),  (make-vector3d-array dimensions &key adjustable fill-pointer), forthly generalised access as in  (setf (vector3d array) tuple) and (setf (vector3d-aref array) index tuple), fiftly and finally, the  functional macros (map-vector3d fn tuples..) (reduce-vector3d fn tuple)."
+ For example (def-tuple-type vector3d single-float (x y z)) will create several macros and functions. 
+ Firstly, the accessor functions (vector3d array) (vector3d-aref array index). 
+ Secondly, the context macros (with-vector3d tuple (element-symbols) forms..) and  (with-vector3d-array tuple (element-symbols) index forms..),  
+ Thirdly the constructors (new-vector3d) and (make-vector3d tuple),  (make-vector3d-array dimensions &key adjustable fill-pointer), 
+ Forthly generalised access as in  (setf (vector3d array) tuple) and (setf (vector3d-aref array) index tuple)," 
   `(eval-when (:compile-toplevel :execute :load-toplevel)
      (cl-tuples::make-tuple-symbol ',tuple-type-name ',tuple-element-type ',initial-element ',elements)
      (cl-tuples::make-tuple-operations ,tuple-type-name)
@@ -174,18 +178,18 @@
 ;; full syntax (def-tuple-op name ((name type (elements)) ..) (
 ;; this needs some way of having the names as meaningful symbols
 ;; also a way of specifying type of return value and non-tuple parameters
-(defmacro def-tuple-op (name args &body forms)
+(defmacro def-tuple-op (name param-list  &body forms)
   "Macro to define a tuple operator. The name of the operator is
    name. The operator arguments are determined by args, which is a
    list of the form ((argument-name argument-type (elements)   ..)).
    Within the forms the tuple value form is bound to the argument-name
    and the tuple elements are bound to the symbols in the element list"
-  (let* ((arg-names (mapcar #'car args))
-        (arg-typenames (mapcar #'cadr  args))
-        (arg-elements (mapcar #'caddr args))
-        (doc (if (stringp (first forms))
+  (let* ((param-names (mapcar #'car param-list))
+		 (param-typenames (mapcar #'cadr  param-list))
+		 (param-elements (mapcar #'caddr param-list))
+		 (doc (if (stringp (first forms))
                  (first forms)
-                 (format nil "DEF-TUPLE-OP ~A ~A" name arg-typenames))))
-    `(defmacro ,name ,arg-names
+                 (format nil "DEF-TUPLE-OP ~A ~A" name param-typenames))))
+    `(defmacro ,name ,param-names
        ,doc
-       ,(arg-expander-fn arg-names arg-typenames arg-elements forms))))
+       ,(arg-expander-fn param-names param-typenames param-elements forms))))

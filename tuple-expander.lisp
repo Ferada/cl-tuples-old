@@ -125,8 +125,8 @@
 			`(setf (aref tuple-place ,index) ,(nth index (tuple-elements type-name))))))
 
 ;; generalised reference to a tuple place
-;;(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf*)))
-;;  (make-adorned-symbol type-name :suffix "SETTER"))
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-setf*)))
+ (make-adorned-symbol type-name :suffix "SETTER"))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setf*)))
   "Expand form that creates generalized reference to a tuple place"
@@ -142,12 +142,12 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
   "Create macro that creates a array of tuple array places."
-  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable initial-element fill-pointer)
+  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable (initial-element ,(tuple-initial-element type-name))  (fill-pointer 0))
 	 (the ,(tuple-typespec** type-name)
 	   (make-array (* ,(tuple-size type-name) dimensions)
 				   :adjustable adjustable
-				   :initial-element (when initial-element ,(tuple-initial-element type-name))
-				   :fill-pointer (when fill-pointer (* ,(tuple-size type-name) fill-pointer))
+				   :initial-element initial-element
+				   :fill-pointer (* ,(tuple-size type-name) fill-pointer)
 				   :element-type ',(tuple-element-type type-name)))))
 
 ;; create an array accessor that accesses an array of tuples and produces a value form eg (vector3d-aref* vecs 2) => #{ 2.3 4.3 2.4 }
@@ -224,12 +224,15 @@
 
 ;; generalised reference to an array of tuples via value forms
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf*)))
-  (make-adorned-symbol type-name :suffix "AREF" ))
+  (make-adorned-symbol type-name :suffix "AREF" :asterisk t))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf*)))
   "Expand form that creates generalized reference to tuple-arrays"
   `(defsetf ,(tuple-symbol type-name :def-tuple-aref*)
 	   ,(tuple-symbol type-name :def-tuple-aref-setter*)))
+
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
+  (make-adorned-symbol type-name :suffix "AREF" ))
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
   "Expand form that creates generalized reference to tuple-arrays"
@@ -423,7 +426,7 @@
 					for gensym in (nth n gensyms)
 					for element in (nth n elements) collect `(,element  ,gensym))
 			(declare (ignorable ,@',(nth n gensyms)))
-			(symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :asterisk t)
+			(symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "VALUES" :asterisk t)
 													,@',(loop
 														   for gensym in (nth n gensyms)
 														   collect gensym))))
@@ -443,7 +446,7 @@
   (if (nth n types)
 	  ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
 	  (if (tuple-typep (nth n types))
-		  ``(,',(make-adorned-symbol (nth n types) :prefix "WITH")
+		  ``(,',(make-adorned-symbol (nth n types) :prefix "WITH" :asterisk t)
 				,,(nth n  names) ,',(nth n  gensyms)
 				,,(if (< (1+ n) (length names))
 					  (arg-expander-fn-aux (1+ n) names types elements gensyms body)
@@ -496,3 +499,4 @@
 										; tester
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))
 ;; (arg-expander-fn '(v q n) '(vector3d quaternion single-float) '((x y z) (qx qy qz qw) nil) '("Return the vector + real" (:return vertex3d (vertex3d-tuple x y z qw))))
+

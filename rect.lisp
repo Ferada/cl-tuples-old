@@ -6,12 +6,12 @@
 
 (export-tuple-operations rect)
 
-(def-tuple-op width
+(def-tuple-op rect-width*
     ((r rect (left right top bottom)))
   (:return single-float 
            (- right left)))
 
-(def-tuple-op height
+(def-tuple-op rect-height*
     ((r rect (left right top bottom)))
   (:return single-float 
            (- bottom top)))

@@ -1,7 +1,7 @@
 
 ;; TO DO -- rewrite this to use assert instead of silly with-result macro
 
-;;(asdf:oos 'asdf:load-op 'cl-tuples)
+(asdf:oos 'asdf:load-op 'cl-tuples)
 
 (defpackage :cl-tuples-test
   (:use :cl-tuples :cl)
@@ -82,17 +82,47 @@
 
 (assert (equalp (quad-aref *quads* 1) #(4 5 6 19)))
 
+;; array dimensions
 (cl-tuples::def-tuple-array-dimensions quad)
 
 (assert (= (quad-array-dimensions *quads*) 2))
 
+;; to do fill pointer
+
+;; array extension
+(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+
 (cl-tuples::def-tuple-vector-push quad)
+
+(quad-vector-push  #( 8 9 22 34 ) *quads*)
+
+(assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
+
+(cl-tuples::def-tuple-vector-push-extend quad)
+
+(quad-vector-push-extend   #( 27 28 29 34 ) *quads*)
+
+(assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
+
+;; fill pointer
+(cl-tuples::def-tuple-fill-pointer quad)
+
+(quad-fill-pointer *quads*)
+
+(cl-tuples::def-tuple-setf-fill-pointer quad)
+
+(setf (quad-fill-pointer *quads*) 3)
+
+;; array extension (values)
+(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+
+(cl-tuples::def-tuple-vector-push* quad)
 
 (quad-vector-push*  #{ 8 9 22 34 } *quads*)
 
 (assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
 
-(cl-tuples::def-tuple-vector-push-extend quad)
+(cl-tuples::def-tuple-vector-push-extend* quad)
 
 (quad-vector-push-extend*   #{ 27 28 29 34 } *quads*)
 
@@ -147,15 +177,14 @@
   (setf (pair-aref* *pair-array* 0) (pair* *test-pair*)))
 
 (defparameter *vector2d* (make-vector2d* #{ 0.0 0.0 0.0 }))
-
 (vector2d-scale *vector2d* 0.5)
 
-;; ;; basic vector math
-;; (defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
-;; (defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
-;; (defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
-;; (defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
-;; (defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
+;; basic vector math
+(defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
+(defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
+(defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
+(defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
+(defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
 
 ;; (defparameter *test-vector* (new-vector3d))
 

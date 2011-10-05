@@ -61,6 +61,12 @@
 (defmacro def-tuple-vector-push-extend (type-name)
     (tuple-expansion-fn type-name :def-tuple-vector-push-extend))
 
+(defmacro def-tuple-vector-push* (type-name)
+    (tuple-expansion-fn type-name :def-tuple-vector-push*))
+
+(defmacro def-tuple-vector-push-extend* (type-name)
+    (tuple-expansion-fn type-name :def-tuple-vector-push-extend*))
+
 (defmacro def-new-tuple (type-name)
   "Create a function to create a place suitable for holding an individual tuple. eg (new-vector3d)"
   (tuple-expansion-fn type-name :def-new-tuple))
@@ -80,6 +86,14 @@
 (defmacro def-tuple-array-dimensions (type-name)
   "Create a function that will return the number of tuples in the array of tuple places."
   (tuple-expansion-fn type-name :def-tuple-array-dimensions))
+
+(defmacro def-tuple-fill-pointer (type-name)
+  "Create a function that will return a vector fill pointer in terms of tuple size"
+  (tuple-expansion-fn type-name :def-tuple-fill-pointer))
+
+(defmacro def-tuple-setf-fill-pointer (type-name)
+  "Create a function that will adjust a vector fill pointer in terms of tuple size"
+  (tuple-expansion-fn type-name :def-tuple-setf-fill-pointer))
 
 (defmacro def-tuple-setf* (type-name)
   "Create generalised variable macros for tuple of type-name with the given elements."
@@ -112,9 +126,9 @@
            (format nil "Creates a macro for setting an ~A vector from a multiple values ~A" ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-aref-setter*) 'function)
            (format nil "Creates a macro for setting an ~A vector in a vector of ~As from a multiple values ~A" ,(string type-name) ,(string type-name) ,(string type-name)))
-     (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push) 'function)
+     (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push*) 'function)
            (format nil "Push a ~A multiple value onto the end of a vector of ~A's " ,(string type-name) ,(string type-name)))
-     (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push-extend) 'function)
+     (setf (documentation ',(tuple-symbol type-name :def-tuple-vector-push-extend*) 'function)
            (format nil  "Push a ~A multiple value onto the end of a vector of ~A's with the possibility of extension" ,(string type-name) ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-new-tuple) 'function)
            (format nil  "Create an array suitable for holding a single ~A" ,(string type-name)))
@@ -141,12 +155,16 @@
      (def-tuple-aref-setter*  ,type-name)
 	 (def-tuple-aref-setter ,type-name)
      (def-tuple-array-dimensions ,type-name)
+     (def-tuple-fill-pointer ,type-name)
+     (def-tuple-setf-fill-pointer ,type-name)
      (def-with-tuple ,type-name)
      (def-with-tuple* ,type-name)
      (def-with-tuple-aref ,type-name)
      (def-tuple-setter  ,type-name)
      (def-tuple-vector-push ,type-name)
      (def-tuple-vector-push-extend ,type-name)
+     (def-tuple-vector-push* ,type-name)
+     (def-tuple-vector-push-extend* ,type-name)
      (def-new-tuple ,type-name)
      (def-tuple-maker ,type-name)
      (def-tuple-maker* ,type-name)

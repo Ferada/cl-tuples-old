@@ -16,7 +16,8 @@
 	   (list e (tuple-initial-element type-name) :type (tuple-element-type type-name))))
 
 (defparameter *tuple-expander-keywords*
-  '(:def-tuple-type :def-tuple-array-type
+  '(:def-tuple-values
+	:def-tuple-type :def-tuple-array-type
 	:def-tuple-struct
 	:def-tuple-getter :def-tuple-aref* :def-tuple-aref
 	:def-nth-tuple
@@ -37,11 +38,11 @@
 (defgeneric tuple-expansion-fn (type-name expansion))
 
 ;; eg. (vector3d-values* 1 2 3) => #{ 1 2 3 }
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple)))
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-values)))
   (make-adorned-symbol type-name :suffix "VALUES" :asterisk t ))
 
 ;; eg (vector3d-values 1.2 3.0 1.2) => #{ 1.2 3.0 1.2 }
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple)))
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-values)))
   "Expand to a macro that will create a values form representing our tuple type."
   `(defmacro ,(tuple-symbol type-name expansion) (&rest elements)
 	 `(the ,',(construct-tuple-value-type type-name)

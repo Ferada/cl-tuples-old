@@ -4,7 +4,7 @@
 
 (defmacro def-tuple (type-name)
   "Create an alias for values for this tuple.eg (vector3d-values 1.0 0.0 0.0) => #{ 1.0 0.0 0.0 }"
-  (tuple-expansion-fn type-name :def-tuple))
+  (tuple-expansion-fn type-name :def-tuple-values))
 
 (defmacro def-tuple-typespec (type-name)
   "Create an alias typespec eg. (deftype vector3d* () `(values 'single-float 'single-float 'single-float))"
@@ -110,7 +110,7 @@
 (defun document-tuple-type (type-name)
   `(progn
      ;; instead of setf, need some form that can use the symbol in the format
-     (setf (documentation ',(tuple-symbol type-name :def-tuple) 'function)
+     (setf (documentation ',(tuple-symbol type-name :def-tuple-values) 'function)
            (format nil "Convert ~A forms to multiple values." ,(string type-name)))
      (setf (documentation ',(tuple-symbol type-name :def-tuple-getter) 'function)
            (format nil "Unpack array representation of an ~A and convert to multiple values." ,(string type-name)))

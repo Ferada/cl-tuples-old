@@ -111,7 +111,7 @@
     ((vec vector3d (x y z)))
   (:return vector3d
            (let 
-               ((mag (vector3d-length vec)))
+               ((mag (vector3d-length* vec)))
              (vector3d-values*
               (/ x mag)
               (/ y mag)
@@ -142,7 +142,7 @@
     ((start vertex3d (ox oy oz ow))
      (end vertex3d (ex ey ez ew)))
   (:return fast-float
-           (vector3d-length (vector3d-values* (- ex ox) (- ey oy) (- ez oz)))))
+           (vector3d-length* (vector3d-values* (- ex ox) (- ey oy) (- ez oz)))))
 
 (def-tuple-op delta-vector3d*
     ((start vertex3d (ox oy oz ow))

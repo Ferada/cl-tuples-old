@@ -1,13 +1,39 @@
 
-;; TO DO -- rewrite this to use assert instead of silly with-result macro
-
-(asdf:oos 'asdf:load-op 'cl-tuples)
-
 (defpackage :cl-tuples-test
   (:use :cl-tuples :cl)
-  (:export "run-cl-tuples-tests"))
+  (:export "test-cl-tuples"))
 
 (in-package :cl-tuples-test)
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+ (pushnew :cl-tuples-debug *features*))
+
+(defvar *test-name* nil)
+
+(defmacro deftest (name parameters &body body)
+  "Define a test function. Within a test function we can call
+   other test functions or use 'check' to run individual test
+   cases."
+  `(defun ,name ,parameters
+    (let ((*test-name* (append *test-name* (list ',name))))
+      ,@body)))
+
+(defmacro check (&body forms)
+  "Run each expression in 'forms' as a test case."
+  `(combine-results
+    ,@(loop for f in forms collect `(report-result ,f ',f))))
+
+(defmacro combine-results (&body forms)
+  "Combine the results (as booleans) of evaluating 'forms' in order."
+  (cl-tuples::with-gensyms (result)
+    `(let ((,result t))
+      ,@(loop for f in forms collect `(unless ,f (setf ,result nil)))
+      ,result)))
+
+(defun report-result (result form)
+  "Report the results of a single test case. Called by 'check'."
+  (format t "~:[FAIL~;pass~] ... ~a: ~a~%" result *test-name* form)
+  result)
 
 (defmacro with-test (test-sym test &rest forms)
   (cl-tuples::with-gensyms (result)
@@ -18,173 +44,149 @@
 		 (assert ,result)
 		 (setf ,test-sym (and ,test-sym ,result))))))
 
-(defparameter *result* t)
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (make-tuple-symbol 'quad 'fixnum 0 '(a b  c d)))
+(defmacro always-pass (&body body)
+  `(prog1
+	   t
+	 ,@body))
+	
+(eval-when (:compile-toplevel :load-toplevel)
+  (unless (find-symbol "QUAD" (FIND-PACKAGE "TUPLE-TYPES")))
+  (cl-tuples::make-tuple-symbol 'quad 'fixnum 0 '(a b  c d)))
 
 (cl-tuples::def-tuple quad)
-
-(quad-values* 8 4 3 1)
-
 (cl-tuples::def-tuple-struct quad)
-
-(cl-tuples::def-tuple-maker quad)
-
+(cl-tuples::def-tuple-maker  quad)
 (cl-tuples::def-tuple-setter quad)
-
 (cl-tuples::def-tuple-getter quad)
-
-(defparameter *quad* (make-quad 3 7 5 9))
-
-(assert (equalp *quad* #(3 7 5 9)))
-
-(assert (equalp (multiple-value-list (quad* *quad*)) '(3 7 5 9))) 
-
 (cl-tuples::def-tuple-set quad)
-
-(set-quad *quad* 5 1 2 3)
-
-(assert (equalp *quad* #(5 1 2 3)))
-
-(quad-setter* *quad* #{9 10 7 6})
-
-(assert (equalp *quad* #(9 10 7 6)))
-
 (cl-tuples::def-new-tuple quad)
-
-(new-quad)
-
-(assert (equalp (make-quad 5 6 10 11) #(5 6 10 11)))
-
 (cl-tuples::def-tuple-maker* quad)
 
-(assert (equalp (make-quad* #{ 5 2 9 12 }) #(5 2 9 12)))
+(deftest test-tuple-primitives ()
+  (check
+	(equalp (multiple-value-list (quad-values* 8 4 3 1)) '(8 4 3 1)))
+	(let ((my-quad (make-quad 3 7 5 9)))
+	  (check
+	   (equalp my-quad #(3 7 5 9))
+	   (always-pass
+		 (set-quad my-quad 5 1 2 3))
+	   (equalp my-quad #(5 1 2 3))
+	   (always-pass
+		 (quad-setter* my-quad #{9 10 7 6}))
+	   (equalp my-quad #(9 10 7 6))
+	   (let ((fresh-quad (new-quad))
+			 (another-quad (make-quad 5 6 10 11)))
+		 (check 
+		   (equalp fresh-quad #(0 0 0 0))
+		   (equalp another-quad  #(5 6 10 11))
+		   (equalp (make-quad* #{ 5 2 9 12 }) #(5 2 9 12)))))))			 
+		 
 
-(cl-tuples::def-tuple-array-maker quad)
 
-(defparameter *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
-;; here..
 
-(cl-tuples::def-tuple-aref* quad)
+(deftest test-tuple-arrays ()
+  (always-pass
+   (cl-tuples::def-tuple-array-maker quad)
+   (defparameter *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+   (cl-tuples::def-tuple-aref* quad))
+  (equalp (quad-aref* *quads* 1) #{0 0 0 0})
+  (always-pass
+   (cl-tuples::def-tuple-aref quad))
+  (equalp (quad-aref *quads* 1) #(0 0 0 0))
+  (always-pass
+   (cl-tuples::def-tuple-aref-setter* quad)  
+   (quad-aref-setter* *quads* 1 #{ 4 5 6 19 }))
+  (equalp (quad-aref *quads* 1) #(4 5 6 19))
+  (always-pass
+   ;; array dimensions
+   (cl-tuples::def-tuple-array-dimensions quad))
+  (= (quad-array-dimensions *quads*) 2)
+  (always-pass
+   ;; array extension
+   (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+   (cl-tuples::def-tuple-vector-push quad)
+   (quad-vector-push  #( 8 9 22 34 ) *quads*))
+  (equalp (quad-aref *quads* 2) #(8 9 22 34))
+  (always-pass
+   (cl-tuples::def-tuple-vector-push-extend quad)
+   (quad-vector-push-extend #( 27 28 29 34 ) *quads*))
+  (equalp (quad-aref *quads* 3) #(27 28 29 34)))
 
-(assert (equalp (quad-aref* *quads* 1) #{0 0 0 0}))
+(deftest test-tuple-fill-pointer ()
+  (always-pass   
+   ;; fill pointer
+   (cl-tuples::def-tuple-fill-pointer quad)   
+   (quad-fill-pointer *quads*)
+   (cl-tuples::def-tuple-setf-fill-pointer quad)   
+   (setf (quad-fill-pointer *quads*) 3)
+   ;; array extension (values)
+   (setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
+   (cl-tuples::def-tuple-vector-push* quad)
+   (quad-vector-push*  #{ 8 9 22 34 } *quads*))
+  (equalp (quad-aref *quads* 2) #(8 9 22 34))
+  (always-pass
+   (cl-tuples::def-tuple-vector-push-extend* quad)
+   (quad-vector-push-extend*   #{ 27 28 29 34 } *quads*))
+  (equalp (quad-aref *quads* 3) #(27 28 29 34)))
 
-(cl-tuples::def-tuple-aref quad)
-
-(assert (equalp (quad-aref *quads* 1) #(0 0 0 0)))
-
-(quad-aref *quads* 1)
-
-(cl-tuples::def-tuple-aref-setter* quad)
-
-(quad-aref-setter* *quads* 1 #{ 4 5 6 19 })
-
-(assert (equalp (quad-aref *quads* 1) #(4 5 6 19)))
-
-;; array dimensions
-(cl-tuples::def-tuple-array-dimensions quad)
-
-(assert (= (quad-array-dimensions *quads*) 2))
-
-;; to do fill pointer
-
-;; array extension
-(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
-
-(cl-tuples::def-tuple-vector-push quad)
-
-(quad-vector-push  #( 8 9 22 34 ) *quads*)
-
-(assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
-
-(cl-tuples::def-tuple-vector-push-extend quad)
-
-(quad-vector-push-extend   #( 27 28 29 34 ) *quads*)
-
-(assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
-
-;; fill pointer
-(cl-tuples::def-tuple-fill-pointer quad)
-
-(quad-fill-pointer *quads*)
-
-(cl-tuples::def-tuple-setf-fill-pointer quad)
-
-(setf (quad-fill-pointer *quads*) 3)
-
-;; array extension (values)
-(setf *quads* (make-quad-array 3 :initial-element 0 :adjustable t :fill-pointer 2))
-
-(cl-tuples::def-tuple-vector-push* quad)
-
-(quad-vector-push*  #{ 8 9 22 34 } *quads*)
-
-(assert (equalp (quad-aref *quads* 2) #(8 9 22 34)))
-
-(cl-tuples::def-tuple-vector-push-extend* quad)
-
-(quad-vector-push-extend*   #{ 27 28 29 34 } *quads*)
-
-(assert (equalp (quad-aref *quads* 3) #(27 28 29 34)))
-
-(cl-tuples::def-with-tuple quad)
-
-(with-quad *quad* (e1 e2 e3 e4) (assert (equalp (list e1 e2 e3 e4) '(9 10 7 6))))
-
-(cl-tuples::def-with-tuple* quad)
-
-(with-quad* #{ 5 6 7 9 } (e1 e2 e3 e4) (assert (equalp (list e1 e2 e3 e4) '(5 6 7 9))))
-
-(cl-tuples::def-with-tuple-aref quad)
-
-(with-quad-aref (*quads* 1 (el1 el2 el3 el4)) (assert (equalp (vector el1 el2 el3 el4) (quad-aref *quads* 1))))
+(def test-tuple-macros ()
+  (always-pass
+   (cl-tuples::def-with-tuple quad))
+  (with-quad *quad* (e1 e2 e3 e4) (equalp (list e1 e2 e3 e4) '(9 10 7 6)))
+  (always-pass
+   (cl-tuples::def-with-tuple* quad))
+  (with-quad* #{ 5 6 7 9 } (e1 e2 e3 e4) (equalp (list e1 e2 e3 e4) '(5 6 7 9)))
+  (always-pass
+   (cl-tuples::def-with-tuple-aref quad))
+  (with-quad-aref (*quads* 1 (el1 el2 el3 el4)) (equalp (vector el1 el2 el3 el4) (quad-aref *quads* 1))))
 
 ;; generalised reference ?
 
-(cl-tuples::def-tuple-setf*  quad)
+(deftest test-tuple-setf ()
+  (always-pass
+   (cl-tuples::def-tuple-setf*  quad)   
+   (setf (quad* *quad*)  #{ -6 -6 -6 5}))   
+  (equalp *quad* #(-6 -6 -6 5))
+  (always-pass 
+   (cl-tuples::def-tuple-array-setf*  quad)
+   (setf (quad-aref* *quads* 1) #{ -1 -2 -3 -5}))
+  (equalp (quad-aref *quads* 1) #(-1 -2 -3 -5))
+  (always-pass
+   (cl-tuples::def-tuple-aref-setter quad)
+   (cl-tuples::def-tuple-array-setf quad)
+   (setf (quad-aref *quads* 3)  #( -3 -3 -7 -9)))
+  (equalp (quad-aref *quads* 3)  #( -3 -3 -7 -9)))
 
-(setf (quad* *quad*)  #{ -6 -6 -6 5})
-
-(assert (equalp *quad* #(-6 -6 -6 5)))
-
-(cl-tuples::def-tuple-array-setf*  quad)
-
-(setf (quad-aref* *quads* 1) #{ -1 -2 -3 -5})
-
-(assert (equalp (quad-aref *quads* 1) #(-1 -2 -3 -5)))
-
-(cl-tuples::def-tuple-aref-setter quad)
-
-(cl-tuples::def-tuple-array-setf quad)
-
-(setf (quad-aref *quads* 3)  #( -3 -3 -7 -9))
-
-(assert (equalp (quad-aref *quads* 3)  #( -3 -3 -7 -9)))
-
-(def-tuple-type pair
+(deftest test-tuple-type ()
+  (always-pass
+   (def-tuple-type pair
 	:tuple-element-type (unsigned-byte 8)
 	:initial-element 0
 	:elements (a b))
+   (defparameter *test-pair* (make-pair 1 2))
+   (defparameter *pair-array* (make-pair-array 2 :initial-element 0 :adjustable t :fill-pointer 1))
+   (setf (pair* *test-pair*) (pair-values*  3 4))
+   (setf (pair-aref* *pair-array* 0) (pair* *test-pair*)))
+  (equalp *test-pair* #(3 4))
+  (equalp *pair-array* #(3 4)))
 
-;; ;; basic operations
-(with-test *result*
-  (and (equalp *test-pair* #(3 4))
-	   (equalp *pair-array* #(3 4)))
-  (defparameter *test-pair* (make-pair 1 2))
-  (defparameter *pair-array* (make-pair-array 2 :initial-element 0 :adjustable t :fill-pointer 1))
-  (setf (pair* *test-pair*) (pair-values*  3 4))
-  (setf (pair-aref* *pair-array* 0) (pair* *test-pair*)))
+(test-cl-tuples
+ (test-tuple-primitives)
+ (test-tuple-arrays)
+ (test-tuple-fill-pointer)
+ (test-tuple-macros)
+ (test-tuple-setf)
+ (test-tuple-type))
 
-(defparameter *vector2d* (make-vector2d* #{ 0.0 0.0 0.0 }))
-(vector2d-scale *vector2d* 0.5)
+;; (defparameter *vector2d* (make-vector2d* #{ 0.0 0.0 0.0 }))
+;; (vector2d-scale *vector2d* 0.5)
 
-;; basic vector math
-(defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
-(defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
-(defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
-(defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
-(defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
+;; ;; basic vector math
+;; (defparameter *vector0* (make-vector3d #{ 0.0 0.0 0.0 } ))
+;; (defparameter *vector1* (make-vector3d #{ 1.0 1.0 1.0 } ))
+;; (defparameter *vectorx* (make-vector3d #{ 1.0 0.0 0.0 } ))
+;; (defparameter *vectory* (make-vector3d #{ 0.0 1.0 0.0 } ))
+;; (defparameter *vectorz* (make-vector3d #{ 0.0 0.0 1.0 } ))
 
 ;; (defparameter *test-vector* (new-vector3d))
 

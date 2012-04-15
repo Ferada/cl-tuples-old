@@ -41,6 +41,7 @@
   (check-type name symbol)
   (check-type prefix (or symbol string null))
   (check-type suffix (or symbol string null))
+#+cl-tuples-debug (break)
   (intern (concatenate 'string
                        (when prefix
                          (string prefix))

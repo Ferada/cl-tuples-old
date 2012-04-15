@@ -2,10 +2,13 @@
 
 (defsystem cl-tuples-test
   :description "Tests for cl-tuples"
-  :depends-on (cl-tuples)
-  :components 
-  ((:file "tuples-test")))
+  :depends-on (:cl-tuples :alexandria)
+  :components ((:file "tuples-test")))
 
-;; (defmethod perform ((o test-op) (c (eql (find-system :cl-tuples-tests))))
-;;              (error "test-op-failed")))
-;;            (unless (run-cl-tuples-tests)
+(defmethod asdf:perform ((op asdf:test-op) (c (eql (find-system ':cl-tuples))))
+  (asdf:operate 'asdf:load-op ':cl-tuples-test)
+  (asdf:operate 'asdf:test-op ':cl-tuples-test))
+
+
+(defmethod asdf:perform ((op asdf:test-op) (c (eql (find-system ':cl-tuples-tests))))
+  (funcall (intern "TEST-CL-TUPLES" (find-package "CL-TUPLES-TEST"))))

@@ -174,8 +174,8 @@
 									   (declare (ignore x))
 									   (prog1
 										   `(aref (the ,',(tuple-typespec** type-name) ,tuple-array)
-												  (+ ,counter ,array-index-sym))
-										 (incf counter)))
+												  (the fixnum (+  ,counter array-index-sym)))
+										 (incf (the fixnum counter))))
 								   varlist))))))))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-nth-tuple)))
@@ -226,7 +226,8 @@
 						   (mapcar #'(lambda (x)
 									   (prog1
 										   `(setf (aref (the ,',(tuple-typespec** type-name) ,array-name)
-														(+ ,counter ,array-index-sym)) (the ,',(tuple-element-type type-name) ,x))
+														(the fixnum (+ (the fixnum ,counter) (the fixnum ,array-index-sym)))) 
+												  (the ,',(tuple-element-type type-name) ,x))
 										 (incf counter)))
 								   varlist))))))))
 
@@ -290,7 +291,8 @@
 	 (declare (type ,(tuple-typespec* type-name)) (type ,(tuple-typespec** type-name)))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
-		do (vector-push (aref tuple index) array-name))))
+		do (vector-push (aref tuple index) array-name))
+	 (the fixnum (/  (the fixnum (fill-pointer array-name)) (the fixnum ,(tuple-size type-name))))))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
   (make-adorned-symbol type-name :suffix "VECTOR-PUSH-EXTEND"))
@@ -301,8 +303,9 @@
   `(defun ,(tuple-symbol type-name :def-tuple-vector-push-extend) (tuple array-name)
 	 (declare (type ,(tuple-typespec* type-name) tuple) (type ,(tuple-typespec** type-name) array-name))
 	 (loop
-		for index from 0 below ,(tuple-size type-name)
-		do (vector-push-extend (aref tuple index) array-name))))
+		for index from 0 below (the fixnum ,(tuple-size type-name))
+		do (vector-push-extend (aref tuple (the fixnum index)) array-name))
+	 (the fixnum (/  (the fixnum (fill-pointer array-name)) (the fixnum ,(tuple-size type-name))))))
 
 ;; eg. (vector3d-push* vecs #{ 0.0 1.0 3.0 })
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push*)))
@@ -313,14 +316,16 @@
   "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push*) (tuple-values array-name)
 	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
-	   `(multiple-value-bind
-			  ,varlist
-			,tuple-values
-		  (declare (type ,',(tuple-element-type type-name) ,@varlist))
-		  ,@(loop
-			   for index from 0 below ,(tuple-size type-name)
-			   collect
-				 `(vector-push ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name)))))))
+	   `(progn 
+		  (multiple-value-bind
+				,varlist
+			  ,tuple-values
+			(declare (type ,',(tuple-element-type type-name) ,@varlist))
+			,@(loop
+				 for index from 0 below ,(tuple-size type-name)
+				 collect
+				   `(vector-push (the fixnum,(nth index varlist)) (the ,',(tuple-typespec** type-name) ,array-name))))
+		  (the fixnum (/  (the fixnum (fill-pointer ,array-name)) (the fixnum ,',(tuple-size type-name))))))))
 
 ;; eg. (vector3d-push-extend* vecs #{ 0.0 1.0 3.0 })
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend*)))
@@ -330,14 +335,16 @@
   "Create a macro that will push a tuple value form into an array of existing tuple places, extending if adjustable."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push-extend*) (tuple-values array-name)
 	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
-	   `(multiple-value-bind
+	   `(progn 
+		  (multiple-value-bind
 			  ,varlist
 			,tuple-values
 		  (declare (type ,',(tuple-element-type type-name) ,@varlist))
 		  ,@(loop
 			   for index from 0 below ,(tuple-size type-name)
 			   collect
-				 `(vector-push-extend ,(nth index varlist) (the ,',(tuple-typespec** type-name) ,array-name) ,',(tuple-size type-name)))))))
+				 `(vector-push-extend (the fixnum ,(nth index varlist)) (the ,',(tuple-typespec** type-name) ,array-name) ,',(tuple-size type-name))))
+		  (the fixnum (/  (the fixnum (fill-pointer ,array-name)) (the fixnum ,',(tuple-size type-name))))))))
 
 ;; -- bindings --
 ;; bind tuple values to symbols during evaluation of the form eg (with-vector3d #{ 1.0 2.0 3.0 } (x y z) (fomat t "~A" (list x y z)))

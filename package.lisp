@@ -32,7 +32,7 @@
            vector3d-mag-square*
            vector3d-length*
            vector3d-normal*
-           vector3d-cross*
+           vector3d-cross* 
            vector3d-vertex3d*
            vertex3d-vector3d*
            vertex3d-distance*

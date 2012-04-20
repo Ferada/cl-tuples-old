@@ -84,11 +84,15 @@ about the tuple type is stored in the property list of the symbol."
 
 (defun tuple-typespec* (type-name)
   "Return typespec of tuple as bounded array"
-  `(vector ,(tuple-element-type type-name) ,(tuple-size type-name)))
+  `(vector * ,(tuple-size type-name)))
 
 (defun tuple-typespec** (type-name)
   "Return typespec of tuple as unbounded array"
-  `(vector ,(tuple-element-type type-name) *))
+  `(vector * *))
+
+(defun simple-tuple-typespec* (type-name)
+  "Return typespec of tuple as bounded array"
+  `(simple-vector  ,(tuple-size type-name)))
 
 (defun tuple-places (type-name array-name)
   "Return a list of (aref *) forms to turn at tuple represeted and array into individual places."

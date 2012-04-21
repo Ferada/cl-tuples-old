@@ -166,17 +166,18 @@
   "Create a macro that will index an array that is considered to be an array of tuples and extract an individual tuple as a value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-aref*) (tuple-array array-index)
 	 (let* ((varlist (gensym-list ,(tuple-size type-name)))
-			(array-index-sym (gensym)))
+			(array-index-sym (gensym))
+			(counter-sym (gensym)))
 	   `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index)))
 		  (the ,',(tuple-typespec type-name)
-			(values ,@(let ((counter 0))
-						   (mapcar #'(lambda (x)
-									   (declare (ignore x))
-									   (prog1
+			(let ((,counter-sym 0))
+			  (values ,@(mapcar #'(lambda (x)
+									(declare (ignore x))
+									(prog1
 										   `(aref (the ,',(tuple-typespec** type-name) ,tuple-array)
-												  (the fixnum (+  ,counter array-index-sym)))
-										 (incf (the fixnum counter))))
-								   varlist))))))))
+												  (the fixnum (+  ,counter-sym ,array-index-sym)))
+									  `(incf (the fixnum ,counter-sym))))
+								varlist))))))))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-nth-tuple)))
   (make-adorned-symbol type-name :prefix "NTH"))

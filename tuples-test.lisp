@@ -158,6 +158,12 @@
 	(equalp (setf (quad-aref test-quads 2)  #( -10 -11 -12 -13)) #(-10 -11 -12 -13))
 	(equalp (quad-aref test-quads 2)  #( -10 -11 -12 -13))))))
 
+(test-tuple-primitives)
+(test-tuple-arrays)
+(test-tuple-fill-pointer)
+(test-tuple-macros)
+(test-tuple-setf)
+
 ;; (deftest test-tuple-type ()
 ;;   (always-pass
 ;;    (def-tuple-type pair

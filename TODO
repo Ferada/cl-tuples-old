@@ -1,7 +1,10 @@
 * cl-tuples
 
 
-** TODO define typespec for tuple array
-** TODO specify initial-element for fresh arrays
-** TODO investigate struct wrapper
-
+** DONE define typespec for tuple array
+** DONE specify initial-element for fresh arrays
+** DONE investigate struct wrapper
+** TODO test vectors, color, aabb etc
+** TODO wither define-tuple-op?
+** TODO investigate cl-generic-arithmetic integration
+** TODO write some test app (quaterinion dragons? raytracers?)

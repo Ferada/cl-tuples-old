@@ -100,10 +100,9 @@
 
 (deftest test-tuple-arrays ()
   (check 
-	(equalp (multiple-value-list (quad-aref* *quads* 1)) '(0 0 0 0))
-	(equalp (quad-aref  *quads* 1) #(0 0 0 0))
 	(equalp (multiple-value-list (quad-aref-setter* *quads* 1 #{ 4 5 6 19 })) '( 4 5 6 19))
-	(equalp (quad-aref *quads* 1) #(4 5 6 19))
+	(equalp (multiple-value-list (quad-aref* *quads* 1)) '(4 5 6 19))
+	(equalp (quad-aref  *quads* 1) #(4 5 6 19))
 	(equalp (quad-aref-setter *quads* 1 #(2 4 3 9))  #(2 4 3 9)))
   (equalp (multiple-value-list (quad-aref* *quads* 1)) '(2 4 3 9))
   (= (quad-array-dimensions *quads*) 2)
@@ -148,15 +147,16 @@
 (cl-tuples::def-tuple-array-setf*  quad)
 (cl-tuples::def-tuple-array-setf quad)
 
-(defparameter *quad* (new-quad))
-
 (deftest test-tuple-setf ()
+  (always-pass
+	(let ((test-quad (new-quad))
+		  (test-quads (make-quad-array 9)))
   (check
-	(equalp (multiple-value-list (setf (quad* *quad*)  #{ -1 -2 -3 -4})) '( -1 -2 -3 -4))
-	(equalp *quad* #(-1 -2 -3 -4))
-	(equalp (multiple-value-list (setf (quad-aref* *quads* 1) #{ -4 -3 -2 -1})) '(-4 -3 -2 -1))
-	(equalp (multiple-value-list (setf (quad-aref *quads* 2)  #( -10 -11 -12 -13))) '(-10 -11 -12 -13))
-	(equalp (quad-aref *quads* 2)  #( -10 -11 -12 -13))))
+	(equalp (multiple-value-list (setf (quad* test-quad)  #{ -1 -2 -3 -4})) '( -1 -2 -3 -4))
+	(equalp test-quad #(-1 -2 -3 -4))
+	(equalp (multiple-value-list (setf (quad-aref* test-quads 1) #{ -4 -3 -2 -1})) '(-4 -3 -2 -1))
+	(equalp (setf (quad-aref test-quads 2)  #( -10 -11 -12 -13)) #(-10 -11 -12 -13))
+	(equalp (quad-aref test-quads 2)  #( -10 -11 -12 -13))))))
 
 ;; (deftest test-tuple-type ()
 ;;   (always-pass

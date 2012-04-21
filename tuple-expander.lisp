@@ -154,10 +154,8 @@
 	 (make-array (* ,(tuple-size type-name) dimensions)
 				 :adjustable adjustable
 				 :initial-element initial-element
-				 :fill-pointer (* ,(tuple-size type-name) fill-pointer)
+				 :fill-pointer (when fill-pointer-p (* ,(tuple-size type-name) fill-pointer))
 				 :element-type ',(tuple-element-type type-name))))
-
-
 		 
 
 ;; create an array accessor that accesses an array of tuples and produces a value form eg (vector3d-aref* vecs 2) => #{ 2.3 4.3 2.4 }

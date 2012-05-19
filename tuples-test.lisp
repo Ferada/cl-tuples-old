@@ -160,7 +160,6 @@
 
 (test-tuple-primitives)
 (test-tuple-arrays)
-(test-tuple-fill-pointer)
 (test-tuple-macros)
 (test-tuple-setf)
 

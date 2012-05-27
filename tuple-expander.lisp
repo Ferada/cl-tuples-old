@@ -436,7 +436,7 @@
 		  ,tuple-sym))))
 
 
-;; --- create and initialise from multiple values
+;; --- create and initialise from multiple values eg (make-vector3d* #{ 12.0 3.0 6.0 })
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-maker*)))
   (make-adorned-symbol type-name :prefix "MAKE" :asterisk t))
 

@@ -22,6 +22,7 @@
            vector2d-length*
            vector2d-normal*
            vector2d-vertex2d*
+		   vector2d-scale*
 
            vertex2d-vector2d*
 

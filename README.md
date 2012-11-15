@@ -155,3 +155,42 @@ The calculated matrix is converted to an actual object to be returned.
             (s 2f0))
         (vector2d-length* (vector2d-scale* (vector2d* v) s)))
     2.828427
+
+# QUATERNIONS
+
+(Adapted from the documentation of cl-quaternion to this API.)
+
+Creating a quaternion from real and imaginary components.  The first
+argument is the real part, and the rest are the imaginary components.
+
+    > (make-quaternion* (quaternion-values* 10f0 3f0 0f0 0f0))
+    #(10.0 3.0 0.0 0.0)
+
+Quaternions can be normalized and magnitudes may be computed.
+
+    > (make-quaternion* (quaternion-normalize* (quaternion* *)))
+    #(0.9578263 0.28734788 0.0 0.0)
+    > (quaternion-mag* (quaternion* *))
+    1.0
+
+Quaternion addition and multiplication are supported.
+
+    > (make-quaternion*
+       (quaternion-sum* (quaternion-values* 3f0 0f0 0f0 0f0)
+                        (quaternion-values* 1f0 1f0 0f0 1f0)))
+    #(4.0 1.0 0.0 1.0)
+    > (make-quaternion*
+       (quaternion-dot* (quaternion-values* 3f0 0f0 0f0 0f0)
+                        (quaternion-values* 1f0 1f0 0f0 1f0)))
+    #(3.0 0.0 3.0 -3.0)
+
+Unit quaternions may be used to represent rotations.  Functions are
+provided for working with quaternions for this purpose.
+
+    > (make-quaternion*
+       (angle-axis-quaternion*
+        (angle-axis-values* 0f0 0f0 1f0 (coerce (/ pi 2f0) 'single-float))))
+    #(0.0 0.0 0.70710677 0.70710677)
+
+(`ROTATE-VECTOR-WITH-QUATERNION` and `ROTATE-VECTOR-BY-AXIS-ANGLE`
+missing though.)

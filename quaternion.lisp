@@ -29,21 +29,24 @@
 		   (quaternion-values*
 			(* s x) (* s y) (* s z) (* s  w))))
 
-(def-tuple-op quaternion-norm*
-	((q quaternion (x y z w)))
+(def-tuple-op quaternion-mag-square*
+    ((q quaternion (x y z w)))
   (:return single-float
-		   (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))
+           (+ (* x x) (* y y) (* z z) (* w w))))
 
+(def-tuple-op quaternion-mag*
+    ((q quaternion (x y z w)))
+  (:return single-float
+           (sqrt (quaternion-mag-square* q))))
 
-
-(def-tuple-op quaternion-unitize*
-	((q quaternion (x y z w)))
+(def-tuple-op quaternion-normalize*
+    ((q quaternion (x y z w)))
   "Ensure a quaternion is a unit"
   (:return quaternion
-		   (let ((1/mag
-				  (the single-float
-					(/ 1.0 (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))))
-			 (quaternion-values* (* x 1/mag) (* y 1/mag) (* z 1/mag) (* w 1/mag)))))
+           (quaternion-scale*
+            (quaternion-values* x y z w)
+            (/ 1f0 (quaternion-mag*
+                    (quaternion-values* x y z w))))))
 
 (def-tuple-op quaternion-sum*
 	((q0 quaternion (x0 y0 z0 w0))
@@ -91,38 +94,34 @@
 			(+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w z))
 			(-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w z))  (- 1 (* 2 x x) (* 2 y y)))))
 
-
 (def-tuple-op angle-axis-quaternion*
-	((aa angle-axis (x y z a)))
+    ((aa angle-axis (x y z a)))
   "Convert an angle-axis tuple to a quaternion tuple"
   (:return quaternion
-		   (quaternion-values* (* x (sin (* 0.5 a)))
-							   (* y (sin (* 0.5 a)))
-							   (* z (sin (* 0.5 a)))
-							   (cos (* 0.5 a)))))
-
-
+           (let* ((a/2 (* 0.5 a))
+                  (sin-angle (sin a/2)))
+             (quaternion-values*
+              (* x sin-angle)
+              (* y sin-angle)
+              (* z sin-angle)
+              (cos a/2)))))
 
 (def-tuple-op quaternion-transform-vector3d*
-	((vector vector3d (vx vy vz))
-	 (quat quaternion (qx qy qz qw)))
+    ((vector vector3d (vx vy vz))
+     (quat quaternion (qx qy qz qw)))
   "Transform a 3d vector with a quaternion"
   (:return vector3d
-		   (with-quaternion*
-			   (quaternion-product*
-				(quaternion-product*
-				 (quaternion-values* qx qy qz qw)
-				 (quaternion-values* vx vy vz 0.0))
-				(quaternion-conjugate (quaternion-values* qx qy qz qw)))
-			   (rx ry rz rw)
-			 (vector3d-values* rx ry rz))))
-
+           (with-quaternion*
+               (quaternion-product*
+                (quaternion-product*
+                 quat
+                 (vector3d-quaternion* vector))
+                (quaternion-conjugate* quat))
+               (rx ry rz rw)
+             (vector3d-values* rx ry rz))))
 
 (def-tuple-op vector3d-quaternion*
-	((vector vector3d (vx vy vz)))
+    ((vector vector3d (vx vy vz)))
   "Convert a 3d vector into q auqt for angular velocity purposes"
   (:return quaternion
-		   (quaternion-values* vx vy vz 0.0)))
-
-
-
+           (quaternion-values* vx vy vz 0.0)))

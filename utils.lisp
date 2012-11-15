@@ -1,46 +1,9 @@
-
-
 (in-package :cl-tuples)
 
 ;; float that fits within range of x86 hardware register minus tag (rather sbcl oriented)
 (deftype fast-float () 
   #+sbcl `(single-float   (#.(- (expt 2f0 64))) (#.(expt 2f0 64)))
   #-sbcl single-float)
-
-;; to do -- alexandria has these anyway -- use that
-(defmacro with-gensyms ((&rest names) &body body)
-  "Classic macro for creating named unique symbols."
-  `(let ,(loop for n in names collect `(,n (gensym)))
-     ,@body))
-
-(defmacro once-only ((&rest names) &body body)
-  "Evaluate arguments once only in macro form body"
-  (let ((gensyms (loop for n in names collect (gensym))))
-    `(let (,@(loop for g in gensyms collect `(,g (gensym))))
-       `(let (,,@(loop for g in gensyms for n in names collect ``(,,g ,,n)))
-          ,(let (,@(loop for n in names for g in gensyms collect `(,n ,g)))
-             ,@body)))))
-
-;; define helper functions we will use
-
-(defun gensym-list (n)
-  "Give us a list of gensyms n elements long"
-  (loop
-     for index from 0 below n
-     collect (gensym)))
-
-(defun last-char (str)
-  (char str (1- (length str))))
-
-(defun symbol-to-string (sym)
-  "If the argument is a symbol or string, return it as a string."
-  (check-type sym (or symbol string))
-  (cond
-    ((symbolp sym)
-     (symbol-name sym))
-    ((stringp sym)
-     sym)))
-
 
 (defun make-adorned-symbol (name &key prefix suffix asterisk package)
   (check-type name (or string symbol))
@@ -58,27 +21,3 @@
                        (when asterisk
                          (string "*")))
           (if package package *package*)))
-
-(defun make-suffixed-symbol (name suffix)
-  (make-adorned-symbol name :suffix suffix))
-
-(defun make-prefixed-symbol (name prefix)
-  (make-adorned-symbol name :prefix prefix))
-
-(defun is-asterisk-symbol (s)
-  (let 
-	  ((ss (symbol-to-string s)))
-	(eql (aref ss (1- (length ss))) #\*)))
-
-(defun make-element-names (elements type-name)
-  "Given a list of element names form a set of symbols of the form
-     <type-name>-<element-name> as used in struct elements."
-  (check-type elements symbol)
-  (check-type type-name symbol)
-  (mapcar #'(lambda (x)
-              (find-symbol
-               (concatenate 'string
-                            (symbol-name type-name) "-struct-"
-                            (symbol-name x))))
-          elements))
-

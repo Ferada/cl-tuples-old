@@ -111,7 +111,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-setter)))
   "Create a macro that will set an tuple place form to the values of a tuple value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-setter) (tuple-place tuple-values)
-	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
+	 (let* ((varlist (make-gensym-list ,(tuple-size type-name))))
 	   `(multiple-value-bind
 			  ,varlist
 			,tuple-values
@@ -180,7 +180,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref*)))
   "Create a macro that will index an array that is considered to be an array of tuples and extract an individual tuple as a value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-aref*) (tuple-array array-index)
-	 (let* ((varlist (gensym-list ,(tuple-size type-name)))
+	 (let* ((varlist (make-gensym-list ,(tuple-size type-name)))
 			(array-index-sym (gensym))
 			(counter-sym (gensym)))
 	   `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index)))
@@ -221,7 +221,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref-setter*)))
   "Create a macro that will set an indexed array of tuple places to the values of a tuple value form"
   `(defmacro ,(tuple-symbol type-name :def-tuple-aref-setter*) (array-name array-index tuple-values)
-	 (let* ((varlist (gensym-list ,(tuple-size type-name)))
+	 (let* ((varlist (make-gensym-list ,(tuple-size type-name)))
 			(array-index-sym (gensym)))
 	   `(let ((,array-index-sym (* ,',(tuple-size type-name) ,array-index)))
 		  (multiple-value-bind
@@ -321,7 +321,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push*)))
   "Create a macro that will push a tuple value form into an array of existing tuple places."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push*) (tuple-values array-name)
-	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
+	 (let* ((varlist (make-gensym-list ,(tuple-size type-name))))
 	   `(progn 
 		  (multiple-value-bind
 				,varlist
@@ -340,7 +340,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend*)))
   "Create a macro that will push a tuple value form into an array of existing tuple places, extending if adjustable."
   `(defmacro ,(tuple-symbol type-name :def-tuple-vector-push-extend*) (tuple-values array-name)
-	 (let* ((varlist (gensym-list ,(tuple-size type-name))))
+	 (let* ((varlist (make-gensym-list ,(tuple-size type-name))))
 	   `(progn 
 		  (multiple-value-bind
 			  ,varlist
@@ -449,7 +449,7 @@
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-maker*)))
   "Create a macro that creates new tuple place, form and initialize it with values"
   `(defmacro ,(tuple-symbol type-name :def-tuple-maker*) (tuple-values)
-	 (let ((varlist (gensym-list ,(tuple-size type-name)))
+	 (let ((varlist (make-gensym-list ,(tuple-size type-name)))
 		   (tuple-sym (gensym))
 		   (counter-sym 0))
 	   (declare (type fixnum counter-sym))
@@ -561,7 +561,7 @@
 	;; create a gensym for every tuple element - they are going to be symbol macros
 	(let ((gensyms
 		   (mapcar #'(lambda (element-list)
-					   (gensym-list (length element-list))) elements)))
+					   (make-gensym-list (length element-list))) elements)))
 	  ;; epand the body
 	  (body-expander-fn params types elements gensyms body))))
 

@@ -3,6 +3,7 @@
 
 (defpackage :cl-tuples
   (:use :cl :alexandria)
+  (:nicknames :tuples)
   (:export make-tuple-symbol
 
            tuple-typep
@@ -13,7 +14,7 @@
            tuple-typespec
            tuple-typespec*
            tuple-typespec**
-           
+
            def-tuple-type
            def-tuple-op
 
@@ -22,7 +23,7 @@
            vector2d-length*
            vector2d-normal*
            vector2d-vertex2d*
-		   vector2d-scale*
+           vector2d-scale*
 
            vertex2d-vector2d*
 
@@ -33,7 +34,7 @@
            vector3d-mag-square*
            vector3d-length*
            vector3d-normal*
-           vector3d-cross* 
+           vector3d-cross*
            vector3d-vertex3d*
            vertex3d-vector3d*
            vertex3d-distance*
@@ -59,8 +60,7 @@
            matrix33-matrix44*
 
            quaternion-sum*
-           quaternion-unitize*
-           quaternion-norm*
+           quaternion-normalize*
            quaternion-scale*
            quaternion-conjugate*
            quaternion-dot*
@@ -74,9 +74,4 @@
            vector3d-quaternion*
 
            width
-           height)
-
-  
-           (:nicknames :tuples))
-
-(in-package :cl-tuples)
+           height))

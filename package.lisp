@@ -2,7 +2,7 @@
 (in-package :cl-user)
 
 (defpackage :cl-tuples
-  (:use :cl)
+  (:use :cl :alexandria)
   (:export make-tuple-symbol
 
            tuple-typep

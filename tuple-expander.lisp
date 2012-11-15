@@ -514,7 +514,7 @@
 					  (arg-expander-fn-aux (1+ n) names types elements gensyms body)
 					  (symbol-macro-expander-fn 0 names types elements gensyms body)))
 		  ;; otherwise just use a straight symbol
-		  ``(symbol-macrolet ((,',(nth n names) (the ,',(nth n types)  ,,(nth n names))))
+		  ``(lexical-rename:lexical-rename-1 ((,',(nth n names) (the ,',(nth n types) ,,(nth n names))))
 			  ,,(if (< (1+ n) (length names))
 					(arg-expander-fn-aux (1+ n) names types elements gensyms body)
 					(symbol-macro-expander-fn 0 names types elements gensyms body))))

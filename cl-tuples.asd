@@ -11,7 +11,7 @@
   :version "1.0"
   :licence "MIT"
   :description "Experimental Tuple Types Facade"
-  :depends-on (:iterate)
+  :depends-on (:iterate :lexical-rename)
   :serial t
   :components ((:file "package")
 			   (:file "utils")

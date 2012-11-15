@@ -1,9 +1,0 @@
-
-This is CL-TUPLES, an experimental "type facade" which appears to give you configurable homogenous
-vectors based on defstruct, and allow for free conversion between multiple values and vectors. As
-such it is to be hoped that it will be of most use when writing code for raytracers, games, and
-the like, which use simple linear algebra primitives intensely.
-
-The rule is that if a symbol ends in an asterisk the function or macro bound to it will operate
-on or return multiple values, and the unadorned symbols will work with vectors.
- 

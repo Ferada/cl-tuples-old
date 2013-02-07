@@ -165,7 +165,7 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
   "Create macro that creates a array of tuple array places."
-  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable (initial-element ,(tuple-initial-element type-name) initial-element-p)  (fill-pointer nil fill-pointer-p))
+  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable (initial-element ,(tuple-initial-element type-name))  (fill-pointer nil fill-pointer-p))
 	 (make-array (* ,(tuple-size type-name) dimensions)
 				 :adjustable adjustable
 				 :initial-element initial-element

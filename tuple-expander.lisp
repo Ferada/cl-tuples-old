@@ -483,20 +483,19 @@
 		(assert (= (length (nth n gensyms))
 				   (length (nth n elements)))
 				nil "~A contains too few elements for a ~A" (nth n elements) (nth n types))
-		``(symbol-macrolet
-			  ,',(loop
-					for gensym in (nth n gensyms)
-					for element in (nth n elements) collect `(,element  ,gensym))
-			(declare (ignorable ,@',(nth n gensyms)))
-			(symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "VALUES" :asterisk t)
-													,@',(loop
-														   for gensym in (nth n gensyms)
-														   collect gensym))))
-			  ;; recurs down to the next parameter
-			  ,,(if (< (1+ n) (length names))
-					(symbol-macro-expander-fn (1+ n) names types elements gensyms body)
-					;; or bottom out
-					``(progn ,@',body)))))
+		``(lexical-rename:lexical-rename-1
+		      ,',(loop
+			   for gensym in (nth n gensyms)
+			   for element in (nth n elements) collect `(,element ,gensym))
+		    (lexical-rename:lexical-rename-1 ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "VALUES" :asterisk t)
+									 ,@',(loop
+									       for gensym in (nth n gensyms)
+									       collect gensym))))
+		      ;; recurs down to the next parameter
+		      ,,(if (< (1+ n) (length names))
+			    (symbol-macro-expander-fn (1+ n) names types elements gensyms body)
+			    ;; or bottom out
+			    ``(progn ,@',body)))))
 	  ;; if this is not a tuple type, and theres more to come, recurse down
 	  (if (< (1+ n) (length names))
 		  (symbol-macro-expander-fn (1+ n) names types elements gensyms body)

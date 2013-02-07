@@ -23,10 +23,12 @@
            vector2d-length*
            vector2d-normal*
            vector2d-vertex2d*
+           vector2d-component-product*
            vector2d-scale*
 
            vertex2d-vector2d*
 
+           vector3d-component-product*
            vector3d-scale*
            vector3d-dot*
            vector3d-sum*

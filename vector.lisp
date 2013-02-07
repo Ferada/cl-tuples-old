@@ -36,10 +36,10 @@
 ;; primitives
 
 (def-tuple-op vector2d-component-product*
-    ((veca vector3d (xa ya za))
-     (vecb vector3d (xb yb zb)))
-  (:return vector3d
-           (vector3d-values* (* xa xb) (* ya yb) (* za zb))))
+    ((veca vector2d (xa ya))
+     (vecb vector2d (xb yb)))
+  (:return vector2d
+           (vector2d-values* (* xa xb) (* ya yb))))
 
 (def-tuple-op vector2d-scale*
     ((vec vector2d (x y))

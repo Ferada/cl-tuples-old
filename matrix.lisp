@@ -296,3 +296,38 @@
 				  xz yz zz)))))
 
 
+(def-tuple-op matrix22-determinant*
+    ((mat matrix22 #.(tuple-elements 'matrix22)))
+  (:return fast-float
+           (- (* e00 e11)
+              (* e01 e10))))
+
+(def-tuple-op matrix33-determinant*
+    ((mat matrix33 #.(tuple-elements 'matrix33)))
+  (:return fast-float
+           (- (+ (* e00 e11 e22)
+                 (* e01 e12 e20)
+                 (* e02 e10 e21))
+              (* e02 e11 e20)
+              (* e01 e10 e22)
+              (* e00 e12 e21))))
+
+(def-tuple-op matrix44-determinant*
+    ((mat matrix44 #.(tuple-elements 'matrix44)))
+  (:return fast-float
+           (let ((t0 (* e00 e22))
+                 (t1 (* e11 e33))
+                 (t2 (* e01 e23))
+                 (t3 (* e12 e30))
+                 (t4 (* e03 e21))
+                 (t5 (* e10 e32))
+                 (t6 (* e13 e31))
+                 (t7 (* e02 e20)))
+             (- (+ (* t0 t1)
+                   (* t2 t3)
+                   (* t7 t6)
+                   (* t4 t5))
+                (* t3 t4)
+                (* t7 t1)
+                (* t2 t5)
+                (* t0 t6)))))

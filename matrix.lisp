@@ -354,3 +354,50 @@
     ((x fast-float)
      (mat matrix44 #1=#.(tuple-elements 'matrix44)))
   (:return matrix44 (multiply-arguments matrix44-values* x #1#)))
+
+(def-tuple-op cofactor-matrix22*
+    ((mat matrix22 #.(tuple-elements 'matrix22)))
+  (:return matrix22
+           (matrix22-values*
+            e11 e10
+            e01 e00)))
+
+(def-tuple-op cofactor-matrix33*
+    ((mat matrix33 #.(tuple-elements 'matrix33)))
+  (:return matrix33
+           (macrolet ((cofactors ()
+                        `(matrix33-values*
+                          ,@(matrix-cofactors 3))))
+             (cofactors))))
+
+(def-tuple-op cofactor-matrix44*
+    ((mat matrix44 #.(tuple-elements 'matrix44)))
+  (:return matrix44
+           (macrolet ((cofactors ()
+                        `(matrix44-values*
+                          ,@(matrix-cofactors 4))))
+             (cofactors))))
+
+(def-tuple-op inverted-matrix22*
+    ((mat matrix22 #.(tuple-elements 'matrix22)))
+  (:return matrix22
+           (matrix22-scale*
+            (matrix22-determinant* mat)
+            (transpose-matrix22*
+             (cofactor-matrix22* mat)))))
+
+(def-tuple-op inverted-matrix33*
+    ((mat matrix33 #.(tuple-elements 'matrix33)))
+  (:return matrix33
+           (matrix33-scale*
+            (matrix33-determinant* mat)
+            (transpose-matrix33*
+             (cofactor-matrix33* mat)))))
+
+(def-tuple-op inverted-matrix44*
+    ((mat matrix44 #.(tuple-elements 'matrix44)))
+  (:return matrix44
+           (matrix44-scale*
+            (matrix44-determinant* mat)
+            (transpose-matrix44*
+             (cofactor-matrix44* mat)))))

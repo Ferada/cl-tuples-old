@@ -28,6 +28,16 @@
 
 (export-tuple-operations matrix44)
 
+(def-tuple-op transpose-matrix22*
+    ((mat22 matrix22
+				 (e00 e01
+					  e10 e11)))
+	"Return the transpose of the matrix"
+	(:return matrix22
+			 (matrix22-values*
+			  e00 e10
+			  e01 e11)))
+
 (defmacro matrix-dot (dimension row col)
   "Generate the symbols required for a dot product between the row and column of a matrix, assuming accessor symbol is e<row><col>"
   (labels

@@ -23,3 +23,6 @@
                        (when asterisk
                          (string "*")))
           (if package package *package*)))
+
+(defmacro multiply-arguments (operator factor arguments)
+  `(,operator ,@(mapcar (lambda (argument) `(* ,factor ,argument)) arguments)))

@@ -1,6 +1,14 @@
 
 (in-package :cl-tuples)
 
+(def-tuple-type matrix22
+	:tuple-element-type fast-float
+	:initial-element 0.0f0
+	:elements (e00 e01
+		   e10 e11))
+
+(export-tuple-operations matrix22)
+
 (def-tuple-type matrix33
 	:tuple-element-type fast-float
 	:initial-element 0.0f0

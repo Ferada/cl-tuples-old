@@ -63,7 +63,7 @@
 		   (+ (* x0 x1) (* y0 y1) (* z0 z1) (* w0 w1))))
 
 (def-tuple-op quaternion-inverse*
-	((q quarternion (x y z w)))
+	((q quaternion (x y z w)))
   "Inverse of quaternion"
   (:return quaternion
 		   (let* ((mag
@@ -71,8 +71,8 @@
 					 (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))
 				  (1/mag2
 				   (the single-float (/ 1.0 (* mag mag)))))
-			 (declare (single-float mag2))
-			 (quaternion-values* (/ x mag2) (/ y mag2) (/ z mag2) (/ w mag2)))))
+			 (declare (single-float 1/mag2))
+			 (quaternion-values* (* x 1/mag2) (* y 1/mag2) (* z 1/mag2) (* w 1/mag2)))))
 
 
 (def-tuple-op quaternion-product*

@@ -13,18 +13,22 @@
 		   (setf e13 y)
 		   (setf e23 z))))
 
+(def-tuple-op scaling-matrix44*
+    ((sx #1=fast-float)
+     (sy #1#)
+     (sz #1#))
+  (:return matrix44
+           (matrix44-key-values
+            e00 sx
+            e11 sy
+            e22 sz
+            e33 1.0)))
 
-		   
+(defun scaling-matrix44 (sx sy sz)
+  (make-matrix44* (scaling-matrix44* sx sy sz)))
+
 (defun make-scaling (x y z)
-  (let ((result (make-matrix-44)))
-    (with-matrix44 result
-		   (e00 e01 e02 e03
-    		    e10 e11 e12 e13
-		    e20 e21 e22 e23
-		    e30 e31 e32 e33)
-		   (setf e00 x)
-		   (setf e11 y)
-		   (setf e22 z))))
+  (scaling-matrix44 x y z))
 
 (defun make-rotation (theta :key axis)
   (let

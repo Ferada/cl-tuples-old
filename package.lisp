@@ -46,6 +46,7 @@
            transpose-matrix33*
            identity-matrix44*
            translation-matrix44*
+           scaling-matrix44*
            vertex3d-translation-matrix44*
            rotatex-matrix44*
            rotatey-matrix44*
@@ -67,9 +68,6 @@
            inverted-matrix22*
            inverted-matrix33*
            inverted-matrix44*
-
-           scaling-matrix44
-           scaling-matrix44*
 
            transform-vertex2d*
            transform-vertex3d*

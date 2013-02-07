@@ -46,6 +46,7 @@
      (s fast-float))
   (:return vector2d
            (vector2d-component-product*
+            vec
             (vector2d-values* s s))))
 
 (def-tuple-op vector2d-length* 
@@ -90,6 +91,7 @@
      (s fast-float))
   (:return vector3d
            (vector3d-component-product*
+            vec
             (vector3d-values* s s s))))
   
 (def-tuple-op vector3d-length*

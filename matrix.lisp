@@ -165,14 +165,29 @@
 			(matrix-dot 4 3 2)
 			(matrix-dot 4 3 3))))
 
+(def-tuple-op identity-matrix22*
+    ()
+  (:return matrix22
+           (matrix22-key-values
+            e00 1.0
+            e11 1.0)))
+
+(def-tuple-op identity-matrix33*
+    ()
+  (:return matrix33
+           (matrix22-key-values
+            e00 1.0
+            e11 1.0
+            e22 1.0)))
+
 (def-tuple-op identity-matrix44*
-	()
+    ()
   (:return matrix44
-		   (matrix44-values*
-			1.0f0 0.0f0 0.0f0 0.0f0
-			0.0f0 1.0f0 0.0f0 0.0f0
-			0.0f0 0.0f0 1.0f0 0.0f0
-			0.0f0 0.0f0 0.0f0 1.0f0)))
+           (matrix44-key-values
+            e00 1.0
+            e11 1.0
+            e22 1.0
+            e33 1.0)))
 
 (def-tuple-op translation-matrix44*
 	((tx fast-float)

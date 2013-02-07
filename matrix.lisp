@@ -241,6 +241,15 @@
 		   (format t "~A ~A ~A ~A ~%" e20 e21 e22 e23)
 		   (format t "~A ~A ~A ~A ~%" e30 e31 e32 e33)))
 
+(def-tuple-op print-matrix33*
+	((mat matrix33 (e00 e01 e02
+		        e10 e11 e12
+			e20 e21 e22)))
+  "Print a matrix in a useful format."
+  (:return (values)
+		   (format t "~A ~A ~A ~%" e00 e01 e02)
+		   (format t "~A ~A ~A ~%" e10 e11 e12)
+		   (format t "~A ~A ~A ~%" e20 e21 e22)))
 
 (def-tuple-op matrix44-matrix33*
 	((mat44 matrix44

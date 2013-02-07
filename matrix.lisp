@@ -179,6 +179,17 @@
 			0.0f0 0.0f0 1.0f0 tz
 			0.0f0 0.0f0 0.0f0 1.0f0)))
 
+(def-tuple-op scaling-matrix44*
+    ((sx #1=fast-float)
+     (sy #1#)
+     (sz #1#))
+  (:return matrix44
+           (matrix44-key-values
+            e00 sx
+            e11 sy
+            e22 sz
+            e33 1.0)))
+
 (def-tuple-op vertex3d-translation-matrix44*
 	((vert vertex3d (tx ty tz tw)))
   "Return a matrix that represents a translation transformation"

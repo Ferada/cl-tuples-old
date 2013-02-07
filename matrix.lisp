@@ -168,7 +168,7 @@
 (def-tuple-op identity-matrix33*
     ()
   (:return matrix33
-           (matrix22-key-values
+           (matrix33-key-values
             e00 1.0
             e11 1.0
             e22 1.0)))

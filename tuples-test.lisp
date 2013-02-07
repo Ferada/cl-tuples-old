@@ -8,6 +8,8 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (pushnew :cl-tuples-debug *features*))
 
+(file-enable-tuples-syntax)
+
 (defvar *test-name* nil)
 
 (defmacro deftest (name parameters &body body)

@@ -6,6 +6,10 @@
   "Create an alias for values for this tuple.eg (vector3d-values 1.0 0.0 0.0) => #{ 1.0 0.0 0.0 }"
   (tuple-expansion-fn type-name :def-tuple-values))
 
+(defmacro def-tuple-key (type-name)
+  "Create an alias for values for this tuple.eg (vector3d-key-values z 1.0 x 2.0) => #{ 2.0 0.0 1.0 }"
+  (tuple-expansion-fn type-name :def-tuple-key-values))
+
 (defmacro def-tuple-typespec (type-name)
   "Create an alias typespec eg. (deftype vector3d* () `(values 'single-float 'single-float 'single-float))"
   (tuple-expansion-fn type-name :def-tuple-type))
@@ -148,6 +152,7 @@
 (defmacro make-tuple-operations (type-name)
   `(progn
      (def-tuple ,type-name)
+     (def-tuple-key ,type-name)
 	 (def-tuple-struct ,type-name)
      (def-tuple-getter ,type-name)
      (def-tuple-aref* ,type-name)

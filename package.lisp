@@ -2,7 +2,7 @@
 (in-package :cl-user)
 
 (defpackage :cl-tuples
-  (:use :cl :alexandria)
+  (:use :cl :alexandria :iterate)
   (:nicknames :tuples)
   (:export make-tuple-symbol
 

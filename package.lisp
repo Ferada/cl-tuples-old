@@ -18,6 +18,8 @@
            def-tuple-type
            def-tuple-op
 
+           fast-float
+
            vector2d-dot*
            vector2d-mag-square*
            vector2d-length*

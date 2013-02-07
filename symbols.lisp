@@ -5,17 +5,6 @@
 ;; package used to hold tuple type info
 (defpackage :tuple-types)
 
-;; to do -- investigate cl-syntax-sugar to see if we can come up with
-;; some nicer custom syntax
-
-;; make #{ .. } notation become a short hand for (values ...)
-(defun |#{-reader| (stream char arg)
-  (declare (ignore char arg))
-  `(values ,@(read-delimited-list #\} stream t)))
-
-(set-dispatch-macro-character #\# #\{ #'|#{-reader|)
-(set-macro-character #\} (get-macro-character #\) nil))
-
 (defun make-tuple-symbol (type-name tuple-element-type tuple-initial-element elements)
   "Makes a symbol used to identify a typle type and interns it in the
 package used for holding metadata about the tuple types. Information

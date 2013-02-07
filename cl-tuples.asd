@@ -16,6 +16,7 @@
   :components ((:file "package")
 			   (:file "utils")
 			   (:file "symbols")
+			   (:file "syntax")
 			   (:file "tuple-expander")
 			   (:file "tuples")
 			   (:file "vector")

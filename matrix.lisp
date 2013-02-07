@@ -322,3 +322,18 @@
                 (* t7 t1)
                 (* t2 t5)
                 (* t0 t6)))))
+
+(def-tuple-op matrix22-scale*
+    ((x fast-float)
+     (mat matrix22 #1=#.(tuple-elements 'matrix22)))
+  (:return matrix22 (multiply-arguments matrix22-values* x #1#)))
+
+(def-tuple-op matrix33-scale*
+    ((x fast-float)
+     (mat matrix33 #1=#.(tuple-elements 'matrix33)))
+  (:return matrix33 (multiply-arguments matrix33-values* x #1#)))
+
+(def-tuple-op matrix44-scale*
+    ((x fast-float)
+     (mat matrix44 #1=#.(tuple-elements 'matrix44)))
+  (:return matrix44 (multiply-arguments matrix44-values* x #1#)))

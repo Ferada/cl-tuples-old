@@ -26,3 +26,28 @@
 
 (defmacro multiply-arguments (operator factor arguments)
   `(,operator ,@(mapcar (lambda (argument) `(* ,factor ,argument)) arguments)))
+
+(defun matrix-symbol (i j &optional (prefix '#:e))
+  (find-symbol (format NIL "~A~D~D" prefix i j)))
+
+(defun matrix-minor (x y length &optional (prefix '#:e))
+  (let ((symbol-prefix (format NIL "~A~D~:*~D" '#:matrix (1- length))))
+    `(,(find-symbol (concatenate 'string symbol-prefix #.(string '#:-determinant*)))
+      (,(find-symbol (concatenate 'string symbol-prefix #.(string '#:-values*)))
+       ,@(iterate values
+           (for i from 1 to length)
+           (iterate
+             (for j from 1 to length)
+             (unless (or (eql i x) (eql j y))
+               (in values (collect (matrix-symbol (1- i) (1- j) prefix))))))))))
+
+(defun matrix-cofactors (length)
+  (iterate values
+    (for i from 1 to length)
+    (iterate
+      (for j from 1 to length)
+      (for value = (matrix-minor i j length))
+      (in values
+          (collect (if (oddp (+ i j))
+                       `(- ,value)
+                       value))))))

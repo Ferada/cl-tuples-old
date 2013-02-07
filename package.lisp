@@ -52,6 +52,25 @@
            rotatez-matrix44*
            transpose-matrix44*
 
+           matrix22-determinant*
+           matrix33-determinant*
+           matrix44-determinant*
+
+           matrix22-scale*
+           matrix33-scale*
+           matrix44-scale*
+
+           cofactor-matrix22*
+           cofactor-matrix33*
+           cofactor-matrix44*
+
+           inverted-matrix22*
+           inverted-matrix33*
+           inverted-matrix44*
+
+           scaling-matrix44
+           scaling-matrix44*
+
            transform-vertex2d*
            transform-vertex3d*
            transform-vector2d*

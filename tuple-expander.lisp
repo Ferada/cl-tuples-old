@@ -21,7 +21,7 @@
 	   (list e (tuple-initial-element type-name) :type (tuple-element-type type-name))))
 
 (defparameter *tuple-expander-keywords*
-  '(:def-tuple-values
+  '(:def-tuple-values :def-tuple-key-values
 	:def-tuple-type :def-tuple-array-type
 	:def-tuple-struct
 	:def-tuple-getter
@@ -54,6 +54,21 @@
   `(defmacro ,(tuple-symbol type-name expansion) (&rest elements)
 	 `(the ,',(construct-tuple-value-type type-name)
 		(values  ,@elements))))
+
+;; eg. (vector3d-key-values z 1.0 x 2.0) => #{ 2.0 0.0 1.0 }
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-key-values)))
+  (make-adorned-symbol type-name :suffix "KEY-VALUES" :asterisk NIL))
+
+;; create freshly initialised multiple values e.g. (vector3d-key-values z 1.0 x 2.0) => #{ 2.0 0.0 1.0 }
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-key-values)))
+  `(defmacro ,(tuple-symbol type-name expansion)
+       (&key
+          (initial-element ,(tuple-initial-element type-name))
+          ,@(mapcar (lambda (element)
+                      `((,element ,element) initial-element))
+                    (tuple-elements type-name)))
+     `(,',(tuple-symbol type-name :def-tuple-values)
+       ,,@(tuple-elements type-name))))
 
 ;; deftype form for the multiple value equivalent of the struct
 ;; eg. (deftype vector3d* () `(values single-float single-float single-float))

@@ -95,4 +95,12 @@
            vector3d-quaternion*
 
            width
-           height))
+           height
+
+           disable-tuples-syntax
+           locally-disable-tuples-syntax
+           enable-tuples-syntax
+           locally-enable-tuples-syntax
+           file-enable-tuples-syntax
+           restore-tuples-syntax-state
+           ))

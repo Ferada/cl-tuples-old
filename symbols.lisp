@@ -5,7 +5,6 @@
 ;; package used to hold tuple type info
 (defpackage :tuple-types)
 
-
 (defun make-tuple-symbol (type-name tuple-element-type tuple-initial-element elements)
   "Makes a symbol used to identify a tuple type and interns it in the
 package used for holding metadata about the tuple types. Information

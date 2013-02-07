@@ -35,11 +35,18 @@
 
 ;; primitives
 
+(def-tuple-op vector2d-component-product*
+    ((veca vector3d (xa ya za))
+     (vecb vector3d (xb yb zb)))
+  (:return vector3d
+           (vector3d-values* (* xa xb) (* ya yb) (* za zb))))
+
 (def-tuple-op vector2d-scale*
     ((vec vector2d (x y))
      (s fast-float))
   (:return vector2d
-           (vector2d-values* (* s x) (* s y))))
+           (vector2d-component-product*
+            (vector2d-values* s s))))
 
 (def-tuple-op vector2d-length* 
     ((vec vector2d (x y)))
@@ -72,11 +79,18 @@
            (vector2d-values* x y)))
 
 
-(def-tuple-op vector3d-scale* 
+(def-tuple-op vector3d-component-product*
+    ((veca vector3d (xa ya za))
+     (vecb vector3d (xb yb zb)))
+  (:return vector3d
+           (vector3d-values* (* xa xb) (* ya yb) (* za zb))))
+
+(def-tuple-op vector3d-scale*
     ((vec vector3d (x y z))
      (s fast-float))
   (:return vector3d
-           (vector3d-values* (* s x) (* s y) (* s z))))
+           (vector3d-component-product*
+            (vector3d-values* s s s))))
   
 (def-tuple-op vector3d-length*
     ((vec vector3d (x y z)))

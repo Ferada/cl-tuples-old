@@ -42,15 +42,21 @@
   (:return angle-axis
            (angle-axis-values* x y z angle)))
 
+;; TODO: the matrix has to be a rotation matrix, but then we can also
+;; restrict the values to their respective ranges, which eliminates the
+;; warning about the empty COND case and yields better compilation
+;; results.  the question is:  are these correct?
 (def-tuple-op matrix33-angle-axis*
     ((m matrix33 #.(tuple-elements 'matrix33)))
   (:return angle-axis
            (let* ((trace (matrix33-trace* m))
                   (angle (acos (/ (1- trace) 2))))
+             (declare (type (single-float -1.0 3.0) trace)
+                      (type (single-float 0.0 #.single-pi)))
              (cond
                ((= angle 0.0)
                 (angle-axis-key-values))
-               ((< 0.0 angle #1=#.(coerce pi 'fast-float))
+               ((< 0.0 angle single-pi)
                 (vector3d-angle-axis*
                  (vector3d-normal*
                   (vector3d-values*
@@ -58,18 +64,18 @@
                    (- e02 e20)
                    (- e10 e01)))
                  angle))
-               ((= angle #1#)
+               (T                       ; (= angle #1#)
                 (vector3d-angle-axis*
                  (flet ((u0 ()
-                          (let* ((u0 (/ (sqrt (1+ (- e00 e11 e22))) 2))
+                          (let* ((u0 (/ (the single-float (sqrt (1+ (- e00 e11 e22)))) 2))
                                  (2u0 (* 2 u0)))
                             (vector3d-values* u0 (/ e01 2u0) (/ e02 2u0))))
                         (u1 ()
-                          (let* ((u1 (/ (sqrt (1+ (- e11 e00 e22))) 2))
+                          (let* ((u1 (/ (the single-float (sqrt (1+ (- e11 e00 e22)))) 2))
                                  (2u1 (* 2 u1)))
                             (vector3d-values* (/ e01 2u1) u1 (/ e12 2u1))))
                         (u2 ()
-                          (let* ((u2 (/ (sqrt (1+ (- e22 e00 e11))) 2))
+                          (let* ((u2 (/ (the single-float (sqrt (1+ (- e22 e00 e11)))) 2))
                                  (2u2 (* 2 u2)))
                             (vector3d-values* (/ e02 2u2) (/ e12 2u2) u2))))
                    (if (> e00 e11)

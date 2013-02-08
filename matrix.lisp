@@ -28,6 +28,49 @@
 
 (export-tuple-operations matrix44)
 
+(def-tuple-op matrix33-equal*
+    ((k matrix33 (k00 k01 k02
+                  k10 k11 k12
+                  k20 k21 k22))
+     (m matrix33 (m00 m01 m02
+                  m10 m11 m12
+                  m20 m21 m22)))
+  (:return boolean
+           (and
+            (= k00 m00) (= k01 m01) (= k02 m02)
+            (= k10 m10) (= k11 m11) (= k12 m12)
+            (= k20 m20) (= k21 m21) (= k22 m22))))
+
+(def-tuple-op matrix44-equal*
+    ((k matrix44 (k00 k01 k02 k03
+                  k10 k11 k12 k13
+                  k20 k21 k22 k23
+                  k30 k31 k32 k33))
+     (m matrix44 (m00 m01 m02 m03
+                  m10 m11 m12 m13
+                  m20 m21 m22 m23
+                  m30 m31 m32 m33)))
+  (:return boolean
+           (and
+            (= k00 m00) (= k01 m01) (= k02 m02) (= k03 m03)
+            (= k10 m10) (= k11 m11) (= k12 m12) (= k13 m13)
+            (= k20 m20) (= k21 m21) (= k22 m22) (= k23 m23)
+            (= k30 m30) (= k31 m31) (= k32 m32) (= k33 m33))))
+
+;; TODO: this probably needs to check the TRACE as well, since otherwise
+;; it might crash in other functions (e.g. MATRIX33-ANGLE-AXIS*)
+(def-tuple-op check-rotation-matrix33*
+    ((m matrix33 :default))
+  (:return boolean (matrix33-equal*
+                    (identity-matrix33*)
+                    (matrix33-product*
+                     m (transpose-matrix33* m)))))
+
+;; TODO: maybe check also whether it is purely a rotation?
+(def-tuple-op check-rotation-matrix44*
+    ((m matrix44 :default))
+  (:return boolean (check-rotation-matrix33* (matrix44-matrix33* m))))
+
 (def-tuple-op transpose-matrix22*
     ((mat22 matrix22
 				 (e00 e01

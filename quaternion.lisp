@@ -93,7 +93,7 @@
 
 (def-tuple-op quaternion-scale*
     ((q quaternion (x y z w))
-     (s single-float))
+     (s fast-float))
   "Multiply a quat by a scalar"
   (:return quaternion
            (quaternion-map*
@@ -132,7 +132,7 @@
            (quaternion-map* (+) q0 q1)))
 
 (def-tuple-op quaternion-inverse*
-    ((q quaternion (x y z w)))
+    ((q quaternion))
   "Inverse of quaternion"
   (:return quaternion
            (quaternion-scale*

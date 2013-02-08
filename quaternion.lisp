@@ -17,21 +17,22 @@
 (def-tuple-op angle-axis-matrix33*
     ((aa angle-axis (x y z a)))
   (:return matrix33
-           (lexical-rename:lexical-rename-1
-               ((s (matrix33-values*
-                    0.0 (- z) y
-                    z 0.0 (- x)
-                    (- y) x 0.0)))
-             (matrix33-map*
-              (+)
-              (identity-matrix33*)
-              (matrix33-scale*
-               (sin a)
-               s)
-              (matrix33-scale*
-               (- 1 (cos a))
-               (matrix33-product*
-               s s))))))
+           ;; TODO: this needs another tuple op; i figure this is all too common
+           (with-matrix33*
+               (matrix33-values*
+                0.0 (- z) y
+                z 0.0 (- x)
+                (- y) x 0.0)
+               #1=#.(make-gensym-list (tuple-size 'matrix33))
+             (lexical-rename:lexical-rename-1 ((s (matrix33-values* . #1#)))
+               (matrix33-map*
+                (+)
+                (identity-matrix33*)
+                (matrix33-scale* (sin a) s)
+                (matrix33-scale*
+                 (- 1 (cos a))
+                 (matrix33-product*
+                  s s)))))))
 
 (def-tuple-op matrix33-trace*
     ((m matrix33 #.(tuple-elements 'matrix33)))

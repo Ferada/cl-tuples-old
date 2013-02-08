@@ -36,7 +36,9 @@
 	:def-tuple-array-dimensions 
 	:def-tuple-fill-pointer :def-tuple-setf-fill-pointer
 	:def-tuple-setf* :def-tuple-array-setf*
-	:def-tuple-array-setf))
+	:def-tuple-array-setf
+	:def-tuple-map
+	:def-tuple-reduce))
 
 (defgeneric tuple-symbol (type-name expansion))
 
@@ -470,6 +472,48 @@
 								   (incf counter-sym)))
 							 varlist)
 				   ,tuple-sym))))))
+
+;; eg. (vector2d-map* (+) #{1.0 2.0} #{4.0 5.0}) => #{5.0 7.0}
+;; or even (vector2d-map* (and) #{1.0 2.0} #{3.0 4.0}) => #{3.0 4.0}
+;; and (vector2d-map* ((lambda (a b) (funcall #'+ a b))) #{1.0 2.0} #{4.0 5.0}) => #{5.0 7.0}
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-map)))
+  (make-adorned-symbol type-name :suffix "MAP*" :asterisk NIL))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-map)))
+  `(defmacro ,(tuple-symbol type-name expansion) (operator &rest args)
+     (let* ((symbols
+              (mapcar (lambda (arg)
+                        (declare (ignore arg))
+                        (make-gensym-list ,(tuple-size type-name)))
+                      args))
+            (values
+              `(,',(tuple-symbol type-name :def-tuple-values)
+                ,@(iterate
+                    (for index below ,(tuple-size type-name))
+                    (collect `(,@operator ,@(mapcar (lambda (gensyms)
+                                                      (nth index gensyms))
+                                                    symbols)))))))
+       (iterate
+         (for arg in (reverse args))
+         (for gensyms in (reverse symbols))
+         (setf values `(,',(tuple-symbol type-name :def-with-tuple*)
+                        ,arg ,gensyms
+                        ,values)))
+       values)))
+
+;; eg. (vector3d-reduce* '+ #{1.0 2.0 3.0}) => 6.0
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-reduce)))
+  (make-adorned-symbol type-name :suffix "REDUCE*" :asterisk NIL))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-reduce)))
+  `(defmacro ,(tuple-symbol type-name expansion) (operator tuple)
+     (let ((operator (if (and (listp operator) (eq (car operator) 'quote))
+                          `(,(cadr operator))
+                          `(funcall ,operator)))
+           (symbols (make-gensym-list ,(tuple-size type-name))))
+       `(,',(tuple-symbol type-name :def-with-tuple*)
+         ,tuple ,symbols
+         (,@operator ,@symbols)))))
 
 
 ;; -- def-tuple-op expanders begin here ------------------------------------

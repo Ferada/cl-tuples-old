@@ -111,6 +111,12 @@
   "Create generalised variable macros for an array of  tuples of type-name with the given elements."
   (tuple-expansion-fn type-name :def-tuple-array-setf))
 
+(defmacro def-tuple-map (type-name)
+  (tuple-expansion-fn type-name :def-tuple-map))
+
+(defmacro def-tuple-reduce (type-name)
+  (tuple-expansion-fn type-name :def-tuple-reduce))
+
 (defun document-tuple-type (type-name)
   `(progn
      ;; instead of setf, need some form that can use the symbol in the format
@@ -176,7 +182,9 @@
      (def-tuple-array-maker ,type-name)
      (def-tuple-setf*  ,type-name)
      (def-tuple-array-setf*  ,type-name)
-	 (def-tuple-array-setf ,type-name)))
+     (def-tuple-array-setf ,type-name)
+     (def-tuple-map ,type-name)
+     (def-tuple-reduce ,type-name)))
 
 (defmacro export-tuple-operations (type-name)
   `(progn

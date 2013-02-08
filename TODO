@@ -8,3 +8,6 @@
 ** TODO wither define-tuple-op?
 ** TODO investigate cl-generic-arithmetic integration
 ** TODO write some test app (quaterinion dragons? raytracers?)
+** TODO &rest (single type), &optional and &key arguments for def-tuple-op
+** TODO uniform naming convention (-* for tuple value arguments, return
+        value has to be indicated some other way)

@@ -73,8 +73,14 @@
                                  (2u2 (* 2 u2)))
                             (vector3d-values* (/ e02 2u2) (/ e12 2u2) u2))))
                    (if (> e00 e11)
-                       (if (>= e00 e22) (u0) (u2))
-                       (if (>= e11 e22) (u1) (u2))))
+                       (if (> e00 e22)
+                           (u0)
+                           (if (> e22 e11)
+                               (u2)
+                               (u1)))
+                       (if (> e22 e11)
+                           (u2)
+                           (u1))))
                  angle))))))
 
 ;; need conjugate, angle-axis conversion, slerp

@@ -169,6 +169,21 @@
               (* z sin-angle)
               (cos a/2)))))
 
+(def-tuple-op quaternion-angle-axis*
+    ((q quaternion (x y z w)))
+  "Convert an quaternion tuple to an angle-axis tuple.  If the angle is
+zero, the axis isn't defined, so the unit x vector is returned instead."
+  (:return angle-axis
+           ;; either test for one, disable traps, or catch the exception
+           (if (or (= w 1.0) (= w -1.0))
+               (angle-axis-key-values x 1.0)
+               (let ((angle (* 2 (acos w))))
+                 (vector3d-angle-axis*
+                  (vector3d-scale*
+                   (vector3d-values* x y z)
+                   (/ (sqrt (- 1 (* w w)))))
+                  angle)))))
+
 (def-tuple-op quaternion-transform-vector3d*
     ((vector vector3d (vx vy vz))
      (quat quaternion (qx qy qz qw)))

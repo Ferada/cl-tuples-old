@@ -15,6 +15,69 @@
 
 (export-tuple-operations angle-axis)
 
+(def-tuple-op angle-axis-matrix33*
+    ((aa angle-axis (x y z a)))
+  (:return matrix33
+           (matrix33-map*
+            (+)
+            (identity-matrix33*)
+            (matrix33-scale*
+             (sin a)
+             #1=(matrix33-values*
+                0.0 (- z) y
+                z 0.0 (- x)
+                (- y) x 0.0))
+            (matrix33-scale*
+             (- 1 (cos a))
+             (matrix33-product*
+              #1# #1#)))))
+
+(def-tuple-op matrix33-trace*
+    ((m matrix33 #.(tuple-elements 'matrix33)))
+  (:return fast-float
+           (+ e00 e11 e22)))
+
+(def-tuple-op vector3d-angle-axis*
+    ((axis vector3d (x y z))
+     (angle fast-float))
+  (:return angle-axis
+           (angle-axis-values* x y z angle)))
+
+(def-tuple-op matrix33-angle-axis*
+    ((m matrix33 #.(tuple-elements 'matrix33)))
+  (:return angle-axis
+           (let* ((trace (matrix33-trace* m))
+                  (angle (acos (/ (1- trace) 2))))
+             (cond
+               ((= angle 0.0)
+                (angle-axis-key-values))
+               ((< 0.0 angle #1=#.(coerce pi 'fast-float))
+                (vector3d-angle-axis*
+                 (vector3d-normal*
+                  (vector3d-values*
+                   (- e21 e12)
+                   (- e02 e20)
+                   (- e10 e01)))
+                 angle))
+               ((= angle #1#)
+                (vector3d-angle-axis*
+                 (flet ((u0 ()
+                          (let* ((u0 (/ (sqrt (1+ (- e00 e11 e22))) 2))
+                                 (2u0 (* 2 u0)))
+                            (vector3d-values* u0 (/ e01 2u0) (/ e02 2u0))))
+                        (u1 ()
+                          (let* ((u1 (/ (sqrt (1+ (- e11 e00 e22))) 2))
+                                 (2u1 (* 2 u1)))
+                            (vector3d-values* (/ e01 2u1) u1 (/ e12 2u1))))
+                        (u2 ()
+                          (let* ((u2 (/ (sqrt (1+ (- e22 e00 e11))) 2))
+                                 (2u2 (* 2 u2)))
+                            (vector3d-values* (/ e02 2u2) (/ e12 2u2) u2))))
+                   (if (> e00 e11)
+                       (if (>= e00 e22) (u0) (u2))
+                       (if (>= e11 e22) (u1) (u2))))
+                 angle))))))
+
 ;; need conjugate, angle-axis conversion, slerp
 
 (def-tuple-op quaternion-conjugate*

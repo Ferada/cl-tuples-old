@@ -136,6 +136,18 @@
            (quaternion-scale*
             q (/ (quaternion-mag-square* q)))))
 
+(def-tuple-op quaternion-power*
+    ((q quaternion (x y z w))
+     (times fast-float))
+  (:return quaternion
+           (let* ((angle (acos w))
+                  (sin (sin angle))
+                  (factor (* angle times (/ sin))))
+             (quaternion-values*
+              (sin (* x factor))
+              (sin (* y factor))
+              (sin (* z factor))
+              (cos (* times angle))))))
 
 (def-tuple-op quaternion-product*
 	((q-lhs quaternion (x1 y1 z1 w1))
@@ -155,6 +167,52 @@
 			(- 1 (* 2 y y) (* 2 z z))   (- (* 2 x y) (* 2 w z))   (+ (* 2 x z) (* 2 w y))
 			(+   (* 2 x y) (* 2 w z))   (- 1 (* 2 x x) (* 2 z z)) (- (* 2 y z) (* 2 w x))
 			(-   (* 2 x z) (* 2 w y))   (+  (* 2 y z) (* 2 w x))  (- 1 (* 2 x x) (* 2 y y)))))
+
+(def-tuple-op matrix33-quaternion*
+    ((m matrix33 :default))
+  (:return quaternion
+           (let ((trace (matrix33-trace* m)))
+             (if (> trace 0)
+                 (let* ((w (/ (sqrt (1+ trace)) 2))
+                        (4w (* 4 w)))
+                   (quaternion-values*
+                    (/ (- e21 e12) 4w)
+                    (/ (- e20 e02) 4w)
+                    (/ (- e01 e10) 4w)
+                    w))
+                 (flet ((e00 ()
+                          (let* ((x (/ (sqrt (1+ (- e00 e11 e22))) 2))
+                                 (4x (* 4 x)))
+                            (quaternion-values*
+                             x
+                             (/ (+ e01 e10) 4x)
+                             (/ (+ e02 e20) 4x)
+                             (/ (- e21 e21) 4x))))
+                        (e11 ()
+                          (let* ((y (/ (sqrt (1+ (- e11 e00 e22))) 2))
+                                  (4y (* 4 y)))
+                             (quaternion-values*
+                              (/ (- e01 e10) 4y)
+                              y
+                              (/ (+ e12 e21) 4y)
+                              (/ (- e20 e02) 4y))))
+                        (e22 ()
+                          (let* ((z (/ (sqrt (1+ (- e22 e00 e11))) 2))
+                                 (4z (* 4 z)))
+                            (quaternion-values*
+                             (/ (+ e02 e20) 4z)
+                             (/ (+ e12 e21) 4z)
+                             z
+                             (/ (- e01 e10) 4z)))))
+                   (if (> e00 e11)
+                       (if (> e00 e22)
+                           (e00)
+                           (if (> e22 e11)
+                               (e22)
+                               (e11)))
+                       (if (> e22 e11)
+                           (e22)
+                           (e11))))))))
 
 (def-tuple-op angle-axis-quaternion*
     ((aa angle-axis (x y z a)))

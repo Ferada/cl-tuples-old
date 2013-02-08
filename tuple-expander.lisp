@@ -557,21 +557,36 @@
 (defun arg-expander-fn-aux (n names types elements gensyms body)
   "Handle the expansion of the n-th parameter in a def-tuple-op call list"
   (if (nth n types)
-	  ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
-	  (if (tuple-typep (nth n types))
-		  ``(,',(make-adorned-symbol (nth n types) :prefix "WITH" :asterisk t)
-				,,(nth n  names) ,',(nth n  gensyms)
-				,,(if (< (1+ n) (length names))
-					  (arg-expander-fn-aux (1+ n) names types elements gensyms body)
-					  (symbol-macro-expander-fn 0 names types elements gensyms body)))
-		  ;; otherwise just use a straight symbol
-		  ``(symbol-macrolet ((,',(nth n names) (the ,',(nth n types)  ,,(nth n names))))
-			  ,,(if (< (1+ n) (length names))
-					(arg-expander-fn-aux (1+ n) names types elements gensyms body)
-					(symbol-macro-expander-fn 0 names types elements gensyms body))))
-	  ;; if there are no associated parameters with this op, just expand the body
-	  (symbol-macro-expander-fn 0 nil nil nil nil body)))
+      ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
+      (if (tuple-typep (nth n types))
+          (if (< (1+ n) (length names))
+              (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+              (symbol-macro-expander-fn 0 names types elements gensyms body))
+          ;; otherwise just use a straight symbol
+          ``(let ((,',(nth n names) (the ,',(nth n types) ,,(nth n names))))
+              ,,(if (< (1+ n) (length names))
+                    (arg-expander-fn-aux (1+ n) names types elements gensyms body)
+                    (symbol-macro-expander-fn 0 names types elements gensyms body))))
+      ;; if there are no associated parameters with this op, just expand the body
+      (symbol-macro-expander-fn 0 nil nil nil nil body)))
 
+(defun arg-expander-fn-aux-with (n names types elements gensyms body)
+  "Handle the tuple type case, expanding into -WITH macros.  The rest is
+handled by ARG-EXPANDER-FN-AUX in a separate step."
+  (if (nth n types)
+      ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
+      (if (tuple-typep (nth n types))
+          ``(,',(make-adorned-symbol (nth n types) :prefix "WITH" :asterisk t)
+             ,,(nth n  names) ,',(nth n  gensyms)
+             ,,(if (< (1+ n) (length names))
+                   (arg-expander-fn-aux-with (1+ n) names types elements gensyms body)
+                   (arg-expander-fn-aux 0 names types elements gensyms body)))
+          ;; otherwise just use a straight symbol
+          (if (< (1+ n) (length names))
+              (arg-expander-fn-aux-with (1+ n) names types elements gensyms body)
+              (arg-expander-fn-aux 0 names types elements gensyms body)))
+      ;; if there are no associated parameters with this op, just expand the body
+      (symbol-macro-expander-fn 0 nil nil nil nil body)))
 
 (defun body-expander-fn (names types elements gensyms body)
   "Expand the declarations and return type wrapper round a def-tuple-op. form"
@@ -588,12 +603,12 @@
 			(real-body (cddar body)))
 		;; when we have a parameter list, expand it
 		``(the ,',ret-type
-			,,(arg-expander-fn-aux 0 names types elements gensyms real-body)))
+			,,(arg-expander-fn-aux-with 0 names types elements gensyms real-body)))
 	  ;;         ;; otherwise splice in the quoted body
 	  ;;         ``(the ,',ret-type
 	  ;;             (progn ,@',real-body)))
 	  ;; no we havent specified a return type, just fall in
-	  (arg-expander-fn-aux 0 names types elements gensyms body)))
+	  (arg-expander-fn-aux-with 0 names types elements gensyms body)))
 
 (defun arg-expander-fn (names types elements forms)
   "Helper function for def-tuple-op. Expands the arguments into a series of WITH-* forms so that

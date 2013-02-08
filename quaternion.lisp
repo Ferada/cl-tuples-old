@@ -1,17 +1,16 @@
-
 (in-package :cl-tuples)
 
 (def-tuple-type quaternion
-	:tuple-element-type fast-float
-	:initial-element 0.0f0
-	:elements (x y z w))
+  :tuple-element-type fast-float
+  :initial-element 0.0f0
+  :elements (x y z w))
 
 (export-tuple-operations quaternion)
 
 (def-tuple-type angle-axis
-	:tuple-element-type fast-float
-	:initial-element 0.0f0
-	:elements (x y z a))
+  :tuple-element-type fast-float
+  :initial-element 0.0f0
+  :elements (x y z a))
 
 (export-tuple-operations angle-axis)
 
@@ -81,61 +80,55 @@
 ;; need conjugate, angle-axis conversion, slerp
 
 (def-tuple-op quaternion-conjugate*
-	((q quaternion (x y z w)))
+    ((q quaternion (x y z w)))
   (quaternion-values* (- x) (- y) (- z) w))
 
 (def-tuple-op quaternion-scale*
-	((q quaternion (x y z w))
-	 (s single-float))
+    ((q quaternion (x y z w))
+     (s single-float))
   "Multiply a quat by a scalar"
   (:return quaternion
-		   (quaternion-values*
-			(* s x) (* s y) (* s z) (* s  w))))
+           (quaternion-map*
+            (*) (quaternion-key-values :initial-element s) q)))
+
+(def-tuple-op quaternion-dot*
+    ((q0 quaternion)
+     (q1 quaternion))
+  "Dot product of two quaternions."
+  (:return fast-float
+           (quaternion-reduce*
+            (+) (quaternion-map* (*) q0 q1))))
 
 (def-tuple-op quaternion-mag-square*
-    ((q quaternion (x y z w)))
-  (:return single-float
-           (+ (* x x) (* y y) (* z z) (* w w))))
+    ((q quaternion))
+  (:return fast-float
+           (quaternion-dot* q q)))
 
 (def-tuple-op quaternion-mag*
-    ((q quaternion (x y z w)))
-  (:return single-float
+    ((q quaternion))
+  (:return fast-float
            (sqrt (quaternion-mag-square* q))))
 
 (def-tuple-op quaternion-normalize*
-    ((q quaternion (x y z w)))
+    ((q quaternion))
   "Ensure a quaternion is a unit"
   (:return quaternion
            (quaternion-scale*
-            (quaternion-values* x y z w)
-            (/ 1f0 (quaternion-mag*
-                    (quaternion-values* x y z w))))))
+            q (/ (quaternion-mag* q)))))
 
 (def-tuple-op quaternion-sum*
-	((q0 quaternion (x0 y0 z0 w0))
-	 (q1 quaternion (x1 y1 z1 w1)))
+    ((q0 quaternion)
+     (q1 quaternion))
   "Sum the components of two quaternions"
   (:return quaternion
-		   (quaternion-values* (+ x0 x1) (+ y0 y1) (+ z0 z1) (+ w0 w1))))
-
-(def-tuple-op quaternion-dot*
-	((quaternion-lhs quaternion (x0 y0 z0 w0))
-	 (quaternion-rhs quaternion (x1 y1 z1 w1)))
-  "Dot product of two quaternions."
-  (:return single-float
-		   (+ (* x0 x1) (* y0 y1) (* z0 z1) (* w0 w1))))
+           (quaternion-map* (+) q0 q1)))
 
 (def-tuple-op quaternion-inverse*
-	((q quaternion (x y z w)))
+    ((q quaternion (x y z w)))
   "Inverse of quaternion"
   (:return quaternion
-		   (let* ((mag
-				   (the single-float
-					 (sqrt (+ (* x x) (* y y) (* z z) (* w w)))))
-				  (1/mag2
-				   (the single-float (/ 1.0 (* mag mag)))))
-			 (declare (single-float 1/mag2))
-			 (quaternion-values* (* x 1/mag2) (* y 1/mag2) (* z 1/mag2) (* w 1/mag2)))))
+           (quaternion-scale*
+            q (/ (quaternion-mag-square* q)))))
 
 
 (def-tuple-op quaternion-product*

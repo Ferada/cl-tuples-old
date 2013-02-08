@@ -513,10 +513,7 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-reduce)))
   `(defmacro ,(tuple-symbol type-name expansion) (operator tuple)
-     (let ((operator (if (and (listp operator) (eq (car operator) 'quote))
-                          `(,(cadr operator))
-                          `(funcall ,operator)))
-           (symbols (make-gensym-list ,(tuple-size type-name))))
+     (let ((symbols (make-gensym-list ,(tuple-size type-name))))
        `(,',(tuple-symbol type-name :def-with-tuple*)
          ,tuple ,symbols
          (,@operator ,@symbols)))))

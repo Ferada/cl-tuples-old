@@ -208,11 +208,20 @@
    Within the forms the tuple value form is bound to the argument-name
    and the tuple elements are bound to the symbols in the element list"
   (let* ((param-names (mapcar #'car param-list))
-		 (param-typenames (mapcar #'cadr  param-list))
-		 (param-elements (mapcar #'caddr param-list))
-		 (doc (if (stringp (first forms))
-                 (first forms)
-                 (format nil "DEF-TUPLE-OP ~A ~A" name param-typenames))))
+         (param-typenames (mapcar #'cadr  param-list))
+         (param-elements (mapcar (lambda (param)
+                                   (let* ((type-name (cadr param))
+                                          (size (tuple-size type-name))
+                                          (elements (caddr param)))
+                                     (or
+                                      (if (eq elements :default)
+                                          (tuple-elements type-name)
+                                          elements)
+                                      (and size (make-gensym-list size)))))
+                                 param-list))
+         (doc (if (stringp (first forms))
+                  (first forms)
+                  (format nil "DEF-TUPLE-OP ~A ~A" name param-typenames))))
     `(defmacro ,name ,param-names
        ,doc
        ,(def-tuple-expander-fn param-names param-typenames param-elements forms))))

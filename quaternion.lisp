@@ -150,13 +150,15 @@
      (times fast-float))
   (:return quaternion
            (let* ((angle (acos w))
-                  (sin (sin angle))
-                  (factor (* angle times (/ sin))))
-             (quaternion-values*
-              (sin (* x factor))
-              (sin (* y factor))
-              (sin (* z factor))
-              (cos (* times angle))))))
+                  (sin (sin angle)))
+             (if (= angle 0)
+                 q
+                 (let ((factor (* angle times (/ sin))))
+                   (quaternion-values*
+                    (sin (* x factor))
+                    (sin (* y factor))
+                    (sin (* z factor))
+                    (cos (* times angle))))))))
 
 (def-tuple-op quaternion-product*
 	((q-lhs quaternion (x1 y1 z1 w1))

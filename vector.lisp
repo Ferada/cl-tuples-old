@@ -48,10 +48,15 @@
            (vector2d-reduce*
             (+) (vector2d-map* (*) veca vecb))))
 
+(def-tuple-op vector2d-length-square*
+    ((vec vector2d (x y)))
+  (:return fast-float
+           (vector2d-dot* vec vec)))
+
 (def-tuple-op vector2d-length*
     ((vec vector2d (x y)))
   (:return fast-float
-           (sqrt (vector3d-dot* vec vec))))
+           (sqrt (vector2d-length-square* vec))))
 
 (def-tuple-op vector2d-normal*
     ((vec vector2d (x y)))

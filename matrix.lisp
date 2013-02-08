@@ -222,38 +222,62 @@
 			0.0f0 0.0f0 1.0f0 tz
 			0.0f0 0.0f0 0.0f0 1.0f0)))
 
+(def-tuple-op rotatex-matrix33*
+    ((rotation fast-float))
+  "Return a matrix for rotating around the x axis."
+  (:return matrix33
+           (let* ((sin (sin rotation))
+                  (-sin (- sin))
+                  (cos (cos rotation)))
+             (matrix33-values*
+              1.0 0.0 0.0
+              0.0 cos -sin
+              0.0 sin cos))))
 
 (def-tuple-op rotatex-matrix44*
-	((rotation fast-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the x axis."
   (:return matrix44
-		   (matrix44-values*
-			1.0f0  0.0f0            0.0f0                0.0f0
-			0.0f0 (cos rotation) (- (sin rotation))  0.0f0
-			0.0f0 (sin rotation) (cos rotation)      0.0f0
-			0.0f0  0.0f0           0.0f0                 1.0f0)))
+           (matrix33-matrix44*
+            (rotatex-matrix33* rotation))))
 
-
+(def-tuple-op rotatey-matrix33*
+    ((rotation fast-float))
+  "Return a matrix for rotating around the y axis."
+  (:return matrix33
+           (let* ((sin (sin rotation))
+                  (-sin (- sin))
+                  (cos (cos rotation)))
+             (matrix33-values*
+              cos  0.0 sin
+              0.0  1.0 0.0
+              -sin 0.0 cos))))
 
 (def-tuple-op rotatey-matrix44*
-	((rotation fast-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the y axis."
   (:return matrix44
-		   (matrix44-values*
-			(cos rotation)      0.0f0    (sin rotation)   0.0f0
-			0.0f0     1.0f0         0.0f0     0.0f0
-			(- (sin rotation))  0.0f0    (cos rotation)   0.0f0
-			0.0f0     0.0f0         0.0f0     1.0f0)))
+           (matrix33-matrix44*
+            (rotatey-matrix33* rotation))))
+
+(def-tuple-op rotatez-matrix33*
+    ((rotation fast-float))
+  "Return a matrix for rotating around the z axis."
+  (:return matrix33
+           (let* ((sin (sin rotation))
+                  (-sin (- sin))
+                  (cos (cos rotation)))
+             (matrix33-values*
+              cos -sin 0.0
+              sin cos  0.0
+              0.0 0.0  1.0))))
 
 (def-tuple-op rotatez-matrix44*
-	((rotation fast-float))
+    ((rotation fast-float))
   "Return a matrix for rotating around the z axis."
   (:return matrix44
-		   (matrix44-values*
-			(cos rotation)   0.0f0   (- (sin rotation))  0.0f0
-			(sin rotation)   0.0f0   (cos rotation)   0.0f0
-			0.0f0     0.0f0   1.0f0     0.0f0
-			0.0f0     0.0f0   0.0f0     1.0f0)))
+           (matrix33-matrix44*
+            (rotatez-matrix33* rotation))))
 
 (def-tuple-op transpose-matrix44*
 	((mat44 matrix44

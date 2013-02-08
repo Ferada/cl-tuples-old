@@ -73,11 +73,11 @@ about the tuple type is stored in the property list of the symbol."
 
 (defun tuple-typespec* (type-name)
   "Return typespec of tuple as bounded array"
-  `(vector * ,(tuple-size type-name)))
+  `(vector ,(tuple-element-type type-name) ,(tuple-size type-name)))
 
 (defun tuple-typespec** (type-name)
   "Return typespec of tuple as unbounded array"
-  `(vector * *))
+  `(vector ,(tuple-element-type type-name) *))
 
 (defun simple-tuple-typespec* (type-name)
   "Return typespec of tuple as bounded array"

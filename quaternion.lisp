@@ -55,11 +55,11 @@
            (let* ((trace (matrix33-trace* m))
                   (angle (acos (/ (1- trace) 2))))
              (declare (type (single-float -1.0 3.0) trace)
-                      (type (single-float 0.0 #.single-pi)))
+                      (type (single-float 0.0 #.fast-pi)))
              (cond
                ((= angle 0.0)
                 (angle-axis-key-values))
-               ((< 0.0 angle single-pi)
+               ((< 0.0 angle fast-pi)
                 (vector3d-angle-axis*
                  (vector3d-normal*
                   (vector3d-values*

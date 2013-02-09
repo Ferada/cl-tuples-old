@@ -4,8 +4,8 @@
 (deftype fast-float ()
   `(single-float (#.(- (expt 2f0 64))) (#.(expt 2f0 64))))
 
-(defconstant single-pi
-  #.(coerce pi 'single-float))
+(defconstant fast-pi
+  #.(coerce pi 'fast-float))
 
 ;; define helper functions we will use
 

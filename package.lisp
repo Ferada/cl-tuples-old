@@ -19,6 +19,7 @@
            def-tuple-op
 
            fast-float
+           fast-pi
 
            vector2d-dot*
            vector2d-mag-square*

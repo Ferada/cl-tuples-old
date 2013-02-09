@@ -5,8 +5,8 @@
   #+sbcl `(single-float   (#.(- (expt 2f0 64))) (#.(expt 2f0 64)))
   #-sbcl single-float)
 
-(defconstant single-pi
-  #.(coerce pi 'single-float))
+(defconstant fast-pi
+  #.(coerce pi 'fast-float))
 
 (defun make-adorned-symbol (name &key prefix suffix asterisk package)
   (check-type name (or string symbol))

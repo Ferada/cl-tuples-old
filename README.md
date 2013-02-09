@@ -115,11 +115,15 @@ without ever creating a vector object.
 
 The reader syntax may be used to the same effect:
 
+    > (enable-tuples-syntax)
     > #{1.0 1.0}
     1.0
     1.0
     > (vector2d-length* #{1.0 1.0})
     1.4142135
+
+(Since the reader syntax and `VECTOR2D-VALUES` expand directly into a
+`VALUES` call, nothing prevents you from using that as well.)
 
 Based on this design more operations are implemented.  See the API and
 the tests for details on vectors, vertexes, matrixes and quaternions.
@@ -127,9 +131,9 @@ the tests for details on vectors, vertexes, matrixes and quaternions.
 Defining new operators is done via `DEF-TUPLE-OP`, e.g.:
 
     (def-tuple-op scaling-matrix44*
-        ((sx cl-tuples::fast-float)
-         (sy cl-tuples::fast-float)
-         (sz cl-tuples::fast-float))
+        ((sx fast-float)
+         (sy fast-float)
+         (sz fast-float))
       (:return matrix44
                (matrix44-values*
                 sx    0.0f0 0.0f0 0.0f0
@@ -180,17 +184,45 @@ Quaternion addition and multiplication are supported.
                         (quaternion-values* 1f0 1f0 0f0 1f0)))
     #(4.0 1.0 0.0 1.0)
     > (make-quaternion*
-       (quaternion-dot* (quaternion-values* 3f0 0f0 0f0 0f0)
-                        (quaternion-values* 1f0 1f0 0f0 1f0)))
+       (quaternion-product* (quaternion-values* 3f0 0f0 0f0 0f0)
+                            (quaternion-values* 1f0 1f0 0f0 1f0)))
     #(3.0 0.0 3.0 -3.0)
 
 Unit quaternions may be used to represent rotations.  Functions are
 provided for working with quaternions for this purpose.
 
+    > (values fast-pi (type-of fast-pi))
+    3.1415927
+    SINGLE-FLOAT
     > (make-quaternion*
        (angle-axis-quaternion*
-        (angle-axis-values* 0f0 0f0 1f0 (coerce (/ pi 2f0) 'single-float))))
+        (angle-axis-values* 0f0 0f0 1f0 (/ single-pi 2f0))))
     #(0.0 0.0 0.70710677 0.70710677)
 
-(`ROTATE-VECTOR-WITH-QUATERNION` and `ROTATE-VECTOR-BY-AXIS-ANGLE`
-missing though.)
+Vectors can then be transformed using these quaternions.
+
+    > (quaternion-transform-vector3d*
+       (vector3d-values* 0.0 1.0 0.0)
+       (angle-axis-quaternion*
+        (angle-axis-values* 0.0 0.0 1.0 (/ fast-pi 2))))
+    -0.99999994
+    0.0
+    0.0
+
+At the moment you have still to convert an angle-axis representation to
+either a matrix or a quaternion by yourself to rotate a vector by it.
+
+    > (quaternion-transform-vector3d*
+       (vector3d-values* 0.0 1.0 0.0)
+       (angle-axis-quaternion*
+        (angle-axis-values* 0.0 0.0 1.0 fast-pi)))
+    8.742278e-8
+    -1.0
+    0.0
+    > (transform-vector3d*
+       (angle-axis-matrix33*
+        (angle-axis-values* 0.0 0.0 1.0 fast-pi))
+       (vector3d-values* 0.0 1.0 0.0))
+    8.742278e-8
+    -1.0
+    0.0

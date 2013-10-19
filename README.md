@@ -1,6 +1,6 @@
-% cl-tuples - A set of macros for auto-generating optimised vector math routines
+# cl-tuples - A set of macros for auto-generating optimised vector math routines
 
-## A tuple type declaration auto-generates a number of useful functions, macros, and types. ##
+## A tuple type declaration auto-generates a number of useful functions, macros, and types. 
 
 It is best to give an example.
 
@@ -26,8 +26,8 @@ tuple.
 
 Literals can be written via the modified read syntax
 
-#[ vector2d 0.2 1.2 ] => #( 0.2 1.2 )
-#[ vector2d* 0.2 1.2 ] => (values 0.2 1.2)
+		#[ vector2d 0.2 1.2 ] => #( 0.2 1.2 )
+		#[ vector2d* 0.2 1.2 ] => (values 0.2 1.2)
 
 It is reccomended literals are written with the above syntax as their
 expansion will also incorportate type definitions that will be

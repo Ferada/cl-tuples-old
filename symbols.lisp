@@ -5,19 +5,9 @@
 ;; package used to hold tuple type info
 (defpackage :tuple-types)
 
-;; to do -- investigate cl-syntax-sugar to see if we can come up with
-;; some nicer custom syntax
-
-;; make #{ .. } notation become a short hand for (values ...)
-(defun |#{-reader| (stream char arg)
-  (declare (ignore char arg))
-  `(values ,@(read-delimited-list #\} stream t)))
-
-(set-dispatch-macro-character #\# #\{ #'|#{-reader|)
-(set-macro-character #\} (get-macro-character #\) nil))
 
 (defun make-tuple-symbol (type-name tuple-element-type tuple-initial-element elements)
-  "Makes a symbol used to identify a typle type and interns it in the
+  "Makes a symbol used to identify a tuple type and interns it in the
 package used for holding metadata about the tuple types. Information
 about the tuple type is stored in the property list of the symbol."
   (assert (listp elements))
@@ -91,7 +81,7 @@ about the tuple type is stored in the property list of the symbol."
   "Return typespec of tuple as unbounded array"
   `(vector ,(tuple-element-type type-name) *))
 
-(defun simple-tuple-typespec* ()
+(defun simple-tuple-typespec* (type-name)
   "Return typespec of tuple as bounded array"
   `(simple-vector  ,(tuple-size type-name)))
 
@@ -101,3 +91,27 @@ about the tuple type is stored in the property list of the symbol."
      for i from 0 below (tuple-size type-name)
      collect `(aref ,array-name ,i)))
   
+;; make #{ .. } notation become a short hand for (values ...)
+(defun |#{-reader| (stream char arg)
+  (declare (ignore char arg))
+  `(values ,@(read-delimited-list #\} stream t)))
+
+(set-dispatch-macro-character #\# #\{ #'|#{-reader|)
+(set-macro-character #\} (get-macro-character #\) nil))
+
+(defun |#[-reader| (stream char arg)
+  (declare (ignore char arg))
+  (let ((form (read-delimited-list #\] stream t)))
+	(if (tuple-typep (car form))
+		(if (is-asterisk-symbol (car form))		
+			(let* ((form-str (symbol-name (car form)))
+				   (tuple-str (subseq form-str 0 (- (length form-str) 1))))
+			  `(,(make-adorned-symbol tuple-str :asterisk t :suffix "VALUES") ,@(cdr form)))
+			`(,(make-adorned-symbol (car form) :prefix "MAKE") ,@(cdr form)))		
+		(error "~A does not define a tuple type" (car form)))))
+			
+		
+		
+
+(set-dispatch-macro-character #\# #\[ #'|#[-reader|)
+(set-macro-character #\] (get-macro-character #\) nil))

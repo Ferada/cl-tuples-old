@@ -100,10 +100,10 @@
 
 (deftest test-tuple-arrays ()
   (check 
-	(equalp (multiple-value-list (quad-aref-setter* *quads* 1 #{ 4 5 6 19 })) '( 4 5 6 19))
+	(equalp (multiple-value-list (quad-aref-setter* *quads* 1 #[ quad* 4 5 6 19 ])) '( 4 5 6 19))
 	(equalp (multiple-value-list (quad-aref* *quads* 1)) '(4 5 6 19))
-	(equalp (quad-aref  *quads* 1) #(4 5 6 19))
-	(equalp (quad-aref-setter *quads* 1 #(2 4 3 9))  #(2 4 3 9)))
+	(equalp (quad-aref  *quads* 1) #[ quad 4 5 6 19])
+	(equalp (quad-aref-setter *quads* 1 #(2 4 3 9))  #[ quad 2 4 3 9 ]))
   (equalp (multiple-value-list (quad-aref* *quads* 1)) '(2 4 3 9))
   (= (quad-array-dimensions *quads*) 2)
   (always-pass
@@ -111,19 +111,19 @@
 		;; array extension
 		((new-quads (make-quad-array 4 :initial-element 0 :adjustable t :fill-pointer 2)))
 	  (check
-		(= (quad-vector-push  #( 8 9 22 34 ) new-quads) 3)
-		(equalp (quad-aref new-quads 2) #(8 9 22 34))
-		(= (quad-vector-push-extend #( 27 28 29 34 ) new-quads) 4)
-		(equalp (quad-aref new-quads 3) #(27 28 29 34)))))
+		(= (quad-vector-push  #[ quad 8 9 22 34 ] new-quads) 3)
+		(equalp (quad-aref new-quads 2) #[ quad 8 9 22 34 ])
+		(= (quad-vector-push-extend #[ quad 27 28 29 34 ] new-quads) 4)
+		(equalp (quad-aref new-quads 3) #[ quad 27 28 29 34 ]))))
   (always-pass
 	(let
 		;; array extension
 		((new-quads (make-quad-array 4 :initial-element 0 :adjustable t :fill-pointer 2)))
 	  (check
-		(= (quad-vector-push*  #{ 8 9 22 34 } new-quads) 3)
-		(equalp (quad-aref new-quads 2) #(8 9 22 34))
-		(= (quad-vector-push-extend* #{ 27 28 29 34 } new-quads) 4)
-		(equalp (quad-aref new-quads 3) #(27 28 29 34))))))
+		(= (quad-vector-push*  #[ quad* 8 9 22 34 ] new-quads) 3)
+		(equalp (quad-aref new-quads 2) #[ quad 8 9 22 34] )
+		(= (quad-vector-push-extend* #[ quad* 27 28 29 34 ] new-quads) 4)
+		(equalp (quad-aref new-quads 3) #[ quad 27 28 29 34])))))
 
 
 (cl-tuples::def-with-tuple quad)
@@ -152,11 +152,11 @@
 	(let ((test-quad (new-quad))
 		  (test-quads (make-quad-array 9)))
 	  (check
-		(equalp (multiple-value-list (setf (quad* test-quad)  #{ -1 -2 -3 -4})) '( -1 -2 -3 -4))
+		(equalp (multiple-value-list (setf (quad* test-quad)  #[ quad* -1 -2 -3 -4])) '( -1 -2 -3 -4))
 		(equalp test-quad #(-1 -2 -3 -4))
-		(equalp (multiple-value-list (setf (quad-aref* test-quads 1) #{ -4 -3 -2 -1})) '(-4 -3 -2 -1))
-		(equalp (setf (quad-aref test-quads 2)  #( -10 -11 -12 -13)) #(-10 -11 -12 -13))
-		(equalp (quad-aref test-quads 2)  #( -10 -11 -12 -13))))))
+		(equalp (multiple-value-list (setf (quad-aref* test-quads 1) #[ quad* -4 -3 -2 -1])) '(-4 -3 -2 -1))
+		(equalp (setf (quad-aref test-quads 2)  #( -10 -11 -12 -13)) #[ quad -10 -11 -12 -13])
+		(equalp (quad-aref test-quads 2)  #[ quad -10 -11 -12 -13])))))
 
 (test-tuple-primitives)
 (test-tuple-arrays)
@@ -176,24 +176,24 @@
 
 (deftest test-tuple-type ()
   (check
-	(equalp *test-pair* #( 1 2 ))
+	(equalp *test-pair* #[ pair 1 2 ])
 	(equalp (multiple-value-list (pair* *test-pair*)) '( 1 2 ))
-	(equalp (multiple-value-list  (setf (pair* *test-pair*) #{3 7})) '(3 7))
-	(equalp *test-pair* #(3 7))))
+	(equalp (multiple-value-list  (setf (pair* *test-pair*) #[ pair* 3 7])) '(3 7))
+	(equalp *test-pair* #[ pair 3 7 ])))
 
 (test-tuple-type) 
 
 
-
 ;; test the vectors
 
-(defparameter *v2d* (make-vector2d* #{ 1.0 2.0 }))
+
+(defparameter *v2d* (make-vector2d* #[ vector2d* 1.0 2.0 ]))
 ;; ;; basic vector math
-(defparameter *vector0* (make-vector3d* #{ 0.0 0.0 0.0 } ))
-(defparameter *vector1* (make-vector3d* #{ 1.0 1.0 1.0 } ))
-(defparameter *vectorx* (make-vector3d* #{ 1.0 0.0 0.0 } ))
-(defparameter *vectory* (make-vector3d* #{ 0.0 1.0 0.0 } ))
-(defparameter *vectorz* (make-vector3d* #{ 0.0 0.0 1.0 } ))
+(defparameter *vector0* (make-vector3d* #[ vector3d* 0.0 0.0 0.0 ] ))
+(defparameter *vector1* (make-vector3d* #[ vector3d* 1.0 1.0 1.0 ] ))
+(defparameter *vectorx* (make-vector3d* #[ vector3d* 1.0 0.0 0.0 ] ))
+(defparameter *vectory* (make-vector3d* #[ vector3d* 0.0 1.0 0.0 ] ))
+(defparameter *vectorz* (make-vector3d* #[ vector3d* 0.0 0.0 1.0 ] ))
 (defparameter *test-vector* (new-vector3d))
 
 (defun === (x y &optional (epsilon 0.00001))
@@ -215,7 +215,9 @@
    (vector3d-dot* (vector3d* *vectorx*) (vector3d-normal* (vector3d* *vector1*)))
    0.57735026))
   (===
-   (vector3d-length* (vector3d* *vector1*))))
+   (vector3d-length* (vector3d* *vector1*))
+   (sqrt 3)))
+
 
 (test-vectors)
 
@@ -223,28 +225,7 @@
 
 
 
-;; (with-test *result*
-;;   (= *result* 0.0)
-;;   
 
-;; (with-test *result*
-;;   (= *result* (sqrt 3.0))
-;;   (setf *result* (vector3d-length (vector3d *vector1*))))
-
-;; (with-test *result*
-;;   (equalp *test-vector* #(0.57735026 0.57735026 0.57735026))
-;;   (setf  *test-vector*
-;; 		 (make-vector3d (vector3d-normal (vector3d *vector1*)))))
-
-;; (with-test *result*
-;;   (equalp *test-vector* #(0.0 0.0 1.0))
-;;   (setf (vector3d *test-vector*)
-;; 		(vector3d-cross (vector3d *vectorx*) (vector3d *vectory*))))
-
-;; (with-test *result*
-;;   (= *result* 0.57735026)
-;;   (setf  *result* (vector3d-dot
-;; 				   (vector3d *vectorx*) (vector3d-normal  (vector3d *vector1*)))))
 
 ;; ;; test identity mult
 

@@ -1,4 +1,4 @@
-# cl-tuples #
+% cl-tuples - A set of macros for auto-generating optimised vector math routines
 
 ## A tuple type declaration auto-generates a number of useful functions, macros, and types. ##
 
@@ -24,7 +24,15 @@ i.e. a struct, stored as a vector with elements representing the
 elements of the tuple, initialised to the initial-element value of the
 tuple.
 
-The following routines will be generated to be able to manipulate them.
+Literals can be written via the modified read syntax
+
+#[ vector2d 0.2 1.2 ] => #( 0.2 1.2 )
+#[ vector2d* 0.2 1.2 ] => (values 0.2 1.2)
+
+It is reccomended literals are written with the above syntax as their
+expansion will also incorportate type definitions that will be
+compatible with the following routines that will be generated to be
+able to manipulate them.
 
 	(vector2d-values* x y) => (values x y)          ;; convert from args to values
 	(vector2d* v) => (values (aref v 0) (aref v 1)) ;; covert from array to values
@@ -58,5 +66,12 @@ The following routines will be generated to be able to manipulate them.
 	(setf (vector2d-fill-pointer v) x)              ;; sets fill pointer
 	(vector2d-array-dimensions v)                   ;; returns number of vector2d's array can hold
 
-In addition a small convienince reader syntax is implemented - #{ x y z } is equivalent to (values x y z) as client
-code of this library is likely to manipulate many multiple values.
+In addition a small convienince reader syntax is implemented - #{ x y
+z } is equivalent to (values x y z) as client code of this library is
+likely to manipulate many multiple values.
+
+Note that the code cl-tuples generates is implementation agnostic: it
+is heavily predicated on the assumption that your implementation does
+a good job of optimising multiple value calls. If this is not the
+case, then the convienence of the array - related functions are
+probably the only good reason to use this library.

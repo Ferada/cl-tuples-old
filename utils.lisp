@@ -2,9 +2,12 @@
 
 (in-package :cl-tuples)
 
-;; float that fits within range of x86 hardware flops
-(deftype fast-float () `(single-float   (#.(- (expt 2f0 64))) (#.(expt 2f0 64))))
+;; float that fits within range of x86 hardware register minus tag (rather sbcl oriented)
+(deftype fast-float () 
+  #+sbcl `(single-float   (#.(- (expt 2f0 64))) (#.(expt 2f0 64)))
+  #-sbcl single-float)
 
+;; to do -- alexandria has these anyway -- use that
 (defmacro with-gensyms ((&rest names) &body body)
   "Classic macro for creating named unique symbols."
   `(let ,(loop for n in names collect `(,n (gensym)))
@@ -26,22 +29,23 @@
      for index from 0 below n
      collect (gensym)))
 
+(defun last-char (str)
+  (char str (1- (length str))))
 
-(defun symbol-to-string (x)
+(defun symbol-to-string (sym)
   "If the argument is a symbol or string, return it as a string."
-  (check-type x (or symbol string))
+  (check-type sym (or symbol string))
   (cond
-    ((symbolp x)
-     (symbol-name x))
-    ((stringp x)
-     x)))
+    ((symbolp sym)
+     (symbol-name sym))
+    ((stringp sym)
+     sym)))
 
 
 (defun make-adorned-symbol (name &key prefix suffix asterisk package)
-  (check-type name symbol)
+  (check-type name (or string symbol))
   (check-type prefix (or symbol string null))
   (check-type suffix (or symbol string null))
-#+cl-tuples-debug (break)
   (intern (concatenate 'string
                        (when prefix
                          (string prefix))

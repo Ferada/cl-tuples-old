@@ -24,7 +24,9 @@
   '(:def-tuple-values
 	:def-tuple-type :def-tuple-array-type
 	:def-tuple-struct
-	:def-tuple-getter :def-tuple-aref* :def-tuple-aref
+	:def-tuple-getter
+	:def-tuple-aref 
+	:def-tuple-aref* 
 	:def-nth-tuple
 	:def-with-tuple :def-with-tuple* :def-with-tuple-aref
 	:def-tuple-set :def-tuple-setter :def-tuple-aref-setter*
@@ -46,7 +48,7 @@
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-values)))
   (make-adorned-symbol type-name :suffix "VALUES" :asterisk t ))
 
-;; eg (vector3d-values 1.2 3.0 1.2) => #{ 1.2 3.0 1.2 }
+;; eg (vector3d-values* 1.2 3.0 1.2) => #{ 1.2 3.0 1.2 }
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-values)))
   "Expand to a macro that will create a values form representing our tuple type."
   `(defmacro ,(tuple-symbol type-name expansion) (&rest elements)
@@ -150,13 +152,26 @@
 
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-maker)))
   "Create macro that creates a array of tuple array places."
-  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable (initial-element ,(tuple-initial-element type-name) initial-element-p)  (fill-pointer nil fill-pointer-p))
+  `(defun ,(tuple-symbol type-name :def-tuple-array-maker) (dimensions &key adjustable (initial-element ,(tuple-initial-element type-name))  (fill-pointer nil fill-pointer-p))
 	 (make-array (* ,(tuple-size type-name) dimensions)
 				 :adjustable adjustable
 				 :initial-element initial-element
 				 :fill-pointer (when fill-pointer-p (* ,(tuple-size type-name) fill-pointer))
 				 :element-type ',(tuple-element-type type-name))))
 		 
+
+;; create an array accessor that will pick an individual tuple out of an array of tuples
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref)))
+  (make-adorned-symbol type-name :suffix "AREF"))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref)))
+  "Create a macro that will set an indexed array of tuple places to the values of a tuple struct form"
+  `(defun  ,(tuple-symbol type-name :def-tuple-aref) (tuple-array tuple-index)
+	 (the ,(tuple-typespec* type-name)
+		  (subseq (the ,(tuple-typespec** type-name) tuple-array)
+				  (* ,(tuple-size type-name) tuple-index)
+				  (* ,(tuple-size type-name) (1+ tuple-index))))))
+	 
 
 ;; create an array accessor that accesses an array of tuples and produces a value form eg (vector3d-aref* vecs 2) => #{ 2.3 4.3 2.4 }
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref*)))
@@ -179,6 +194,7 @@
 									  `(incf (the fixnum ,counter-sym))))
 								varlist))))))))
 
+;; decided not to use this one..
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-nth-tuple)))
   (make-adorned-symbol type-name :prefix "NTH"))
 
@@ -191,22 +207,11 @@
 	
 (defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref-setter)))
   "Create a macro that will set an indexed array of tuple places to the values of a tuple struct form"
-  `(defun ,(tuple-symbol type-name :def-tuple-aref-setter) (tuple-name tuple-index tuple)
-	 (setf (subseq tuple-name
+  `(defun ,(tuple-symbol type-name :def-tuple-aref-setter) (array-name tuple-index tuple)
+	 (setf (subseq array-name
 				   (* ,(tuple-size type-name) tuple-index)
 				   (* ,(tuple-size type-name) (1+ tuple-index)))
 		   tuple)))
-
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-aref)))
-  (make-adorned-symbol type-name :suffix "AREF"))
-
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-aref)))
-  "Create a macro that will set an indexed array of tuple places to the values of a tuple struct form"
-  `(defun  ,(tuple-symbol type-name :def-tuple-aref) (tuple-array tuple-index)
-	 (subseq tuple-array 
-			 (* ,(tuple-size type-name) tuple-index)
-			 (* ,(tuple-size type-name) (1+ tuple-index)))))
-		  
 
 ;; create a setter macro (for generalised setf places) that will set a tuple value form into an indexed array
 ;; eg (vector3d-aref-setter vecs 2 #{ 2.3 2.3 4.2 })
@@ -232,6 +237,14 @@
 										 (incf counter)))
 								   varlist))))))))
 
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
+  (make-adorned-symbol type-name :suffix "AREF" ))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
+  "Expand form that creates generalized reference to tuple-arrays"
+  `(defsetf ,(tuple-symbol type-name :def-tuple-aref)
+	   ,(tuple-symbol type-name :def-tuple-aref-setter)))
+
 ;; generalised reference to an array of tuples via value forms
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf*)))
   (make-adorned-symbol type-name :suffix "AREF" :asterisk t))
@@ -240,14 +253,6 @@
   "Expand form that creates generalized reference to tuple-arrays"
   `(defsetf ,(tuple-symbol type-name :def-tuple-aref*)
 	   ,(tuple-symbol type-name :def-tuple-aref-setter*)))
-
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
-  (make-adorned-symbol type-name :suffix "AREF" ))
-
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-tuple-array-setf)))
-  "Expand form that creates generalized reference to tuple-arrays"
-  `(defsetf ,(tuple-symbol type-name :def-tuple-aref)
-	   ,(tuple-symbol type-name :def-tuple-aref-setter)))
 
 ;; create a function that returns the dimensions of an array scaled down to tuple units
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-array-dimensions)))
@@ -292,7 +297,7 @@
 	 (declare (type ,(tuple-typespec* type-name)) (type ,(tuple-typespec** type-name)))
 	 (loop
 		for index from 0 below ,(tuple-size type-name)
-		do (vector-push (aref tuple index) array-name))
+		do (vector-push (the ,(tuple-element-type type-name) (aref tuple index)) array-name))
 	 (the fixnum (/  (the fixnum (fill-pointer array-name)) (the fixnum ,(tuple-size type-name))))))
 
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-tuple-vector-push-extend)))
@@ -348,20 +353,6 @@
 		  (the fixnum (/  (the fixnum (fill-pointer ,array-name)) (the fixnum ,',(tuple-size type-name))))))))
 
 ;; -- bindings --
-;; bind tuple values to symbols during evaluation of the form eg (with-vector3d #{ 1.0 2.0 3.0 } (x y z) (fomat t "~A" (list x y z)))
-(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple*)))
-  (make-adorned-symbol type-name :prefix "WITH" :asterisk t))
-
-(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-with-tuple*)))
-  "Create a wrapper that will bind a tuple value form to symbols during evaluation of the body."
-  `(defmacro ,(tuple-symbol type-name :def-with-tuple*)  (tuple element-syms &body forms)
-	 (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple")
-	 `(multiple-value-bind
-			,element-syms
-		  ,tuple
-		(declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
-		(progn ,@forms))))
-
 ;; bind tuple vector to symbols during evaluation of the form eg (with-vector3d #( 1.0 2.0 3.0 ) (x y z) (fomat t "~A" (list x y z)))
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple)))
   (make-adorned-symbol type-name :prefix "WITH"))
@@ -381,6 +372,21 @@
 								  element-syms)))
 		 (declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
 		 (progn ,@forms))))
+
+;; bind tuple values to symbols during evaluation of the form eg (with-vector3d* #{ 1.0 2.0 3.0 } (x y z) (fomat t "~A" (list x y z)))
+(defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple*)))
+  (make-adorned-symbol type-name :prefix "WITH" :asterisk t))
+
+(defmethod tuple-expansion-fn ((type-name symbol) (expansion (eql :def-with-tuple*)))
+  "Create a wrapper that will bind a tuple value form to symbols during evaluation of the body."
+  `(defmacro ,(tuple-symbol type-name :def-with-tuple*)  (tuple element-syms &body forms)
+	 (assert (= (length element-syms) ,(tuple-size type-name)) nil "Incorrect length element-syms supplied to with-tuple")
+	 `(multiple-value-bind
+			,element-syms
+		  ,tuple
+		(declare (ignorable ,@element-syms) (type ,',(tuple-element-type type-name) ,@element-syms))
+		(progn ,@forms))))
+
 
 ;; bind tuple array elements to symbols during evaluation of the form eg (with-vector3d-aref (vecs 2 (x y z)) (fomat t "~A" (list x y z)))
 (defmethod tuple-symbol ((type-name symbol) (expansion (eql :def-with-tuple-aref)))
@@ -487,7 +493,7 @@
 			  ,',(loop
 					for gensym in (nth n gensyms)
 					for element in (nth n elements) collect `(,element  ,gensym))
-			(declare (ignorable ,@',(nth n gensyms)))
+;;			(declare (ignorable ,@',(nth n gensyms)))
 			(symbol-macrolet ((,',(nth n names) (,',(make-adorned-symbol (nth n types) :suffix "VALUES" :asterisk t)
 													,@',(loop
 														   for gensym in (nth n gensyms)

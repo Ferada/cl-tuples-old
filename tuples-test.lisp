@@ -213,7 +213,9 @@
 	(vector3d-cross* (vector3d* *vectorx*) (vector3d* *vectory*))) '(0.0 0.0 1.0))
   (===
    (vector3d-dot* (vector3d* *vectorx*) (vector3d-normal* (vector3d* *vector1*)))
-   0.57735026)))
+   0.57735026))
+  (===
+   (vector3d-length* (vector3d* *vector1*))))
 
 (test-vectors)
 

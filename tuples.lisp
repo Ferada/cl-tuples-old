@@ -3,7 +3,7 @@
 (in-package :cl-tuples)
 
 (defmacro def-tuple (type-name)
-  "Create an alias for values for this tuple.eg (vector3d-values 1.0 0.0 0.0) => #{ 1.0 0.0 0.0 }"
+  "Create an alias for values for this tuple.eg (vector3d-values* 1.0 0.0 0.0) => #{ 1.0 0.0 0.0 }"
   (tuple-expansion-fn type-name :def-tuple-values))
 
 (defmacro def-tuple-typespec (type-name)

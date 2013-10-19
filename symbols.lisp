@@ -52,7 +52,8 @@ about the tuple type is stored in the property list of the symbol."
 (defun tuple-size (type-name)
   "Return the size of the type"
   (assert (or (symbolp type-name) (stringp type-name)))
-  (get (find-symbol (string-upcase (string type-name)) :tuple-types)  :tuple-length))
+  (the  fixnum
+		(get (find-symbol (string-upcase (string type-name)) :tuple-types)  :tuple-length)))
 
 (defun tuple-initial-element (type-name)
   "Return the inital element type of a tuple array"
@@ -84,13 +85,13 @@ about the tuple type is stored in the property list of the symbol."
 
 (defun tuple-typespec* (type-name)
   "Return typespec of tuple as bounded array"
-  `(vector * ,(tuple-size type-name)))
+  `(vector ,(tuple-element-type type-name) ,(tuple-size type-name)))
 
 (defun tuple-typespec** (type-name)
   "Return typespec of tuple as unbounded array"
-  `(vector * *))
+  `(vector ,(tuple-element-type type-name) *))
 
-(defun simple-tuple-typespec* (type-name)
+(defun simple-tuple-typespec* ()
   "Return typespec of tuple as bounded array"
   `(simple-vector  ,(tuple-size type-name)))
 

@@ -509,8 +509,9 @@
 		  ;; otherwise, bottom out
 		  ``(progn ,@',body))))
 
+
 (defun arg-expander-fn-aux (n names types elements gensyms body)
-  "Handle the expansion of the n-th parameter in a def-tuple-op call list"
+  "Handle the expansion of the n-th parameter in a def-tuple-op call list. Names are the "
   (if (nth n types)
 	  ;; if it's a tuple type, bind to gensyms using the apropiate with-tuple macro
 	  (if (tuple-typep (nth n types))
@@ -550,10 +551,10 @@
 	  ;; no we havent specified a return type, just fall in
 	  (arg-expander-fn-aux 0 names types elements gensyms body)))
 
-(defun arg-expander-fn (names types elements forms)
+(defun def-tuple-expander-fn (params types elements forms)
   "Helper function for def-tuple-op. Expands the arguments into a series of WITH-* forms so that
    symbols are bound to tuple elements in the body of the operator."
-  (assert (= (length names) (length types) (length elements)) ()
+  (assert (= (length params) (length types) (length elements)) ()
 		  "Malformed def-tuple-op argument list.")
   ;; if the first of the forms is a string then it's a docstring
   (let ((body (if (stringp (first forms)) (rest forms) forms)))
@@ -562,7 +563,7 @@
 		   (mapcar #'(lambda (element-list)
 					   (gensym-list (length element-list))) elements)))
 	  ;; epand the body
-	  (body-expander-fn names types elements gensyms body))))
+	  (body-expander-fn params types elements gensyms body))))
 
 										; tester
 ;; (arg-expander-fn '(v q) '(vector3d quaternion) '((x y z) (qx qy qz qw)) '("Return the vector + real" (:return (values single-float single-float single-float single-float) (vertex3d-tuple x y z qw))))

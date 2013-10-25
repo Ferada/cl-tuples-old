@@ -21,8 +21,7 @@
 (export-tuple-operations matrix44)
 
 (defmacro matrix-dot (dimension row col)
-  "Generate the symbols required for a dot
-   product between the row and column of a matrix"
+  "Generate the symbols required for a dot product between the row and column of a matrix, assuming accessor symbol is e<row><col>"
   (labels
 	  ((make-matrix-element-symbol (mat row col)
 		 (intern (string-upcase (format nil "e~A~A~A" mat row col)) :cl-tuples)))
@@ -41,8 +40,8 @@
 
 
 (def-tuple-op transform-vertex2d*
-	((matrix33 mat (e00 e01 e02 e10 e11 e12 e20 e21 e22))
-	 (vertex2d vert (x y w)))
+	((mat matrix33 (e00 e01 e02 e10 e11 e12 e20 e21 e22))
+	 (vert vector2d (x y w)))
   (:return vertex2d
 		   (vertex2d*
 			(+ (* x e00) (* y e01) (* w e02))
@@ -51,8 +50,8 @@
 
 
 (def-tuple-op transform-vector2d*
-	((matrix33 mat (e00 e01 e02 e10 e11 e12 e20 e21 e22))
-	 (vector2d vec (x y)))
+	((mat matrix33 (e00 e01 e02 e10 e11 e12 e20 e21 e22))
+	 (vec vector2d (x y)))
   (:return vector2d
 		   (vector2d*
 			(+ (* x e00) (* y e01))
@@ -104,10 +103,7 @@
 			(+ (* x e20) (* y e21) (* z e12) ))))
 
 (def-tuple-op transpose-matrix33*
-    ((mat33 matrix33
-				 (e00 e01 e02
-					  e10 e11 e12
-					  e20 e21 e22)))
+    ((mat33 matrix33 (e00 e01 e02 e10 e11 e12 e20 e21 e22)))
 	"Return the transpose of the matrix"
 	(:return matrix33
 			 (matrix33*

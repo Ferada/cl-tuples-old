@@ -210,4 +210,4 @@
                  (format nil "DEF-TUPLE-OP ~A ~A" name param-typenames))))
     `(defmacro ,name ,param-names
        ,doc
-       ,(arg-expander-fn param-names param-typenames param-elements forms))))
+       ,(def-tuple-expander-fn param-names param-typenames param-elements forms))))

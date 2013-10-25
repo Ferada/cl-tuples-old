@@ -115,7 +115,7 @@
 	  (check
 		(= (quad-vector-push  #( 8 9 22 34 ) new-quads) 3)
 		(equalp (quad-aref new-quads 2) #(8 9 22 34))
-		(= (quad-vector-push-extend #( 27 28 29 34 ) new-quads) 4)
+		(= (quad-vector-push-extend (coerce #( 27 28 29 34 ) '(vector fixnum 4)) new-quads) 4)
 		(equalp (quad-aref new-quads 3) #(27 28 29 34)))))
   (always-pass
 	(let

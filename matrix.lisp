@@ -111,6 +111,17 @@
 			  e01 e11 e21
 			  e02 e12 e22)))
 
+(def-tuple-op print-matrix33*
+	((mat matrix44 (e00 e01 e02 e03
+						e10 e11 e12 e13
+						e20 e21 e22 e23
+						e30 e31 e32 e33)))
+  "Print a 3x3 matrix in a useful format."
+  (:return (values)
+		   (format t "~A ~A ~A ~A ~%" e00 e01 e02)
+		   (format t "~A ~A ~A ~A ~%" e10 e11 e12)
+		   (format t "~A ~A ~A ~A ~%" e20 e21 e22)))
+
 (def-tuple-op matrix44-product*
 	((m0 matrix44 (e000 e001 e002 e003 e010 e011 e012 e013  e020 e021 e022 e023  e030 e031 e032 e033))
 	 (m1 matrix44 (e100 e101 e102 e103 e110 e111 e112 e113  e120 e121 e122 e123  e130 e131 e132 e133)))

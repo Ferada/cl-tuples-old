@@ -219,7 +219,7 @@
          (param-typenames (mapcar #'cadr  param-list))
          (param-elements (mapcar (lambda (param)
                                    (let* ((type-name (cadr param))
-                                          (size (tuple-size type-name))
+                                          (size (and (tuple-typep type-name) (tuple-size type-name)))
                                           (elements (caddr param)))
                                      (or
                                       (if (eq elements :default)
